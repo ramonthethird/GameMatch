@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'pages/Home.dart'; // Import the home page
 
 void main() {
-  runApp(GameMatchApp());
+  runApp(const GameMatchApp());
 }
 
 class GameMatchApp extends StatelessWidget {
@@ -16,7 +16,7 @@ class GameMatchApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: HomePage(), // This is the main screen of your app
+      home: const HomePage(), // This is the main screen of your app
     );
   }
 }

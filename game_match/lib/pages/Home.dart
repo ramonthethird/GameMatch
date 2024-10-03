@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class HomePage extends StatelessWidget {
-  const HomePage({Key? key}) : super(key: key);
+  const HomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -9,8 +9,8 @@ class HomePage extends StatelessWidget {
       appBar: AppBar(
         title: const Text('GameMatch Home'), // Title in the AppBar
       ),
-      body: Center(
-        child: const Text(
+      body: const Center(
+        child: Text(
           'Welcome to GameMatch!', // Welcome message
           style: TextStyle(fontSize: 24),
         ),
