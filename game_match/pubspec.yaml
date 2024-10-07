@@ -42,7 +42,7 @@ dependencies:
   http: ^0.13.5
 
   # secure storage to store the access token for API
-  flutter_secure_storage: ^6.0.0
+  flutter_secure_storage: ^8.0.0
 
 dev_dependencies:
   flutter_test:
