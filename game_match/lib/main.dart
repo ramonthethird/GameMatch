@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'api_service.dart';
 import 'game_model.dart';
 import 'pages/Home.dart'; // Import the home page
+import 'pages/Profile.dart'; // Import the profile page
+import 'pages/Side_bar.dart'; // Import the side bar page
 
 void main() {
   runApp(const GameMatchApp());
@@ -17,7 +19,12 @@ class GameMatchApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: HomePage(), // This is the main screen of your app
+      home: const SideBar(), // This is the side bar page
+      routes: {
+        '/side_bar': (context) => const SideBar(), // This is the side bar page
+        '/Profile': (context) => const Profile(), // This is the profile page
+      },
+      //home: const HomePage(), // This is the main screen of your app
     );
   }
 }
