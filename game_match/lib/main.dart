@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-
+import 'firebase_options.dart'; // Auto-generated during Firebase setup
 import 'pages/Home.dart'; // Import the home page
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(GameMatchApp());
 }
 

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "861037100165",
+    "project_id": "gamematch-e492c",
+    "storage_bucket": "gamematch-e492c.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:861037100165:android:365827f585021fcc0c3dec",
+        "android_client_info": {
+          "package_name": "com.example.game_match"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBJB6PuXfoq7QYPhLkiLBZOuTrhci2bRgI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
