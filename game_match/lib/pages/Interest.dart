@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
-
+import 'package:game_match/firebase_options.dart';
 
 class InterestsPage extends StatefulWidget {
+  const InterestsPage({super.key});
   @override
   _InterestsPageState createState() => _InterestsPageState();
 }
@@ -89,7 +90,8 @@ class _InterestsPageState extends State<InterestsPage> {
         leading: IconButton(
           icon: Icon(Icons.menu),
           onPressed: () {
-            Scaffold.of(context).openDrawer();
+            //Scaffold.of(context).openDrawer();
+            Navigator.pop(context);
           },
         ),
       ),

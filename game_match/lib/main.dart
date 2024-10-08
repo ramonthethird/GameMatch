@@ -1,13 +1,19 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'api_service.dart';
 import 'game_model.dart';
-import 'firebase_options.dart'; // Auto-generated during Firebase setup
+import 'firebase_options.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'pages/Home.dart'; // Import the home page
 import 'pages/Profile.dart'; // Import the profile page
 import 'pages/Side_bar.dart'; // Import the side bar page
+import 'pages/Interest.dart'; // Import the interest page
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(const GameMatchApp());
 }
 
@@ -25,6 +31,7 @@ class GameMatchApp extends StatelessWidget {
       routes: {
         '/side_bar': (context) => const SideBar(), // This is the side bar page
         '/Profile': (context) => const Profile(), // This is the profile page
+        '/Interest':(context) => const InterestsPage(), // This is the interest page
       },
       //home: const HomePage(), // This is the main screen of your app
     );
