@@ -33,6 +33,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
     if (isValid) {
       _formKey.currentState!.save();
+      // Normally you'd do something with the data, like sending it to a backend
       print('Email: $email, Username: $username, Password: $password');
     }
   }
@@ -40,7 +41,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Create an Account')),
+      appBar: AppBar(
+        title: Text('Create an Account'),
+        // Adding a back button in the AppBar's leading widget
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () => Navigator.of(context).pop(), // This will pop the current route off the navigator.
+        ),
+      ),
       body: Center(
         child: Card(
           margin: EdgeInsets.all(20),
@@ -51,12 +59,18 @@ class _SignUpScreenState extends State<SignUpScreen> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
+                  Image.asset(
+                    'assets/GameMatch Logo Black.png',
+                    height: 100, // Set your desired height
+                  ),
+                  SizedBox(height: 20),
                   TextFormField(
                     decoration: InputDecoration(
-                        labelText: 'Email',
-                        border: OutlineInputBorder(),
-                        filled: true,
-                        fillColor: Colors.white),
+                      labelText: 'Email',
+                      border: OutlineInputBorder(),
+                      filled: true,
+                      fillColor: Colors.white,
+                    ),
                     keyboardType: TextInputType.emailAddress,
                     validator: (value) {
                       if (value!.isEmpty || !value.contains('@')) {
@@ -71,13 +85,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   SizedBox(height: 12),
                   TextFormField(
                     decoration: InputDecoration(
-                        labelText: 'Username',
-                        border: OutlineInputBorder(),
-                        filled: true,
-                        fillColor: Colors.white),
+                      labelText: 'Username',
+                      border: OutlineInputBorder(),
+                      filled: true,
+                      fillColor: Colors.white,
+                    ),
                     validator: (value) {
                       if (value!.isEmpty || value.length < 4) {
-                        return 'Username must be at least 4 characters long.';
+                        return 'Please enter at least 4 characters.';
                       }
                       return null;
                     },
@@ -85,17 +100,17 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       username = value!;
                     },
                   ),
-                  SizedBox(height: 12),
                   TextFormField(
                     decoration: InputDecoration(
-                        labelText: 'Password',
-                        border: OutlineInputBorder(),
-                        filled: true,
-                        fillColor: Colors.white),
+                      labelText: 'Password',
+                      border: OutlineInputBorder(),
+                      filled: true,
+                      fillColor: Colors.white,
+                    ),
                     obscureText: true,
                     validator: (value) {
-                      if (value!.isEmpty || value.length < 7) {
-                        return 'Password must be at least 7 characters long.';
+                      if (value!.isEmpty || value.length < 8) {
+                        return 'Password must be at least 8 characters long.';
                       }
                       return null;
                     },
@@ -103,32 +118,33 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       password = value!;
                     },
                   ),
-                  SizedBox(height: 12),
                   TextFormField(
                     decoration: InputDecoration(
-                        labelText: 'Re-enter Password',
-                        border: OutlineInputBorder(),
-                        filled: true,
-                        fillColor: Colors.white),
+                      labelText: 'Confirm Password',
+                      border: OutlineInputBorder(),
+                      filled: true,
+                      fillColor: Colors.white,
+                    ),
                     obscureText: true,
                     validator: (value) {
-                      if (value!.isEmpty || value != password) {
+                      if (value != password) {
                         return 'Passwords do not match.';
                       }
                       return null;
                     },
+                    onSaved: (value) {
+                      confirmPassword = value!;
+                    },
                   ),
                   SizedBox(height: 20),
                   Container(
-                    width: double.infinity, // Makes the button wide
-                    height: 50, // Sets a fixed height for the button
+                    width: double.infinity,
+                    height: 50,
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor:
-                            Colors.lightBlueAccent, // Sets the background color
+                        backgroundColor: Colors.lightBlueAccent,
                         shape: RoundedRectangleBorder(
-                          borderRadius:
-                              BorderRadius.zero, // Removes the rounded borders
+                          borderRadius: BorderRadius.zero,
                         ),
                       ),
                       onPressed: _trySubmit,

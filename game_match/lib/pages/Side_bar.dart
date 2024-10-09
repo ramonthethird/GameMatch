@@ -91,7 +91,7 @@ class SideBar extends StatelessWidget {
               icon: const Icon(Icons.room_preferences),
               label: const Text("Preference"),
               onPressed: () {
-                Navigator.pushNamed(context, '/Interest');
+                Navigator.pushNamed(context, '/Preference_&_Interest');
               },
               style: ElevatedButton.styleFrom(
                 padding: const EdgeInsets.all(10),

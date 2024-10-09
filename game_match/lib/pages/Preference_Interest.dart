@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:game_match/pages/Side_bar.dart';
 
 class Preference_Interest_Page extends StatelessWidget {
   @override
@@ -21,6 +22,8 @@ class Preference_Interest_Page extends StatelessWidget {
             icon: Icon(Icons.menu),
             onPressed: () {
               //Scaffold.of(context).openDrawer();
+              Navigator.pop(context,"/SideBar");
+
             },
           ),
         ),
@@ -105,6 +108,7 @@ class Preference_Interest_Page extends StatelessWidget {
                     subtitle: 'Edit and Save other filter options',
                     icon: Icons.filter_list,
                     onPressed: () {
+                      Navigator.pushNamed(context, '/Interest');
                       // Navigate or perform functionality
                     },
                   ),
