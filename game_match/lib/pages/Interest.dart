@@ -17,10 +17,33 @@ class _InterestsPageState extends State<InterestsPage> {
   String? dropdownValue4;
 
   // Customized list of items for each dropdown
-  final List<String> gameModes = ['Single Player', 'Multiplayer', 'Co-op', 'Online Pvp'];
-  final List<String> playerPerspective = ['First Person', 'Third Person', 'Top-Down', 'Side-Scrolling'];
-  final List<String> platforms = ['PC', 'PlayStation', 'Xbox', 'Nintendo Switch'];
-  final List<String> price = ['Free', '\$0 - \$20', '\$20 - \$50', '\$50 - \$80'];
+  final List<String> gameModes = [
+    'Single Player', 
+    'Multiplayer', 
+    'Co-op', 
+    'Online Pvp'
+  ];
+
+  final List<String> playerPerspective = [
+    'First Person', 
+    'Third Person', 
+    'Top-Down', 
+    'Side-Scrolling'
+  ];
+
+  final List<String> platforms = [
+    'PC', 
+    'PlayStation', 
+    'Xbox', 
+    'Nintendo Switch'
+  ];
+
+  final List<String> price = [
+    'Free', 
+    '\$0 - \$20', 
+    '\$20 - \$50', 
+    '\$50 - \$80'
+  ];
 
   // Firestore instance
   final firestore = FirebaseFirestore.instance;
@@ -80,13 +103,14 @@ class _InterestsPageState extends State<InterestsPage> {
     }
   }
 
+  // SideBar button
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text('Interests'),
         centerTitle: true,
-        backgroundColor: Colors.blue,
+        backgroundColor: const Color(0xFF74ACD5),
         leading: IconButton(
           icon: Icon(Icons.menu),
           onPressed: () {
@@ -101,7 +125,7 @@ class _InterestsPageState extends State<InterestsPage> {
           children: <Widget>[
             DrawerHeader(
               decoration: BoxDecoration(
-                color: Colors.blue,
+                color: const Color(0xFF74ACD5),
               ),
               child: Text(
                 'Menu',
@@ -232,16 +256,21 @@ class _InterestsPageState extends State<InterestsPage> {
             // Save Button
             ElevatedButton(
               onPressed: _saveInterests,
-              child: Text('Save'),
+              child: Text(
+                'Save',
+                style: TextStyle(
+                  color: Colors.white, // Set the text color here
+                  fontSize: 18,
+                ),
+              ),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.blue,
                 padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
-                textStyle: TextStyle(fontSize: 18),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),
               ),
-            ),
+            )
           ],
         ),
       ),
