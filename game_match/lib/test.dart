@@ -3,18 +3,20 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 void main() {
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
-          title: Text('OAuth Test'),
+          title: const Text('OAuth Test'),
         ),
-        body: Center(
+        body: const Center(
           child: OAuthTestButton(),
         ),
       ),
@@ -23,6 +25,8 @@ class MyApp extends StatelessWidget {
 }
 
 class OAuthTestButton extends StatefulWidget {
+  const OAuthTestButton({super.key});
+
   @override
   _OAuthTestButtonState createState() => _OAuthTestButtonState();
 }
@@ -32,8 +36,8 @@ class _OAuthTestButtonState extends State<OAuthTestButton> {
   String _errorMessage = '';
 
   Future<void> getAccessToken() async {
-    final String clientId = 'v5v1uyyo05m4ttc8yvd26yrwslfimc';
-    final String clientSecret = 'hu3w4pwpc344uwdp2k77xfjozbaxc5';
+    const String clientId = 'v5v1uyyo05m4ttc8yvd26yrwslfimc';
+    const String clientSecret = 'hu3w4pwpc344uwdp2k77xfjozbaxc5';
     final Uri url = Uri.parse('https://id.twitch.tv/oauth2/token');
     final Map<String, String> body = {
       'client_id': clientId,
@@ -92,16 +96,16 @@ class _OAuthTestButtonState extends State<OAuthTestButton> {
       children: [
         ElevatedButton(
           onPressed: getAccessToken,
-          child: Text('Get Access Token'),
+          child: const Text('Get Access Token'),
         ),
-        SizedBox(height: 20),
+        const SizedBox(height: 20),
         Text(_accessToken.isEmpty ? 'No Token' : 'Access Token: $_accessToken'),
         if (_errorMessage.isNotEmpty)
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Text(
               _errorMessage,
-              style: TextStyle(color: Colors.red),
+              style: const TextStyle(color: Colors.red),
             ),
           ),
       ],

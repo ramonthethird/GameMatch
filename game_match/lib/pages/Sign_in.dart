@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -13,12 +15,14 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: SignUpScreen(),
+      home: const SignUpScreen(),
     );
   }
 }
 
 class SignUpScreen extends StatefulWidget {
+  const SignUpScreen({super.key});
+
   @override
   _SignUpScreenState createState() => _SignUpScreenState();
 }
@@ -40,19 +44,19 @@ class _SignUpScreenState extends State<SignUpScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Create an Account')),
+      appBar: AppBar(title: const Text('Create an Account')),
       body: Center(
         child: Card(
-          margin: EdgeInsets.all(20),
+          margin: const EdgeInsets.all(20),
           child: SingleChildScrollView(
-            padding: EdgeInsets.all(16),
+            padding: const EdgeInsets.all(16),
             child: Form(
               key: _formKey,
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
                   TextFormField(
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                         labelText: 'Email',
                         border: OutlineInputBorder(),
                         filled: true,
@@ -68,9 +72,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       email = value!;
                     },
                   ),
-                  SizedBox(height: 12),
+                  const SizedBox(height: 12),
                   TextFormField(
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                         labelText: 'Username',
                         border: OutlineInputBorder(),
                         filled: true,
@@ -85,9 +89,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       username = value!;
                     },
                   ),
-                  SizedBox(height: 12),
+                  const SizedBox(height: 12),
                   TextFormField(
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                         labelText: 'Password',
                         border: OutlineInputBorder(),
                         filled: true,
@@ -103,9 +107,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       password = value!;
                     },
                   ),
-                  SizedBox(height: 12),
+                  const SizedBox(height: 12),
                   TextFormField(
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                         labelText: 'Re-enter Password',
                         border: OutlineInputBorder(),
                         filled: true,
@@ -118,21 +122,21 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       return null;
                     },
                   ),
-                  SizedBox(height: 20),
-                  Container(
+                  const SizedBox(height: 20),
+                  SizedBox(
                     width: double.infinity, // Makes the button wide
                     height: 50, // Sets a fixed height for the button
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         backgroundColor:
                             Colors.lightBlueAccent, // Sets the background color
-                        shape: RoundedRectangleBorder(
+                        shape: const RoundedRectangleBorder(
                           borderRadius:
                               BorderRadius.zero, // Removes the rounded borders
                         ),
                       ),
                       onPressed: _trySubmit,
-                      child: Text('Sign Up'),
+                      child: const Text('Sign Up'),
                     ),
                   ),
                 ],
