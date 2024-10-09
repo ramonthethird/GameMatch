@@ -90,7 +90,9 @@ class SideBar extends StatelessWidget {
             ElevatedButton.icon(
               icon: const Icon(Icons.room_preferences),
               label: const Text("Preference"),
-              onPressed: () {},
+              onPressed: () {
+                Navigator.pushNamed(context, '/Interest');
+              },
               style: ElevatedButton.styleFrom(
                 padding: const EdgeInsets.all(10),
                 backgroundColor: Colors.white,

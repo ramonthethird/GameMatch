@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
-
+import 'package:game_match/firebase_options.dart';
 
 class InterestsPage extends StatefulWidget {
+  const InterestsPage({super.key});
   const InterestsPage({super.key});
 
   @override
@@ -18,10 +19,33 @@ class _InterestsPageState extends State<InterestsPage> {
   String? dropdownValue4;
 
   // Customized list of items for each dropdown
-  final List<String> gameModes = ['Single Player', 'Multiplayer', 'Co-op', 'Online Pvp'];
-  final List<String> playerPerspective = ['First Person', 'Third Person', 'Top-Down', 'Side-Scrolling'];
-  final List<String> platforms = ['PC', 'PlayStation', 'Xbox', 'Nintendo Switch'];
-  final List<String> price = ['Free', '\$0 - \$20', '\$20 - \$50', '\$50 - \$80'];
+  final List<String> gameModes = [
+    'Single Player', 
+    'Multiplayer', 
+    'Co-op', 
+    'Online Pvp'
+  ];
+
+  final List<String> playerPerspective = [
+    'First Person', 
+    'Third Person', 
+    'Top-Down', 
+    'Side-Scrolling'
+  ];
+
+  final List<String> platforms = [
+    'PC', 
+    'PlayStation', 
+    'Xbox', 
+    'Nintendo Switch'
+  ];
+
+  final List<String> price = [
+    'Free', 
+    '\$0 - \$20', 
+    '\$20 - \$50', 
+    '\$50 - \$80'
+  ];
 
   // Firestore instance
   final firestore = FirebaseFirestore.instance;
@@ -81,17 +105,19 @@ class _InterestsPageState extends State<InterestsPage> {
     }
   }
 
+  // SideBar button
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Interests'),
         centerTitle: true,
-        backgroundColor: Colors.blue,
+        backgroundColor: const Color(0xFF74ACD5),
         leading: IconButton(
           icon: const Icon(Icons.menu),
           onPressed: () {
-            Scaffold.of(context).openDrawer();
+            //Scaffold.of(context).openDrawer();
+            Navigator.pop(context);
           },
         ),
       ),
@@ -240,8 +266,7 @@ class _InterestsPageState extends State<InterestsPage> {
                   borderRadius: BorderRadius.circular(10),
                 ),
               ),
-              child: const Text('Save'),
-            ),
+            )
           ],
         ),
       ),
