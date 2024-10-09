@@ -117,7 +117,7 @@ class _InterestsPageState extends State<InterestsPage> {
           icon: const Icon(Icons.menu),
           onPressed: () {
             //Scaffold.of(context).openDrawer();
-            Navigator.pop(context);
+            Navigator.pushNamed(context,"/side_bar");
           },
         ),
       ),
