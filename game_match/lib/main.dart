@@ -30,6 +30,9 @@ class GameMatchApp extends StatelessWidget {
       routes: {
         '/side_bar': (context) => const SideBar(), // This is the side bar page
         '/Profile': (context) => const Profile(), // This is the profile page
+        '/Interest': (context) =>
+            const InterestsPage(), // This is the interest page
+        '/Edit_profile': (context) => const EditProfile(), // This is the edit profile page
         '/Preference_&_Interest': (context) => Preference_Interest_Page(), // This is the interest page
         '/Interest': (context) => const InterestsPage(),
       },

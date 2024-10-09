@@ -16,8 +16,8 @@ class SideBar extends StatelessWidget {
               padding: const EdgeInsets.all(10),
               color: const Color(0xFF74ACD5),
               width: 200,
-              child: Row(
-                children: [
+          child: Row(
+            children: [
                   ElevatedButton(
                     onPressed: () {
                       // navigate to the profile page

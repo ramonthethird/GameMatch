@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -13,12 +15,14 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: SignUpScreen(),
+      home: const SignUpScreen(),
     );
   }
 }
 
 class SignUpScreen extends StatefulWidget {
+  const SignUpScreen({super.key});
+
   @override
   _SignUpScreenState createState() => _SignUpScreenState();
 }
@@ -41,6 +45,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(title: const Text('Create an Account')),
       appBar: AppBar(
         title: Text('Create an Account'),
         // Adding a back button in the AppBar's leading widget
@@ -49,11 +54,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
           onPressed: () => Navigator.of(context).pop(), // This will pop the current route off the navigator.
         ),
       ),
+
       body: Center(
         child: Card(
-          margin: EdgeInsets.all(20),
+          margin: const EdgeInsets.all(20),
           child: SingleChildScrollView(
-            padding: EdgeInsets.all(16),
+            padding: const EdgeInsets.all(16),
             child: Form(
               key: _formKey,
               child: Column(
@@ -65,6 +71,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   ),
                   SizedBox(height: 20),
                   TextFormField(
+                    decoration: const InputDecoration(
+                        labelText: 'Email',
+                        border: OutlineInputBorder(),
+                        filled: true,
+                        fillColor: Colors.white),
                     decoration: InputDecoration(
                       labelText: 'Email',
                       border: OutlineInputBorder(),
@@ -82,8 +93,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       email = value!;
                     },
                   ),
-                  SizedBox(height: 12),
+                  const SizedBox(height: 12),
                   TextFormField(
+                    decoration: const InputDecoration(
+                        labelText: 'Username',
+                        border: OutlineInputBorder(),
+                        filled: true,
+                        fillColor: Colors.white),
                     decoration: InputDecoration(
                       labelText: 'Username',
                       border: OutlineInputBorder(),
@@ -100,6 +116,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       username = value!;
                     },
                   ),
+                  const SizedBox(height: 12),
+                  TextFormField(
+                    decoration: const InputDecoration(
+                        labelText: 'Password',
+                        border: OutlineInputBorder(),
+                        filled: true,
+                        fillColor: Colors.white),
                   TextFormField(
                     decoration: InputDecoration(
                       labelText: 'Password',
@@ -118,6 +141,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       password = value!;
                     },
                   ),
+                  const SizedBox(height: 12),
+                  TextFormField(
+                    decoration: const InputDecoration(
+                        labelText: 'Re-enter Password',
+                        border: OutlineInputBorder(),
+                        filled: true,
+                        fillColor: Colors.white),
                   TextFormField(
                     decoration: InputDecoration(
                       labelText: 'Confirm Password',
@@ -136,6 +166,17 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       confirmPassword = value!;
                     },
                   ),
+                  const SizedBox(height: 20),
+                  SizedBox(
+                    width: double.infinity, // Makes the button wide
+                    height: 50, // Sets a fixed height for the button
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor:
+                            Colors.lightBlueAccent, // Sets the background color
+                        shape: const RoundedRectangleBorder(
+                          borderRadius:
+                              BorderRadius.zero, // Removes the rounded borders
                   SizedBox(height: 20),
                   Container(
                     width: double.infinity,
@@ -148,7 +189,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         ),
                       ),
                       onPressed: _trySubmit,
-                      child: Text('Sign Up'),
+                      child: const Text('Sign Up'),
                     ),
                   ),
                 ],

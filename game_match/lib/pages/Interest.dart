@@ -5,6 +5,8 @@ import 'package:game_match/firebase_options.dart';
 
 class InterestsPage extends StatefulWidget {
   const InterestsPage({super.key});
+  const InterestsPage({super.key});
+
   @override
   _InterestsPageState createState() => _InterestsPageState();
 }
@@ -69,7 +71,7 @@ class _InterestsPageState extends State<InterestsPage> {
     }, SetOptions(merge: true)); // Merge the interests with existing data
 
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Interests saved successfully!')),
+      const SnackBar(content: Text('Interests saved successfully!')),
     );
 
     // Print for debugging
@@ -108,11 +110,11 @@ class _InterestsPageState extends State<InterestsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Interests'),
+        title: const Text('Interests'),
         centerTitle: true,
         backgroundColor: const Color(0xFF74ACD5),
         leading: IconButton(
-          icon: Icon(Icons.menu),
+          icon: const Icon(Icons.menu),
           onPressed: () {
             //Scaffold.of(context).openDrawer();
             Navigator.pushNamed(context,"/side_bar");
@@ -123,9 +125,9 @@ class _InterestsPageState extends State<InterestsPage> {
         child: ListView(
           padding: EdgeInsets.zero,
           children: <Widget>[
-            DrawerHeader(
+            const DrawerHeader(
               decoration: BoxDecoration(
-                color: const Color(0xFF74ACD5),
+                color: Colors.blue,
               ),
               child: Text(
                 'Menu',
@@ -136,13 +138,13 @@ class _InterestsPageState extends State<InterestsPage> {
               ),
             ),
             ListTile(
-              leading: Icon(Icons.home),
-              title: Text('Home'),
+              leading: const Icon(Icons.home),
+              title: const Text('Home'),
               onTap: () {},
             ),
             ListTile(
-              leading: Icon(Icons.settings),
-              title: Text('Settings'),
+              leading: const Icon(Icons.settings),
+              title: const Text('Settings'),
               onTap: () {},
             ),
           ],
@@ -153,7 +155,7 @@ class _InterestsPageState extends State<InterestsPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Align(
+            const Align(
               alignment: Alignment.topCenter,
               child: Text(
                 'Manage Interests',
@@ -163,16 +165,16 @@ class _InterestsPageState extends State<InterestsPage> {
                 ),
               ),
             ),
-            SizedBox(height: 40),
+            const SizedBox(height: 40),
 
             // Dropdown 1: Game Mode
-            Text(
+            const Text(
               'Game Mode',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
             ),
             DropdownButton<String>(
               value: dropdownValue1,
-              hint: Text('Select Game Mode'),
+              hint: const Text('Select Game Mode'),
               onChanged: (String? newValue) {
                 setState(() {
                   dropdownValue1 = newValue;
@@ -185,16 +187,16 @@ class _InterestsPageState extends State<InterestsPage> {
                 );
               }).toList(),
             ),
-            SizedBox(height: 30),
+            const SizedBox(height: 30),
 
             // Dropdown 2: Player Perspective
-            Text(
+            const Text(
               'Player Perspective',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
             ),
             DropdownButton<String>(
               value: dropdownValue2,
-              hint: Text('Select Player Perspective'),
+              hint: const Text('Select Player Perspective'),
               onChanged: (String? newValue) {
                 setState(() {
                   dropdownValue2 = newValue;
@@ -207,16 +209,16 @@ class _InterestsPageState extends State<InterestsPage> {
                 );
               }).toList(),
             ),
-            SizedBox(height: 30),
+            const SizedBox(height: 30),
 
             // Dropdown 3: Platform
-            Text(
+            const Text(
               'Platform',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
             ),
             DropdownButton<String>(
               value: dropdownValue3,
-              hint: Text('Select Platform'),
+              hint: const Text('Select Platform'),
               onChanged: (String? newValue) {
                 setState(() {
                   dropdownValue3 = newValue;
@@ -229,16 +231,16 @@ class _InterestsPageState extends State<InterestsPage> {
                 );
               }).toList(),
             ),
-            SizedBox(height: 30),
+            const SizedBox(height: 30),
 
             // Dropdown 4: Price
-            Text(
+            const Text(
               'Price',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
             ),
             DropdownButton<String>(
               value: dropdownValue4,
-              hint: Text('Select Price'),
+              hint: const Text('Select Price'),
               onChanged: (String? newValue) {
                 setState(() {
                   dropdownValue4 = newValue;
@@ -251,21 +253,15 @@ class _InterestsPageState extends State<InterestsPage> {
                 );
               }).toList(),
             ),
-            SizedBox(height: 30),
+            const SizedBox(height: 30),
 
             // Save Button
             ElevatedButton(
               onPressed: _saveInterests,
-              child: Text(
-                'Save',
-                style: TextStyle(
-                  color: Colors.white, // Set the text color here
-                  fontSize: 18,
-                ),
-              ),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.blue,
-                padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                textStyle: const TextStyle(fontSize: 18),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),
