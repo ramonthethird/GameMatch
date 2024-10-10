@@ -15,19 +15,19 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: const SignUpScreen(),
+      home: const SignUp(),
     );
   }
 }
 
-class SignUpScreen extends StatefulWidget {
-  const SignUpScreen({super.key});
+class SignUp extends StatefulWidget {
+  const SignUp({super.key});
 
   @override
   _SignUpScreenState createState() => _SignUpScreenState();
 }
 
-class _SignUpScreenState extends State<SignUpScreen> {
+class _SignUpScreenState extends State<SignUp> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   late String email, username, password, confirmPassword;
 
@@ -45,12 +45,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Create an Account')),
+      //appBar: AppBar(title: const Text('Create an Account')),
       appBar: AppBar(
-        title: Text('Create an Account'),
+        title: const Text('Create an Account'),
         // Adding a back button in the AppBar's leading widget
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.of(context).pop(), // This will pop the current route off the navigator.
         ),
       ),
@@ -69,19 +69,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     'assets/GameMatch Logo Black.png',
                     height: 100, // Set your desired height
                   ),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                   TextFormField(
                     decoration: const InputDecoration(
                         labelText: 'Email',
                         border: OutlineInputBorder(),
                         filled: true,
                         fillColor: Colors.white),
-                    decoration: InputDecoration(
-                      labelText: 'Email',
-                      border: OutlineInputBorder(),
-                      filled: true,
-                      fillColor: Colors.white,
-                    ),
                     keyboardType: TextInputType.emailAddress,
                     validator: (value) {
                       if (value!.isEmpty || !value.contains('@')) {
@@ -100,12 +94,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         border: OutlineInputBorder(),
                         filled: true,
                         fillColor: Colors.white),
-                    decoration: InputDecoration(
-                      labelText: 'Username',
-                      border: OutlineInputBorder(),
-                      filled: true,
-                      fillColor: Colors.white,
-                    ),
                     validator: (value) {
                       if (value!.isEmpty || value.length < 4) {
                         return 'Please enter at least 4 characters.';
@@ -123,13 +111,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         border: OutlineInputBorder(),
                         filled: true,
                         fillColor: Colors.white),
-                  TextFormField(
-                    decoration: InputDecoration(
-                      labelText: 'Password',
-                      border: OutlineInputBorder(),
-                      filled: true,
-                      fillColor: Colors.white,
-                    ),
                     obscureText: true,
                     validator: (value) {
                       if (value!.isEmpty || value.length < 8) {
@@ -144,17 +125,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   const SizedBox(height: 12),
                   TextFormField(
                     decoration: const InputDecoration(
-                        labelText: 'Re-enter Password',
+                        labelText: 'Confirm Password',
                         border: OutlineInputBorder(),
                         filled: true,
                         fillColor: Colors.white),
-                  TextFormField(
-                    decoration: InputDecoration(
-                      labelText: 'Confirm Password',
-                      border: OutlineInputBorder(),
-                      filled: true,
-                      fillColor: Colors.white,
-                    ),
                     obscureText: true,
                     validator: (value) {
                       if (value != password) {
@@ -168,27 +142,19 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   ),
                   const SizedBox(height: 20),
                   SizedBox(
-                    width: double.infinity, // Makes the button wide
-                    height: 50, // Sets a fixed height for the button
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor:
-                            Colors.lightBlueAccent, // Sets the background color
-                        shape: const RoundedRectangleBorder(
-                          borderRadius:
-                              BorderRadius.zero, // Removes the rounded borders
-                  SizedBox(height: 20),
-                  Container(
                     width: double.infinity,
                     height: 50,
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.lightBlueAccent,
-                        shape: RoundedRectangleBorder(
+                        shape: const RoundedRectangleBorder(
                           borderRadius: BorderRadius.zero,
                         ),
                       ),
-                      onPressed: _trySubmit,
+                      onPressed: () {
+                        _trySubmit();
+                        Navigator.pushNamed(context, '/Interest');
+                      },
                       child: const Text('Sign Up'),
                     ),
                   ),
