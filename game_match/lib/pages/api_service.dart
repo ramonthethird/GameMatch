@@ -21,9 +21,6 @@ class ApiService {
   }
 
   Future<void> authenticate() async {
-    // final Uri url = Uri.parse('https://id.twitch.tv/oauth2/token');
-    // final String body =
-    //     'client_id=$clientId&client_secret=$clientSecret&grant_type=client_credentials';
     final Uri url = Uri.parse(
         'https://id.twitch.tv/oauth2/token?client_id=$clientId&client_secret=$clientSecret&grant_type=client_credentials');
 
@@ -58,16 +55,18 @@ class ApiService {
     final Uri url = Uri.parse('https://api.igdb.com/v4/games');
     final String body = '''
     fields name, summary, genres.name, cover.url;
-    limit 1;
+    limit 10;
     ''';
 
     try {
       final response = await http.post(
         url,
         headers: {
-          'Client-ID': clientId,
-          'Authorization': 'Bearer $accessToken',
-          'Content-Type': 'application/json',
+          'Client-ID': clientId, // Client ID as per instructions
+          'Authorization':
+              'Bearer $accessToken', // Include 'Bearer' as per instructions
+          'Content-Type':
+              'application/json', // Ensure the body is treated as JSON
         },
         body: body,
       );
@@ -76,26 +75,34 @@ class ApiService {
       print('Response Body: ${response.body}');
 
       if (response.statusCode == 200) {
-        final List<dynamic> gameDataJson =
-            json.decode(response.body) as List<dynamic>;
-        if (gameDataJson.isEmpty) {
+        // Parse the response body safely
+        final responseData = json.decode(response.body);
+
+        // Handle cases where response data is not as expected
+        if (responseData == null || responseData.isEmpty) {
           print('No games found in the response.');
           return [];
         }
 
-        final List<Game> games = gameDataJson
-            .map((dynamic json) => Game.fromJson(json as Map<String, dynamic>))
+        // Ensure the response is a list
+        if (responseData is! List) {
+          print('Unexpected response structure. Expected a list.');
+          return [];
+        }
+
+        // Map the list to Game objects
+        final List<Game> games = responseData
+            .map((json) => Game.fromJson(json as Map<String, dynamic>))
             .toList();
+
         return games;
-        //print('Game Data: $gameData');
-        // Handle the game data here (e.g., return it or update state)
       } else {
         print(
             'Failed to fetch game data: ${response.statusCode} ${response.body}');
         return [];
       }
     } catch (error) {
-      print('Error: $error');
+      print('Error fetching games: $error');
       return [];
     }
   }
