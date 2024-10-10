@@ -16,7 +16,7 @@ class _InterestsPageState extends State<InterestsPage> {
   String? dropdownValue3;
   String? dropdownValue4;
 
-  // Customized list of items for each dropdown
+  // List of items for each dropdown
   final List<String> gameModes = [
     'Single Player', 
     'Multiplayer', 
@@ -57,7 +57,7 @@ class _InterestsPageState extends State<InterestsPage> {
     _loadInterests(); // Load the user's interests when the page initializes
   }
 
-  // Method to save user's interests to Firestore
+  // Save user's interests to Firestore
   void _saveInterests() async {
     await firestore.collection('users').doc(userId).set({
       'interests': {
@@ -69,7 +69,7 @@ class _InterestsPageState extends State<InterestsPage> {
     }, SetOptions(merge: true)); // Merge the interests with existing data
 
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Interests saved successfully!')),
+      SnackBar(content: Text('Interests saved successfully!')), // Pop up to notify user that changes has been saved
     );
 
     // Print for debugging
@@ -82,10 +82,11 @@ class _InterestsPageState extends State<InterestsPage> {
     });
   }
 
-  // Method to load user's interests from Firestore
+  // Load user's interests from Firestore
   void _loadInterests() async {
     DocumentSnapshot doc = await firestore.collection('users').doc(userId).get();
 
+    // If a user already have interests saved before, load them
     if (doc.exists && doc['interests'] != null) {
       Map<String, dynamic> interests = doc['interests'];
       setState(() {
@@ -108,46 +109,19 @@ class _InterestsPageState extends State<InterestsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Interests'),
+        title: Text('Interests'), // AppBar title
         centerTitle: true,
         backgroundColor: const Color(0xFF74ACD5),
         leading: IconButton(
-          icon: Icon(Icons.menu),
+          icon: Icon(Icons.menu), // Sidebar Icon
           onPressed: () {
             //Scaffold.of(context).openDrawer();
-            Navigator.pushNamed(context,"/side_bar");
+            Navigator.pushNamed(context,"/side_bar"); // Open/Return to sidebar
           },
         ),
       ),
-      drawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: <Widget>[
-            DrawerHeader(
-              decoration: BoxDecoration(
-                color: const Color(0xFF74ACD5),
-              ),
-              child: Text(
-                'Menu',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 24,
-                ),
-              ),
-            ),
-            ListTile(
-              leading: Icon(Icons.home),
-              title: Text('Home'),
-              onTap: () {},
-            ),
-            ListTile(
-              leading: Icon(Icons.settings),
-              title: Text('Settings'),
-              onTap: () {},
-            ),
-          ],
-        ),
-      ),
+      
+      // Header Title
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -167,18 +141,18 @@ class _InterestsPageState extends State<InterestsPage> {
 
             // Dropdown 1: Game Mode
             Text(
-              'Game Mode',
+              'Game Mode', // Dropdown Title
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
             ),
             DropdownButton<String>(
               value: dropdownValue1,
-              hint: Text('Select Game Mode'),
-              onChanged: (String? newValue) {
+              hint: Text('Select Game Mode'), // Dropdown Hint
+              onChanged: (String? newValue) { // Change state of dropdown, show selected item
                 setState(() {
                   dropdownValue1 = newValue;
                 });
               },
-              items: gameModes.map<DropdownMenuItem<String>>((String value) {
+              items: gameModes.map<DropdownMenuItem<String>>((String value) { // Use gameModes string values as dropdown items
                 return DropdownMenuItem<String>(
                   value: value,
                   child: Text(value),
@@ -189,18 +163,18 @@ class _InterestsPageState extends State<InterestsPage> {
 
             // Dropdown 2: Player Perspective
             Text(
-              'Player Perspective',
+              'Player Perspective', // Dropdown Title
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
             ),
             DropdownButton<String>(
               value: dropdownValue2,
-              hint: Text('Select Player Perspective'),
-              onChanged: (String? newValue) {
+              hint: Text('Select Player Perspective'), //Dropdown Hint
+              onChanged: (String? newValue) { // Change state of dropdown, show selected item
                 setState(() {
                   dropdownValue2 = newValue;
                 });
               },
-              items: playerPerspective.map<DropdownMenuItem<String>>((String value) {
+              items: playerPerspective.map<DropdownMenuItem<String>>((String value) { // Use playerPerspective string values as dropdown items
                 return DropdownMenuItem<String>(
                   value: value,
                   child: Text(value),
@@ -211,18 +185,18 @@ class _InterestsPageState extends State<InterestsPage> {
 
             // Dropdown 3: Platform
             Text(
-              'Platform',
+              'Platform', // Dropdown Title
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
             ),
             DropdownButton<String>(
               value: dropdownValue3,
-              hint: Text('Select Platform'),
-              onChanged: (String? newValue) {
+              hint: Text('Select Platform'), // Dropdown Hint
+              onChanged: (String? newValue) { // Change state of dropdown, show selected item
                 setState(() {
                   dropdownValue3 = newValue;
                 });
               },
-              items: platforms.map<DropdownMenuItem<String>>((String value) {
+              items: platforms.map<DropdownMenuItem<String>>((String value) { // Use platforms string values as dropdown items
                 return DropdownMenuItem<String>(
                   value: value,
                   child: Text(value),
@@ -233,18 +207,18 @@ class _InterestsPageState extends State<InterestsPage> {
 
             // Dropdown 4: Price
             Text(
-              'Price',
+              'Price', // Dropdown Title
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
             ),
             DropdownButton<String>(
               value: dropdownValue4,
-              hint: Text('Select Price'),
-              onChanged: (String? newValue) {
+              hint: Text('Select Price'), // Dropdown Hint
+              onChanged: (String? newValue) { // Change state of dropdown item, show selected item
                 setState(() {
                   dropdownValue4 = newValue;
                 });
               },
-              items: price.map<DropdownMenuItem<String>>((String value) {
+              items: price.map<DropdownMenuItem<String>>((String value) { // Use price string values as dropdown items
                 return DropdownMenuItem<String>(
                   value: value,
                   child: Text(value),
@@ -259,7 +233,7 @@ class _InterestsPageState extends State<InterestsPage> {
               child: Text(
                 'Save',
                 style: TextStyle(
-                  color: Colors.white, // Set the text color here
+                  color: Colors.white,
                   fontSize: 18,
                 ),
               ),

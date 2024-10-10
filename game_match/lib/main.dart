@@ -7,6 +7,7 @@ import 'pages/Home.dart'; // Import the home page
 import 'pages/Profile.dart'; // Import the profile page
 import 'pages/Side_bar.dart'; // Import the side bar page
 import 'pages/Interest.dart'; // Import the interest page
+import 'pages/Settings.dart'; // Import the settings page
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -30,8 +31,9 @@ class GameMatchApp extends StatelessWidget {
       routes: {
         '/side_bar': (context) => const SideBar(), // This is the side bar page
         '/Profile': (context) => const Profile(), // This is the profile page
-        '/Preference_&_Interest': (context) => Preference_Interest_Page(), // This is the interest page
-        '/Interest': (context) => const InterestsPage(),
+        '/Preference_&_Interest': (context) => Preference_Interest_Page(), // This is the branch page for preference and interest page
+        '/Interest': (context) => const InterestsPage(), // This is the interest page
+        '/Settings': (context) => SettingsPage(),
       },
       //home: const HomePage(), // This is the main screen of your app
     );
