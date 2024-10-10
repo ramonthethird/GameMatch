@@ -2,17 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:game_match/pages/Side_bar.dart';
 
 class SettingsPage extends StatelessWidget {
+  const SettingsPage({super.key});
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Settings'),
+        title: const Text('Settings'),
         centerTitle: true,
         backgroundColor: Colors.white,
         elevation: 1.0,
         leading: Builder(
           builder: (context) => IconButton(
-            icon: Icon(
+            icon: const Icon(
               Icons.menu,
               color: Colors.black,
             ),
@@ -22,7 +23,7 @@ class SettingsPage extends StatelessWidget {
             },
           ),
         ),
-        titleTextStyle: TextStyle(
+        titleTextStyle: const TextStyle(
           color: Colors.black,
           fontSize: 20,
           fontWeight: FontWeight.bold,
@@ -53,14 +54,14 @@ class SettingsPage extends StatelessWidget {
   // Settings Options
   Widget buildSettingsOption(BuildContext context, String title) {
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: 1.0, vertical: 0.1),
+      margin: const EdgeInsets.symmetric(horizontal: 1.0, vertical: 0.1),
       decoration: BoxDecoration(
         border: Border.all(color: Colors.black, width: 1.0),
       ),
       child: ListTile(
         title: Text(
           title,
-          style: TextStyle(
+          style: const TextStyle(
             fontSize: 18.0,
           ),
         ),
@@ -73,12 +74,12 @@ class SettingsPage extends StatelessWidget {
   // Section Headers
   Widget buildSectionHeader(String title) {
     return Container(
-      padding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
+      padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
       color: const Color.fromARGB(255, 210, 210, 210),
       width: double.infinity,
       child: Text(
         title,
-        style: TextStyle(
+        style: const TextStyle(
           fontSize: 18.0,
           fontWeight: FontWeight.bold,
         ),

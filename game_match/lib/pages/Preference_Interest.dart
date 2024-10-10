@@ -1,19 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:game_match/pages/Side_bar.dart';
 
 class PreferenceInterestPage extends StatelessWidget {
   const PreferenceInterestPage({super.key});
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(60.0), // Adjust height as needed
+        preferredSize: const Size.fromHeight(60.0),
         child: AppBar(
           title: const Text(
-            'Preferences & Interests',
-        preferredSize: Size.fromHeight(60.0),
-        child: AppBar(
-          title: Text(
             'Preferences & Interests', // AppBar Title
             style: TextStyle(
               color: Colors.black,
@@ -26,51 +22,6 @@ class PreferenceInterestPage extends StatelessWidget {
             icon: const Icon(Icons.menu),
             onPressed: () {
               //Scaffold.of(context).openDrawer();
-              Navigator.pop(context,"/SideBar");
-            },
-          ),
-        ),
-      ),
-      drawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: <Widget>[
-           const DrawerHeader(
-              decoration: BoxDecoration(
-                color: Colors.blue,
-              ),
-              child: Text(
-                'Menu',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 24,
-                ),
-              ),
-            ),
-            ListTile(
-              leading: const Icon(Icons.home),
-              title: const Text('Home'),
-              onTap: () {
-                // Navigate to Home Page
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.settings),
-              title: const Text('Settings'),
-              onTap: () {
-                // Navigate to Settings Page
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.info),
-              title: const Text('About'),
-              onTap: () {
-                // Navigate to About Page
-              },
-            ),
-          ],
-        ),
-      ),
               Navigator.pop(context,"/SideBar"); // Open/Return to sidebar
 
             },
@@ -81,12 +32,9 @@ class PreferenceInterestPage extends StatelessWidget {
       body: Stack(
         children: [
           Container(
-            height: 0, // Adjust height to better fit the new AppBar size
-            decoration:const BoxDecoration(
-              color: Colors.blue,
             height: 0,
-            decoration: BoxDecoration(
-              color: const Color(0xFF74ACD5),
+            decoration: const BoxDecoration(
+              color: Color(0xFF74ACD5),
               borderRadius: BorderRadius.only(
               ),
             ),
@@ -98,7 +46,7 @@ class PreferenceInterestPage extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                 const  SizedBox(height: 15), // Space below AppBar
+                  const SizedBox(height: 15), // Space below AppBar
 
                   // Manage Preference button
                   CustomButton(
@@ -137,7 +85,7 @@ class CustomButton extends StatelessWidget {
   final IconData icon;
   final VoidCallback onPressed;
 
-  const CustomButton({super.key, 
+  const CustomButton({
     required this.title,
     required this.subtitle,
     required this.icon,
