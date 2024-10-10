@@ -84,8 +84,7 @@ class SideBar extends StatelessWidget {
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(
                         0)), // make the button rectangular
-                //alignment: Alignment.center, // align the text to the center
-              ), //will be used to navigate to the next page
+              ),
             ),
             ElevatedButton.icon(
               icon: const Icon(Icons.room_preferences),
