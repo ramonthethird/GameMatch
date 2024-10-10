@@ -1,5 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:game_match/pages/Preference_Interest.dart';
 import 'package:game_match/pages/game_info.dart';
 import 'firebase_options.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -32,6 +33,11 @@ class GameMatchApp extends StatelessWidget {
         '/Profile': (context) => const Profile(), // This is the profile page
         '/Interest': (context) =>
             const InterestsPage(), // This is the interest page
+        '/Edit_profile': (context) =>
+            const EditProfile(), // This is the edit profile page
+        '/Preference_&_Interest': (context) =>
+            Preference_Interest_Page(), // This is the interest page
+        '/Interest': (context) => const InterestsPage(),
       },
       //home: const HomePage(), // This is the main screen of your app
     );

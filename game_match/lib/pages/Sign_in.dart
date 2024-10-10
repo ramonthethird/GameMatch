@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -13,12 +15,14 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: SignUpScreen(),
+      home: const SignUpScreen(),
     );
   }
 }
 
 class SignUpScreen extends StatefulWidget {
+  const SignUpScreen({super.key});
+
   @override
   _SignUpScreenState createState() => _SignUpScreenState();
 }
@@ -33,6 +37,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
     if (isValid) {
       _formKey.currentState!.save();
+      // Normally you'd do something with the data, like sending it to a backend
       print('Email: $email, Username: $username, Password: $password');
     }
   }
@@ -40,23 +45,43 @@ class _SignUpScreenState extends State<SignUpScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Create an Account')),
+      appBar: AppBar(title: const Text('Create an Account')),
+      appBar: AppBar(
+        title: Text('Create an Account'),
+        // Adding a back button in the AppBar's leading widget
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () => Navigator.of(context).pop(), // This will pop the current route off the navigator.
+        ),
+      ),
+
       body: Center(
         child: Card(
-          margin: EdgeInsets.all(20),
+          margin: const EdgeInsets.all(20),
           child: SingleChildScrollView(
-            padding: EdgeInsets.all(16),
+            padding: const EdgeInsets.all(16),
             child: Form(
               key: _formKey,
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
+                  Image.asset(
+                    'assets/GameMatch Logo Black.png',
+                    height: 100, // Set your desired height
+                  ),
+                  SizedBox(height: 20),
                   TextFormField(
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                         labelText: 'Email',
                         border: OutlineInputBorder(),
                         filled: true,
                         fillColor: Colors.white),
+                    decoration: InputDecoration(
+                      labelText: 'Email',
+                      border: OutlineInputBorder(),
+                      filled: true,
+                      fillColor: Colors.white,
+                    ),
                     keyboardType: TextInputType.emailAddress,
                     validator: (value) {
                       if (value!.isEmpty || !value.contains('@')) {
@@ -68,16 +93,22 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       email = value!;
                     },
                   ),
-                  SizedBox(height: 12),
+                  const SizedBox(height: 12),
                   TextFormField(
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                         labelText: 'Username',
                         border: OutlineInputBorder(),
                         filled: true,
                         fillColor: Colors.white),
+                    decoration: InputDecoration(
+                      labelText: 'Username',
+                      border: OutlineInputBorder(),
+                      filled: true,
+                      fillColor: Colors.white,
+                    ),
                     validator: (value) {
                       if (value!.isEmpty || value.length < 4) {
-                        return 'Username must be at least 4 characters long.';
+                        return 'Please enter at least 4 characters.';
                       }
                       return null;
                     },
@@ -85,17 +116,24 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       username = value!;
                     },
                   ),
-                  SizedBox(height: 12),
+                  const SizedBox(height: 12),
                   TextFormField(
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                         labelText: 'Password',
                         border: OutlineInputBorder(),
                         filled: true,
                         fillColor: Colors.white),
+                  TextFormField(
+                    decoration: InputDecoration(
+                      labelText: 'Password',
+                      border: OutlineInputBorder(),
+                      filled: true,
+                      fillColor: Colors.white,
+                    ),
                     obscureText: true,
                     validator: (value) {
-                      if (value!.isEmpty || value.length < 7) {
-                        return 'Password must be at least 7 characters long.';
+                      if (value!.isEmpty || value.length < 8) {
+                        return 'Password must be at least 8 characters long.';
                       }
                       return null;
                     },
@@ -103,36 +141,55 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       password = value!;
                     },
                   ),
-                  SizedBox(height: 12),
+                  const SizedBox(height: 12),
                   TextFormField(
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                         labelText: 'Re-enter Password',
                         border: OutlineInputBorder(),
                         filled: true,
                         fillColor: Colors.white),
+                  TextFormField(
+                    decoration: InputDecoration(
+                      labelText: 'Confirm Password',
+                      border: OutlineInputBorder(),
+                      filled: true,
+                      fillColor: Colors.white,
+                    ),
                     obscureText: true,
                     validator: (value) {
-                      if (value!.isEmpty || value != password) {
+                      if (value != password) {
                         return 'Passwords do not match.';
                       }
                       return null;
                     },
+                    onSaved: (value) {
+                      confirmPassword = value!;
+                    },
                   ),
-                  SizedBox(height: 20),
-                  Container(
+                  const SizedBox(height: 20),
+                  SizedBox(
                     width: double.infinity, // Makes the button wide
                     height: 50, // Sets a fixed height for the button
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         backgroundColor:
                             Colors.lightBlueAccent, // Sets the background color
-                        shape: RoundedRectangleBorder(
+                        shape: const RoundedRectangleBorder(
                           borderRadius:
                               BorderRadius.zero, // Removes the rounded borders
+                  SizedBox(height: 20),
+                  Container(
+                    width: double.infinity,
+                    height: 50,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.lightBlueAccent,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.zero,
                         ),
                       ),
                       onPressed: _trySubmit,
-                      child: Text('Sign Up'),
+                      child: const Text('Sign Up'),
                     ),
                   ),
                 ],

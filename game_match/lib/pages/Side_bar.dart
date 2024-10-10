@@ -16,8 +16,8 @@ class SideBar extends StatelessWidget {
               padding: const EdgeInsets.all(10),
               color: const Color(0xFF74ACD5),
               width: 200,
-              child: Row(
-                children: [
+          child: Row(
+            children: [
                   ElevatedButton(
                     onPressed: () {
                       // navigate to the profile page
@@ -91,7 +91,7 @@ class SideBar extends StatelessWidget {
               icon: const Icon(Icons.room_preferences),
               label: const Text("Preference"),
               onPressed: () {
-                Navigator.pushNamed(context, '/Interest');
+                Navigator.pushNamed(context, '/Preference_&_Interest');
               },
               style: ElevatedButton.styleFrom(
                 padding: const EdgeInsets.all(10),
