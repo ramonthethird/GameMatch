@@ -27,7 +27,7 @@ class GameMatchApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const SignUp(), // This is the side bar page this is the main screen of your app for now
+      home: const SideBar(), // This is the side bar page this is the main screen of your app for now
       routes: {
         '/Sign_in': (context) => const SignUp(), // This is the sign in page
         '/side_bar': (context) => const SideBar(), // This is the side bar page

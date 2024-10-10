@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:game_match/pages/Side_bar.dart'; // Import the side bar page
 
 void main() {
   runApp(const MyApp());
@@ -61,16 +62,18 @@ class _InterestsPageState extends State<InterestsPage> {
       appBar: AppBar(
         title: const Text('Interests'),
         centerTitle: true,
-        backgroundColor: Colors.blue,
+        backgroundColor:const Color(0xFF74ACD5),
         // Sidebar button
         leading: IconButton(
           icon: const Icon(Icons.menu), // Three-lines icon
           onPressed: () {
-            // Action to open a drawer or sidebar
-            // Scaffold.of(context).openDrawer();
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const SideBar()),
+            );
           },
         ),
-      ),
+        ),
       // Sidebar Nav (in dev)
       drawer: Drawer(
         child: ListView(
@@ -78,7 +81,7 @@ class _InterestsPageState extends State<InterestsPage> {
           children: <Widget>[
             const DrawerHeader(
               decoration: BoxDecoration(
-                color: Colors.blue,
+                color:  Color(0xFF74ACD5),
               ),
               child: Text(
                 'Menu',
@@ -160,7 +163,7 @@ class _InterestsPageState extends State<InterestsPage> {
                 ],
               ),
             ),
-            const SizedBox(height: 50),
+            const SizedBox(height: 40),
 
             // Second Dropdown (Player Perspective)
             Center(
@@ -190,7 +193,7 @@ class _InterestsPageState extends State<InterestsPage> {
                 ],
               ),
             ),
-            const SizedBox(height: 50),
+            const SizedBox(height: 40),
 
             // Third Dropdown (Platform)
             Center(
@@ -220,7 +223,7 @@ class _InterestsPageState extends State<InterestsPage> {
                 ],
               ),
             ),
-            const SizedBox(height: 50),
+            const SizedBox(height: 40),
 
             // Fourth Dropdown Price
             Center(
@@ -249,7 +252,7 @@ class _InterestsPageState extends State<InterestsPage> {
                 ],
               ),
             ),
-            const SizedBox(height: 50),
+            const SizedBox(height: 40),
 
             // Save Button
             Center(
