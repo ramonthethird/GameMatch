@@ -18,10 +18,17 @@ class _GameListScreenState extends State<GameListScreen> {
   }
 
   Future<void> _fetchGames() async {
-    List<Game> fetchedGames = await apiService.fetchGames();
-    setState(() {
-      games = fetchedGames; // Set the state with the fetched games
-    });
+    try {
+      List<Game> fetchedGames = await apiService.fetchGames();
+      setState(() {
+        games = fetchedGames;
+      });
+      if (games.isEmpty) {
+        print('No games found in the response.');
+      }
+    } catch (e) {
+      print('Error fetching games: $e');
+    }
   }
 
   @override

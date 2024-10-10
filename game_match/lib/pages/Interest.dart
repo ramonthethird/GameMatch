@@ -30,7 +30,7 @@ class _InterestsPageState extends State<InterestsPage> {
   String? dropdownValue3;
   String? dropdownValue4;
 
-  // Customized list of items for each dropdown
+  // List of items for each dropdown
   final List<String> gameModes = [
     'Single Player',
     'Multiplayer',
@@ -56,11 +56,72 @@ class _InterestsPageState extends State<InterestsPage> {
     '\$50 - \$80'
   ];
 
+
+  // Firestore instance
+  final firestore = FirebaseFirestore.instance;
+
+  // Dummy user ID for testing purposes
+  final String userId = 'user123';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadInterests(); // Load the user's interests when the page initializes
+  }
+
+  // Save user's interests to Firestore
+  void _saveInterests() async {
+    await firestore.collection('users').doc(userId).set({
+      'interests': {
+        'gameMode': dropdownValue1 ?? '',
+        'playerPerspective': dropdownValue2 ?? '',
+        'platform': dropdownValue3 ?? '',
+        'price': dropdownValue4 ?? '',
+      }
+    }, SetOptions(merge: true)); // Merge the interests with existing data
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Interests saved successfully!')),
+    );
+
+    // Print for debugging
+    print('Interests saved successfully:');
+    print({
+      'gameMode': dropdownValue1,
+      'playerPerspective': dropdownValue2,
+      'platform': dropdownValue3,
+      'price': dropdownValue4,
+    });
+  }
+
+  // Load user's interests from Firestore
+  void _loadInterests() async {
+    DocumentSnapshot doc = await firestore.collection('users').doc(userId).get();
+
+    // If a user already have interests saved before, load them
+    if (doc.exists && doc['interests'] != null) {
+      Map<String, dynamic> interests = doc['interests'];
+      setState(() {
+        dropdownValue1 = interests['gameMode'];
+        dropdownValue2 = interests['playerPerspective'];
+        dropdownValue3 = interests['platform'];
+        dropdownValue4 = interests['price'];
+      });
+
+      // Print for debugging
+      print('Interests loaded successfully:');
+      print(interests);
+    } else {
+      print('No interests found for the user.');
+    }
+  }
+
+  // SideBar button
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Interests'),
+        title: Text('Interests'), // AppBar title
         centerTitle: true,
         backgroundColor:const Color(0xFF74ACD5),
         // Sidebar button
@@ -118,6 +179,15 @@ class _InterestsPageState extends State<InterestsPage> {
           ],
         ),
       ),
+          icon: const Icon(Icons.menu), // Sidebar Icon
+          onPressed: () {
+            //Scaffold.of(context).openDrawer();
+            Navigator.pushNamed(context,"/side_bar"); // Open/Return to sidebar
+          },
+        ),
+      ),
+      
+      // Header Title
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -162,8 +232,28 @@ class _InterestsPageState extends State<InterestsPage> {
                   ),
                 ],
               ),
+            // Dropdown 1: Game Mode
+            const Text(
+              'Game Mode', // Dropdown Title
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+            ),
+            DropdownButton<String>(
+              value: dropdownValue1,
+              hint: const Text('Select Game Mode'), // Dropdown Hint
+              onChanged: (String? newValue) { // Change state of dropdown, show selected item
+                setState(() {
+                  dropdownValue1 = newValue;
+                });
+              },
+              items: gameModes.map<DropdownMenuItem<String>>((String value) { // Use gameModes string values as dropdown items
+                return DropdownMenuItem<String>(
+                  value: value,
+                  child: Text(value),
+                );
+              }).toList(),
             ),
             const SizedBox(height: 40),
+
 
             // Second Dropdown (Player Perspective)
             Center(
@@ -192,6 +282,25 @@ class _InterestsPageState extends State<InterestsPage> {
                   ),
                 ],
               ),
+            // Dropdown 2: Player Perspective
+            const Text(
+              'Player Perspective', // Dropdown Title
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+            ),
+            DropdownButton<String>(
+              value: dropdownValue2,
+              hint: const Text('Select Player Perspective'), //Dropdown Hint
+              onChanged: (String? newValue) { // Change state of dropdown, show selected item
+                setState(() {
+                  dropdownValue2 = newValue;
+                });
+              },
+              items: playerPerspective.map<DropdownMenuItem<String>>((String value) { // Use playerPerspective string values as dropdown items
+                return DropdownMenuItem<String>(
+                  value: value,
+                  child: Text(value),
+                );
+              }).toList(),
             ),
             const SizedBox(height: 40),
 
@@ -222,8 +331,28 @@ class _InterestsPageState extends State<InterestsPage> {
                   ),
                 ],
               ),
+            // Dropdown 3: Platform
+            const Text(
+              'Platform', // Dropdown Title
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+            ),
+            DropdownButton<String>(
+              value: dropdownValue3,
+              hint: const Text('Select Platform'), // Dropdown Hint
+              onChanged: (String? newValue) { // Change state of dropdown, show selected item
+                setState(() {
+                  dropdownValue3 = newValue;
+                });
+              },
+              items: platforms.map<DropdownMenuItem<String>>((String value) { // Use platforms string values as dropdown items
+                return DropdownMenuItem<String>(
+                  value: value,
+                  child: Text(value),
+                );
+              }).toList(),
             ),
             const SizedBox(height: 40),
+
 
             // Fourth Dropdown Price
             Center(
@@ -251,6 +380,25 @@ class _InterestsPageState extends State<InterestsPage> {
                   ),
                 ],
               ),
+            // Dropdown 4: Price
+            const Text(
+              'Price', // Dropdown Title
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+            ),
+            DropdownButton<String>(
+              value: dropdownValue4,
+              hint: const Text('Select Price'), // Dropdown Hint
+              onChanged: (String? newValue) { // Change state of dropdown item, show selected item
+                setState(() {
+                  dropdownValue4 = newValue;
+                });
+              },
+              items: price.map<DropdownMenuItem<String>>((String value) { // Use price string values as dropdown items
+                return DropdownMenuItem<String>(
+                  value: value,
+                  child: Text(value),
+                );
+              }).toList(),
             ),
             const SizedBox(height: 40),
 
@@ -268,6 +416,21 @@ class _InterestsPageState extends State<InterestsPage> {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),
+            ElevatedButton(
+              onPressed: _saveInterests,
+              child: Text(
+                'Save',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                ),
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.blue,
+                padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                textStyle: const TextStyle(fontSize: 18),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
                 ),
                 child: const Text('Save'),
               ),
