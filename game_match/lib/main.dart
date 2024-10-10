@@ -8,6 +8,8 @@ import 'pages/Home.dart'; // Import the home page
 import 'pages/Profile.dart'; // Import the profile page
 import 'pages/Side_bar.dart'; // Import the side bar page
 import 'pages/Interest.dart'; // Import the interest page
+import 'pages/Settings.dart'; // Import the settings page
+import 'pages/Edit_profile.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

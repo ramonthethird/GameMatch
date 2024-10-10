@@ -179,7 +179,9 @@ class SideBar extends StatelessWidget {
             ElevatedButton.icon(
               icon: const Icon(Icons.settings),
               label: const Text("Settings"),
-              onPressed: () {},
+              onPressed: () {
+                Navigator.pushNamed(context, '/Settings');
+              },
               style: ElevatedButton.styleFrom(
                 padding: const EdgeInsets.all(10),
                 backgroundColor: Colors.white,
