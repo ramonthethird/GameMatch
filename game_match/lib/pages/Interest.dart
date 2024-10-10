@@ -5,6 +5,7 @@ import 'package:game_match/firebase_options.dart';
 
 class InterestsPage extends StatefulWidget {
   const InterestsPage({super.key});
+
   @override
   _InterestsPageState createState() => _InterestsPageState();
 }
@@ -69,7 +70,7 @@ class _InterestsPageState extends State<InterestsPage> {
     }, SetOptions(merge: true)); // Merge the interests with existing data
 
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Interests saved successfully!')), // Pop up to notify user that changes has been saved
+      const SnackBar(content: Text('Interests saved successfully!')),
     );
 
     // Print for debugging
@@ -113,7 +114,7 @@ class _InterestsPageState extends State<InterestsPage> {
         centerTitle: true,
         backgroundColor: const Color(0xFF74ACD5),
         leading: IconButton(
-          icon: Icon(Icons.menu), // Sidebar Icon
+          icon: const Icon(Icons.menu), // Sidebar Icon
           onPressed: () {
             //Scaffold.of(context).openDrawer();
             Navigator.pushNamed(context,"/side_bar"); // Open/Return to sidebar
@@ -127,7 +128,7 @@ class _InterestsPageState extends State<InterestsPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Align(
+            const Align(
               alignment: Alignment.topCenter,
               child: Text(
                 'Manage Interests',
@@ -137,16 +138,16 @@ class _InterestsPageState extends State<InterestsPage> {
                 ),
               ),
             ),
-            SizedBox(height: 40),
+            const SizedBox(height: 40),
 
             // Dropdown 1: Game Mode
-            Text(
+            const Text(
               'Game Mode', // Dropdown Title
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
             ),
             DropdownButton<String>(
               value: dropdownValue1,
-              hint: Text('Select Game Mode'), // Dropdown Hint
+              hint: const Text('Select Game Mode'), // Dropdown Hint
               onChanged: (String? newValue) { // Change state of dropdown, show selected item
                 setState(() {
                   dropdownValue1 = newValue;
@@ -159,16 +160,16 @@ class _InterestsPageState extends State<InterestsPage> {
                 );
               }).toList(),
             ),
-            SizedBox(height: 30),
+            const SizedBox(height: 30),
 
             // Dropdown 2: Player Perspective
-            Text(
+            const Text(
               'Player Perspective', // Dropdown Title
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
             ),
             DropdownButton<String>(
               value: dropdownValue2,
-              hint: Text('Select Player Perspective'), //Dropdown Hint
+              hint: const Text('Select Player Perspective'), //Dropdown Hint
               onChanged: (String? newValue) { // Change state of dropdown, show selected item
                 setState(() {
                   dropdownValue2 = newValue;
@@ -181,16 +182,16 @@ class _InterestsPageState extends State<InterestsPage> {
                 );
               }).toList(),
             ),
-            SizedBox(height: 30),
+            const SizedBox(height: 30),
 
             // Dropdown 3: Platform
-            Text(
+            const Text(
               'Platform', // Dropdown Title
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
             ),
             DropdownButton<String>(
               value: dropdownValue3,
-              hint: Text('Select Platform'), // Dropdown Hint
+              hint: const Text('Select Platform'), // Dropdown Hint
               onChanged: (String? newValue) { // Change state of dropdown, show selected item
                 setState(() {
                   dropdownValue3 = newValue;
@@ -203,16 +204,16 @@ class _InterestsPageState extends State<InterestsPage> {
                 );
               }).toList(),
             ),
-            SizedBox(height: 30),
+            const SizedBox(height: 30),
 
             // Dropdown 4: Price
-            Text(
+            const Text(
               'Price', // Dropdown Title
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
             ),
             DropdownButton<String>(
               value: dropdownValue4,
-              hint: Text('Select Price'), // Dropdown Hint
+              hint: const Text('Select Price'), // Dropdown Hint
               onChanged: (String? newValue) { // Change state of dropdown item, show selected item
                 setState(() {
                   dropdownValue4 = newValue;
@@ -225,7 +226,7 @@ class _InterestsPageState extends State<InterestsPage> {
                 );
               }).toList(),
             ),
-            SizedBox(height: 30),
+            const SizedBox(height: 30),
 
             // Save Button
             ElevatedButton(
@@ -239,7 +240,8 @@ class _InterestsPageState extends State<InterestsPage> {
               ),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.blue,
-                padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                textStyle: const TextStyle(fontSize: 18),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),
