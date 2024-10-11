@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:game_match/pages/add_game.dart';
 import 'api_service.dart';
 import 'game_model.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'wishlist_model.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class GameListScreen extends StatefulWidget {
   @override
@@ -10,6 +13,7 @@ class GameListScreen extends StatefulWidget {
 
 class _GameListScreenState extends State<GameListScreen> {
   final ApiService apiService = ApiService();
+  final FirestoreService firestoreService = FirestoreService();
   List<Game> games = [];
 
   @override
@@ -23,6 +27,37 @@ class _GameListScreenState extends State<GameListScreen> {
     setState(() {
       games = fetchedGames; // Set the state with the fetched games
     });
+  }
+
+  // trying to add a game to wishlist and firebase
+  Future<void> addToWishlist(Game game) async {
+    WishlistGame wishlistGame = WishlistGame(
+      id: game.name, // Use a unique identifier if possible
+      name: game.name,
+      coverUrl: game.coverUrl ?? '',
+      url: game.websites?.isNotEmpty == true
+          ? game.websites!.first
+          : '', // Example: Using the first URL
+    );
+
+    try {
+      // Reference to the wishlist collection for the user
+      final userId =
+          'example_user_id'; // Replace with actual user ID or authentication logic
+      await FirebaseFirestore.instance
+          .collection('wishlists')
+          .doc(userId)
+          .collection('games')
+          .doc(wishlistGame.id)
+          .set(wishlistGame.toJson());
+
+      print('Game added to wishlist: ${wishlistGame.name}');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('${wishlistGame.name} added to wishlist!')),
+      );
+    } catch (e) {
+      print('Error adding to wishlist: $e');
+    }
   }
 
   @override
