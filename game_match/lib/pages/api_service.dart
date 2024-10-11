@@ -47,7 +47,7 @@ class ApiService {
 
     final Uri url = Uri.parse('$baseUrl/games');
     final String body = '''
-    fields name, summary, genres.name. cover.url;
+    fields name, summary, genres.name. cover.url, platforms.name, release_dates.human, websites.url;
     limit 10;
     ''';
 

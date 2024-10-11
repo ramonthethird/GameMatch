@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'api_service.dart';
 import 'game_model.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class GameListScreen extends StatefulWidget {
   @override
@@ -56,6 +57,22 @@ class _GameListScreenState extends State<GameListScreen> {
                           'Description: ${game.summary ?? 'No description available'}'),
                       Text(
                           'Genres: ${game.genres?.join(', ') ?? 'Unknown genres'}'),
+                      Text(
+                          'Platforms: ${game.platforms?.join(',') ?? 'Unknown platforms'}'),
+                      Text(
+                          'Release Date: ${game.releaseDates?.join(',') ?? 'Unknown'}'),
+                      if (game.websites != null &&
+                          game.websites!.isNotEmpty) ...[
+                        SizedBox(height: 8),
+                        Text('Offical Website:'),
+                        for (var url in game.websites!)
+                          TextButton(
+                            onPressed: () {
+                              launch(url);
+                            },
+                            child: Text(url),
+                          ),
+                      ],
                     ],
                   ),
                 );
