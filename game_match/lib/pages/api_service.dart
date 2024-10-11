@@ -10,29 +10,36 @@ class ApiService {
   final String baseUrl = 'https://api.igdb.com/v4';
 
   Future<void> storeAccessToken(String token) async {
+    print('Storing access token: $token');
     await secureStorage.write(key: 'access_token', value: token);
   }
 
   Future<String?> retrieveAccessToken() async {
-    return await secureStorage.read(key: 'access_token');
+    final token = await secureStorage.read(key: 'access_token');
+    print('Retrieved access token: $token');
+    return token;
   }
 
   Future<void> authenticate() async {
-    final Uri url = Uri.parse('https://id.twitch.tv/oauth2/token');
-    final String body =
-        'client_id=$clientId&client_secret=$clientSecret&grant_type=client_credentials';
+    final Uri url = Uri.parse(
+        'https://id.twitch.tv/oauth2/token?client_id=$clientId&client_secret=$clientSecret&grant_type=client_credentials');
 
     try {
-      final response = await http.post(url, body: body);
+      final response = await http.post(url);
 
+      print('Authentication Response: ${response.body}');
+
+      //Check if the request was successful
       if (response.statusCode == 200) {
         final Map<String, dynamic> tokenData = json.decode(response.body);
         await storeAccessToken(tokenData['access_token']);
+        print('Access token stored successfully');
       } else {
         print('Failed to fetch token: ${response.statusCode} ${response.body}');
       }
     } catch (error) {
       print('Error fetching token: $error');
+      throw Exception('Error fetching token: $error');
     }
   }
 
@@ -45,7 +52,7 @@ class ApiService {
       return [];
     }
 
-    final Uri url = Uri.parse('$baseUrl/games');
+    final Uri url = Uri.parse('https://api.igdb.com/v4/games');
     final String body = '''
     fields name, summary, genres.name, cover.url, platforms.name, release_dates.human, websites.url;
     limit 10;
@@ -55,12 +62,17 @@ class ApiService {
       final response = await http.post(
         url,
         headers: {
-          'Client-ID': clientId,
-          'Authorization': 'Bearer $accessToken',
-          'Content-Type': 'application/json',
+          'Client-ID': clientId, // Client ID as per instructions
+          'Authorization':
+              'Bearer $accessToken', // Include 'Bearer' as per instructions
+          'Content-Type':
+              'application/json', // Ensure the body is treated as JSON
         },
         body: body,
       );
+
+      print('Response Status Code: ${response.statusCode}');
+      print('Response Body: ${response.body}');
 
       if (response.statusCode == 200) {
         print('Response Body: ${response.body}');
@@ -75,7 +87,7 @@ class ApiService {
         return [];
       }
     } catch (error) {
-      print('Error: $error');
+      print('Error fetching games: $error');
       return [];
     }
   }

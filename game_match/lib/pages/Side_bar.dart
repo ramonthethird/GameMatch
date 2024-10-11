@@ -16,8 +16,8 @@ class SideBar extends StatelessWidget {
               padding: const EdgeInsets.all(10),
               color: const Color(0xFF74ACD5),
               width: 200,
-              child: Row(
-                children: [
+          child: Row(
+            children: [
                   ElevatedButton(
                     onPressed: () {
                       // navigate to the profile page
@@ -84,8 +84,7 @@ class SideBar extends StatelessWidget {
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(
                         0)), // make the button rectangular
-                //alignment: Alignment.center, // align the text to the center
-              ), //will be used to navigate to the next page
+              ),
             ),
             ElevatedButton.icon(
               icon: const Icon(Icons.room_preferences),
@@ -179,7 +178,9 @@ class SideBar extends StatelessWidget {
             ElevatedButton.icon(
               icon: const Icon(Icons.settings),
               label: const Text("Settings"),
-              onPressed: () {},
+              onPressed: () {
+                Navigator.pushNamed(context, '/Settings');
+              },
               style: ElevatedButton.styleFrom(
                 padding: const EdgeInsets.all(10),
                 backgroundColor: Colors.white,
