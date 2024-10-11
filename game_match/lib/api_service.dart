@@ -51,13 +51,6 @@ class ApiService {
     limit 10;
     ''';
 
-    // final String body = '''
-    // {
-    //   "fields": ["id", "name", "cover", "summary"],
-    //   "limit": 10
-    // }
-    // ''';
-
     try {
       final response = await http.post(
         url,
@@ -75,8 +68,6 @@ class ApiService {
             .map((dynamic json) => Game.fromJson(json as Map<String, dynamic>))
             .toList();
         return games;
-        //print('Game Data: $gameData');
-        // Handle the game data here (e.g., return it or update state)
       } else {
         print(
             'Failed to fetch game data: ${response.statusCode} ${response.body}');

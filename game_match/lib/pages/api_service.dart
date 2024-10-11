@@ -54,7 +54,7 @@ class ApiService {
 
     final Uri url = Uri.parse('https://api.igdb.com/v4/games');
     final String body = '''
-    fields name, summary, genres.name, cover.url;
+    fields name, summary, genres.name, cover.url, platforms.name, release_dates.human, websites.url;
     limit 10;
     ''';
 
@@ -75,26 +75,11 @@ class ApiService {
       print('Response Body: ${response.body}');
 
       if (response.statusCode == 200) {
-        // Parse the response body safely
-        final responseData = json.decode(response.body);
-
-        // Handle cases where response data is not as expected
-        if (responseData == null || responseData.isEmpty) {
-          print('No games found in the response.');
-          return [];
-        }
-
-        // Ensure the response is a list
-        if (responseData is! List) {
-          print('Unexpected response structure. Expected a list.');
-          return [];
-        }
-
-        // Map the list to Game objects
-        final List<Game> games = responseData
-            .map((json) => Game.fromJson(json as Map<String, dynamic>))
+        print('Response Body: ${response.body}');
+        final List<dynamic> gameDataJson = json.decode(response.body);
+        final List<Game> games = gameDataJson
+            .map((dynamic json) => Game.fromJson(json as Map<String, dynamic>))
             .toList();
-
         return games;
       } else {
         print(
