@@ -12,7 +12,7 @@ class PreferenceInterestPage extends StatelessWidget {
           title: const Text(
             'Preferences & Interests', // AppBar Title
             style: TextStyle(
-              color: Colors.black,
+              color: Colors.black, fontSize: 24
             ),
           ),
           centerTitle: true,

@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:game_match/pages/Settings_Appearance.dart';
+import 'package:game_match/pages/Settings_Notifications.dart';
+import 'package:game_match/pages/Settings_Terms.dart';
+import 'package:game_match/pages/Settings_Privacy.dart';
 import 'package:game_match/pages/Side_bar.dart';
 
 class SettingsPage extends StatelessWidget {
@@ -7,9 +11,9 @@ class SettingsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Settings'),
+        title: const Text('Settings', style: TextStyle(color: Colors.black, fontSize: 24)),
         centerTitle: true,
-        backgroundColor: Colors.white,
+        backgroundColor: const Color(0xFF74ACD5),
         elevation: 1.0,
         leading: Builder(
           builder: (context) => IconButton(
@@ -25,8 +29,7 @@ class SettingsPage extends StatelessWidget {
         ),
         titleTextStyle: const TextStyle(
           color: Colors.black,
-          fontSize: 20,
-          fontWeight: FontWeight.bold,
+          fontSize: 24,
         ),
       ),
 
@@ -36,23 +39,23 @@ class SettingsPage extends StatelessWidget {
           // Create Section Titles and Buttons
           // Section Title: Content
           buildSectionHeader('Content'),
-          buildSettingsOption(context, 'Notifications'),
+          buildSettingsOption(context, 'Notifications', SettingsNotificationsPage()),
 
           // Section Title: Display
           buildSectionHeader('Display'),
-          buildSettingsOption(context, 'Appearance'),
+          buildSettingsOption(context, 'Appearance', SettingsAppearancePage()),
 
           // Section Title: Legal
           buildSectionHeader('Legal'),
-          buildSettingsOption(context, 'Terms of Use'),
-          buildSettingsOption(context, 'Privacy Policy'),
+          buildSettingsOption(context, 'Terms of Use', SettingsTermsPage()),
+          buildSettingsOption(context, 'Privacy Policy', SettingsPrivacyPage()),
         ],
       ),
     );
   }
 
   // Settings Options
-  Widget buildSettingsOption(BuildContext context, String title) {
+  Widget buildSettingsOption(BuildContext context, String title, Widget page) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 1.0, vertical: 0.1),
       decoration: BoxDecoration(
@@ -66,6 +69,10 @@ class SettingsPage extends StatelessWidget {
           ),
         ),
         onTap: () {
+          Navigator.push(
+            context,
+          MaterialPageRoute(builder: (context) => page), // Navigate to the selected page
+          );
         },
       ),
     );

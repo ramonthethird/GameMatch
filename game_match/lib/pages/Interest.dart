@@ -110,7 +110,7 @@ class _InterestsPageState extends State<InterestsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Interests'), // AppBar title
+        title: Text('Interests', style: TextStyle(color: Colors.black, fontSize: 24)), // AppBar title
         centerTitle: true,
         backgroundColor: const Color(0xFF74ACD5),
         leading: IconButton(
