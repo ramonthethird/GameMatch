@@ -64,13 +64,20 @@ class _GameListScreenState extends State<GameListScreen> {
                       if (game.websites != null &&
                           game.websites!.isNotEmpty) ...[
                         SizedBox(height: 8),
-                        Text('Offical Website:'),
-                        for (var url in game.websites!)
+                        Text('Official Website:'),
+                        for (var urlString in game.websites!)
                           TextButton(
-                            onPressed: () {
-                              launch(url);
+                            onPressed: () async {
+                              // Enusre the url is a Uri object
+                              final Uri url = Uri.parse(urlString);
+                              // Check if url can launch
+                              if (await canLaunchUrl(url)) {
+                                await launchUrl(url);
+                              } else {
+                                throw 'Could not launch $url';
+                              }
                             },
-                            child: Text(url),
+                            child: Text(urlString),
                           ),
                       ],
                     ],
