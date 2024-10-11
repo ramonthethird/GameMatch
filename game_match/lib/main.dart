@@ -27,8 +27,7 @@ class GameMatchApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      //home: const SideBar(), // This is the side bar page
-      home: GameListScreen(),
+      home: const SideBar(), // This is the side bar page
       routes: {
         '/side_bar': (context) => const SideBar(), // This is the side bar page
         '/Profile': (context) => const Profile(), // This is the profile page
