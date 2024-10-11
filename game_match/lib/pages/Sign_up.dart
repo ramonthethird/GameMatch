@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -13,17 +15,19 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: SignUpScreen(),
+      home: const SignUp(),
     );
   }
 }
 
-class SignUpScreen extends StatefulWidget {
+class SignUp extends StatefulWidget {
+  const SignUp({super.key});
+
   @override
   _SignUpScreenState createState() => _SignUpScreenState();
 }
 
-class _SignUpScreenState extends State<SignUpScreen> {
+class _SignUpScreenState extends State<SignUp> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   late String email, username, password, confirmPassword;
 
@@ -41,19 +45,21 @@ class _SignUpScreenState extends State<SignUpScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      //appBar: AppBar(title: const Text('Create an Account')),
       appBar: AppBar(
-        title: Text('Create an Account'),
+        title: const Text('Create an Account'),
         // Adding a back button in the AppBar's leading widget
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.of(context).pop(), // This will pop the current route off the navigator.
         ),
       ),
+
       body: Center(
         child: Card(
-          margin: EdgeInsets.all(20),
+          margin: const EdgeInsets.all(20),
           child: SingleChildScrollView(
-            padding: EdgeInsets.all(16),
+            padding: const EdgeInsets.all(16),
             child: Form(
               key: _formKey,
               child: Column(
@@ -63,14 +69,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     'assets/GameMatch Logo Black.png',
                     height: 100, // Set your desired height
                   ),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                   TextFormField(
-                    decoration: InputDecoration(
-                      labelText: 'Email',
-                      border: OutlineInputBorder(),
-                      filled: true,
-                      fillColor: Colors.white,
-                    ),
+                    decoration: const InputDecoration(
+                        labelText: 'Email',
+                        border: OutlineInputBorder(),
+                        filled: true,
+                        fillColor: Colors.white),
                     keyboardType: TextInputType.emailAddress,
                     validator: (value) {
                       if (value!.isEmpty || !value.contains('@')) {
@@ -82,14 +87,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       email = value!;
                     },
                   ),
-                  SizedBox(height: 12),
+                  const SizedBox(height: 12),
                   TextFormField(
-                    decoration: InputDecoration(
-                      labelText: 'Username',
-                      border: OutlineInputBorder(),
-                      filled: true,
-                      fillColor: Colors.white,
-                    ),
+                    decoration: const InputDecoration(
+                        labelText: 'Username',
+                        border: OutlineInputBorder(),
+                        filled: true,
+                        fillColor: Colors.white),
                     validator: (value) {
                       if (value!.isEmpty || value.length < 4) {
                         return 'Please enter at least 4 characters.';
@@ -100,13 +104,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       username = value!;
                     },
                   ),
+                  const SizedBox(height: 12),
                   TextFormField(
-                    decoration: InputDecoration(
-                      labelText: 'Password',
-                      border: OutlineInputBorder(),
-                      filled: true,
-                      fillColor: Colors.white,
-                    ),
+                    decoration: const InputDecoration(
+                        labelText: 'Password',
+                        border: OutlineInputBorder(),
+                        filled: true,
+                        fillColor: Colors.white),
                     obscureText: true,
                     validator: (value) {
                       if (value!.isEmpty || value.length < 8) {
@@ -118,13 +122,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       password = value!;
                     },
                   ),
+                  const SizedBox(height: 12),
                   TextFormField(
-                    decoration: InputDecoration(
-                      labelText: 'Confirm Password',
-                      border: OutlineInputBorder(),
-                      filled: true,
-                      fillColor: Colors.white,
-                    ),
+                    decoration: const InputDecoration(
+                        labelText: 'Confirm Password',
+                        border: OutlineInputBorder(),
+                        filled: true,
+                        fillColor: Colors.white),
                     obscureText: true,
                     validator: (value) {
                       if (value != password) {
@@ -136,19 +140,22 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       confirmPassword = value!;
                     },
                   ),
-                  SizedBox(height: 20),
-                  Container(
+                  const SizedBox(height: 20),
+                  SizedBox(
                     width: double.infinity,
                     height: 50,
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.lightBlueAccent,
-                        shape: RoundedRectangleBorder(
+                        shape: const RoundedRectangleBorder(
                           borderRadius: BorderRadius.zero,
                         ),
                       ),
-                      onPressed: _trySubmit,
-                      child: Text('Sign Up'),
+                      onPressed: () {
+                        _trySubmit();
+                        Navigator.pushNamed(context, '/Interest');
+                      },
+                      child: const Text('Sign Up'),
                     ),
                   ),
                 ],

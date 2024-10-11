@@ -5,8 +5,9 @@ import 'package:game_match/firebase_options.dart';
 
 class InterestsPage extends StatefulWidget {
   const InterestsPage({super.key});
+
   @override
-  _InterestsPageState createState() => _InterestsPageState();
+   _InterestsPageState createState() => _InterestsPageState();
 }
 
 class _InterestsPageState extends State<InterestsPage> {
@@ -16,7 +17,7 @@ class _InterestsPageState extends State<InterestsPage> {
   String? dropdownValue3;
   String? dropdownValue4;
 
-  // Customized list of items for each dropdown
+  // List of items for each dropdown
   final List<String> gameModes = [
     'Single Player', 
     'Multiplayer', 
@@ -57,7 +58,7 @@ class _InterestsPageState extends State<InterestsPage> {
     _loadInterests(); // Load the user's interests when the page initializes
   }
 
-  // Method to save user's interests to Firestore
+  // Save user's interests to Firestore
   void _saveInterests() async {
     await firestore.collection('users').doc(userId).set({
       'interests': {
@@ -69,7 +70,7 @@ class _InterestsPageState extends State<InterestsPage> {
     }, SetOptions(merge: true)); // Merge the interests with existing data
 
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Interests saved successfully!')),
+      const SnackBar(content: Text('Interests saved successfully!')),
     );
 
     // Print for debugging
@@ -82,10 +83,11 @@ class _InterestsPageState extends State<InterestsPage> {
     });
   }
 
-  // Method to load user's interests from Firestore
+  // Load user's interests from Firestore
   void _loadInterests() async {
     DocumentSnapshot doc = await firestore.collection('users').doc(userId).get();
 
+    // If a user already have interests saved before, load them
     if (doc.exists && doc['interests'] != null) {
       Map<String, dynamic> interests = doc['interests'];
       setState(() {
@@ -108,52 +110,25 @@ class _InterestsPageState extends State<InterestsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Interests'),
+        title: Text('Interests'), // AppBar title
         centerTitle: true,
         backgroundColor: const Color(0xFF74ACD5),
         leading: IconButton(
-          icon: Icon(Icons.menu),
+          icon: const Icon(Icons.menu), // Sidebar Icon
           onPressed: () {
             //Scaffold.of(context).openDrawer();
-            Navigator.pushNamed(context,"/side_bar");
+            Navigator.pushNamed(context,"/side_bar"); // Open/Return to sidebar
           },
         ),
       ),
-      drawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: <Widget>[
-            DrawerHeader(
-              decoration: BoxDecoration(
-                color: const Color(0xFF74ACD5),
-              ),
-              child: Text(
-                'Menu',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 24,
-                ),
-              ),
-            ),
-            ListTile(
-              leading: Icon(Icons.home),
-              title: Text('Home'),
-              onTap: () {},
-            ),
-            ListTile(
-              leading: Icon(Icons.settings),
-              title: Text('Settings'),
-              onTap: () {},
-            ),
-          ],
-        ),
-      ),
+      
+      // Header Title
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Align(
+            const Align(
               alignment: Alignment.topCenter,
               child: Text(
                 'Manage Interests',
@@ -163,95 +138,95 @@ class _InterestsPageState extends State<InterestsPage> {
                 ),
               ),
             ),
-            SizedBox(height: 40),
+            const SizedBox(height: 40),
 
             // Dropdown 1: Game Mode
-            Text(
-              'Game Mode',
+            const Text(
+              'Game Mode', // Dropdown Title
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
             ),
             DropdownButton<String>(
               value: dropdownValue1,
-              hint: Text('Select Game Mode'),
-              onChanged: (String? newValue) {
+              hint: const Text('Select Game Mode'), // Dropdown Hint
+              onChanged: (String? newValue) { // Change state of dropdown, show selected item
                 setState(() {
                   dropdownValue1 = newValue;
                 });
               },
-              items: gameModes.map<DropdownMenuItem<String>>((String value) {
+              items: gameModes.map<DropdownMenuItem<String>>((String value) { // Use gameModes string values as dropdown items
                 return DropdownMenuItem<String>(
                   value: value,
                   child: Text(value),
                 );
               }).toList(),
             ),
-            SizedBox(height: 30),
+            const SizedBox(height: 30),
 
             // Dropdown 2: Player Perspective
-            Text(
-              'Player Perspective',
+            const Text(
+              'Player Perspective', // Dropdown Title
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
             ),
             DropdownButton<String>(
               value: dropdownValue2,
-              hint: Text('Select Player Perspective'),
-              onChanged: (String? newValue) {
+              hint: const Text('Select Player Perspective'), //Dropdown Hint
+              onChanged: (String? newValue) { // Change state of dropdown, show selected item
                 setState(() {
                   dropdownValue2 = newValue;
                 });
               },
-              items: playerPerspective.map<DropdownMenuItem<String>>((String value) {
+              items: playerPerspective.map<DropdownMenuItem<String>>((String value) { // Use playerPerspective string values as dropdown items
                 return DropdownMenuItem<String>(
                   value: value,
                   child: Text(value),
                 );
               }).toList(),
             ),
-            SizedBox(height: 30),
+            const SizedBox(height: 30),
 
             // Dropdown 3: Platform
-            Text(
-              'Platform',
+            const Text(
+              'Platform', // Dropdown Title
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
             ),
             DropdownButton<String>(
               value: dropdownValue3,
-              hint: Text('Select Platform'),
-              onChanged: (String? newValue) {
+              hint: const Text('Select Platform'), // Dropdown Hint
+              onChanged: (String? newValue) { // Change state of dropdown, show selected item
                 setState(() {
                   dropdownValue3 = newValue;
                 });
               },
-              items: platforms.map<DropdownMenuItem<String>>((String value) {
+              items: platforms.map<DropdownMenuItem<String>>((String value) { // Use platforms string values as dropdown items
                 return DropdownMenuItem<String>(
                   value: value,
                   child: Text(value),
                 );
               }).toList(),
             ),
-            SizedBox(height: 30),
+            const SizedBox(height: 30),
 
             // Dropdown 4: Price
-            Text(
-              'Price',
+            const Text(
+              'Price', // Dropdown Title
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
             ),
             DropdownButton<String>(
               value: dropdownValue4,
-              hint: Text('Select Price'),
-              onChanged: (String? newValue) {
+              hint: const Text('Select Price'), // Dropdown Hint
+              onChanged: (String? newValue) { // Change state of dropdown item, show selected item
                 setState(() {
                   dropdownValue4 = newValue;
                 });
               },
-              items: price.map<DropdownMenuItem<String>>((String value) {
+              items: price.map<DropdownMenuItem<String>>((String value) { // Use price string values as dropdown items
                 return DropdownMenuItem<String>(
                   value: value,
                   child: Text(value),
                 );
               }).toList(),
             ),
-            SizedBox(height: 30),
+            const SizedBox(height: 30),
 
             // Save Button
             ElevatedButton(
@@ -259,13 +234,14 @@ class _InterestsPageState extends State<InterestsPage> {
               child: Text(
                 'Save',
                 style: TextStyle(
-                  color: Colors.white, // Set the text color here
+                  color: Colors.white,
                   fontSize: 18,
                 ),
               ),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.blue,
-                padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                textStyle: const TextStyle(fontSize: 18),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),

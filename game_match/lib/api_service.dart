@@ -4,7 +4,7 @@ import 'package:http/http.dart' as http;
 import 'pages/game_model.dart';
 
 class ApiService {
-  final FlutterSecureStorage secureStorage = FlutterSecureStorage();
+  final FlutterSecureStorage secureStorage = const FlutterSecureStorage();
   final String clientId = 'v5v1uyyo05m4ttc8yvd26yrwslfimc';
   final String clientSecret = 'hu3w4pwpc344uwdp2k77xfjozbaxc5';
   final String baseUrl = 'https://api.igdb.com/v4';
@@ -46,7 +46,7 @@ class ApiService {
     }
 
     final Uri url = Uri.parse('$baseUrl/games');
-    final String body = '''
+    const String body = '''
     fields name, summary, genres.name. cover.url;
     limit 10;
     ''';
