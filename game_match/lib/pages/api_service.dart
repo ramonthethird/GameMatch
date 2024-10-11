@@ -47,16 +47,9 @@ class ApiService {
 
     final Uri url = Uri.parse('$baseUrl/games');
     final String body = '''
-    fields name, summary, genres.name. cover.url, platforms.name, release_dates.human, websites.url;
+    fields name, summary, genres.name, cover.url, platforms.name, release_dates.human, websites.url;
     limit 10;
     ''';
-
-    // final String body = '''
-    // {
-    //   "fields": ["id", "name", "cover", "summary"],
-    //   "limit": 10
-    // }
-    // ''';
 
     try {
       final response = await http.post(
@@ -70,13 +63,12 @@ class ApiService {
       );
 
       if (response.statusCode == 200) {
+        print('Response Body: ${response.body}');
         final List<dynamic> gameDataJson = json.decode(response.body);
         final List<Game> games = gameDataJson
             .map((dynamic json) => Game.fromJson(json as Map<String, dynamic>))
             .toList();
         return games;
-        //print('Game Data: $gameData');
-        // Handle the game data here (e.g., return it or update state)
       } else {
         print(
             'Failed to fetch game data: ${response.statusCode} ${response.body}');
