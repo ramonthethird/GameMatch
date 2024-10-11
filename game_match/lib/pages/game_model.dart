@@ -17,23 +17,6 @@ class Game {
     required this.releaseDates,
   });
 
-  // factory Game.fromJson(Map<String, dynamic> json) {
-  //   List<String> genres = (json['genres'] as List)
-  //       .map((genre) => genre['name'] as String)
-  //       .toList();
-
-  //   List<String>? platforms = (json['platforms'] as List<dynamic>?)
-  //       ?.map((platform) => platform['name'] as String)
-  //       .toList();
-
-  //   List<String>? releaseDates = (json['release_dates'] as List<dynamic>?)
-  //       ?.map((date) => date['human'] as String)
-  //       .toList();
-
-  //   List<String>? websites = (json['websites'] as List<dynamic>?)
-  //       ?.map((website) => website['url'] as String)
-  //       .toList();
-
   factory Game.fromJson(Map<String, dynamic> json) {
     // Safely map genres, providing an empty list if null
     List<String> genres = (json['genres'] as List<dynamic>?)
@@ -58,18 +41,6 @@ class Game {
             ?.map((website) => website['url'] as String)
             .toList() ??
         [];
-
-    // return Game(
-    //   name: json['name'] ?? 'No title',
-    //   summary: json['summary'] as String? ?? 'No description available',
-    //   genres: genres ?? [],
-    //   coverUrl: json['cover'] != null
-    //       ? 'https:${json['cover']['url']}' // Append https: to the cover URL
-    //       : null,
-    //   platforms: platforms ?? [], // Default to an empty list if null
-    //   releaseDates: releaseDates ?? [], // Default to an empty list if null
-    //   websites: websites ?? [], // Default to an empty list if null
-    // );
 
     return Game(
       name: json['name'] as String? ?? 'No title',
