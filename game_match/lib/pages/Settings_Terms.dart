@@ -9,7 +9,7 @@ class SettingsTermsPage extends StatelessWidget {
         backgroundColor: const Color(0xFF74ACD5),
         centerTitle: true,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () {
             Navigator.pop(context); // Go back to Settings Page
           },

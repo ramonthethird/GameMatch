@@ -1,39 +1,88 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:game_match/pages/Preference_Interest.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'firebase_options.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'pages/Home.dart'; // Import the home page
-import 'pages/Profile.dart'; // Import the profile page
-import 'pages/Side_bar.dart'; // Import the side bar page
-import 'pages/Interest.dart'; // Import the interest page
+import 'pages/Preference_Interest.dart';
+import 'pages/game_info.dart';
+import 'pages/Profile.dart';
+import 'pages/Side_bar.dart';
+import 'pages/Interest.dart';
+import 'pages/Edit_profile.dart';
+import 'pages/Sign_up.dart';
+import 'pages/Settings.dart';
+import 'pages/Settings_Appearance.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  runApp(const GameMatchApp());
+  runApp(GameMatchApp());
 }
 
-class GameMatchApp extends StatelessWidget {
-  const GameMatchApp({super.key});
+class GameMatchApp extends StatefulWidget {
+  @override
+  _GameMatchAppState createState() => _GameMatchAppState();
+}
+
+class _GameMatchAppState extends State<GameMatchApp> {
+  bool isDarkMode = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadThemePreference(); // Load theme when the app starts
+  }
+
+  Future<void> _loadThemePreference() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      isDarkMode = prefs.getBool('isDarkMode') ?? false;
+    });
+  }
+
+  void _toggleTheme(bool isDark) async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      isDarkMode = isDark; // Update theme mode in state
+    });
+    await prefs.setBool('isDarkMode', isDark); // Save theme mode to SharedPreferences
+  }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'GameMatch', // The title of your app
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
+      title: 'GameMatch',
+      themeMode: isDarkMode ? ThemeMode.dark : ThemeMode.light,
+      theme: ThemeData.light(), // Light theme
+      darkTheme: ThemeData.dark(), // Dark theme
+      home: SideBar(
+        isDarkMode: isDarkMode, // Pass the current theme state
+        onThemeChanged: _toggleTheme, // Pass the theme toggle function
       ),
-      home: const SideBar(), // This is the side bar page
+      //home: GameListScreen(), // This is to test that games are loading from API
       routes: {
-        '/side_bar': (context) => const SideBar(), // This is the side bar page
-        '/Profile': (context) => const Profile(), // This is the profile page
-        '/Preference_&_Interest': (context) => Preference_Interest_Page(), // This is the interest page
-        '/Interest': (context) => const InterestsPage(),
+        '/Sign_in': (context) => const SignUp(),
+        '/side_bar': (context) => SideBar(
+              onThemeChanged: _toggleTheme,
+              isDarkMode: isDarkMode,
+            ),
+        '/Profile': (context) => Profile(),
+        '/Interest': (context) => InterestsPage(),
+        '/Edit_profile': (context) => EditProfile(),
+        '/Preference_&_Interest': (context) => PreferenceInterestPage(
+              onThemeChanged: _toggleTheme,
+              isDarkMode: isDarkMode,
+        ),
+        '/Settings': (context) => SettingsPage(
+              isDarkMode: isDarkMode,
+              onThemeChanged: _toggleTheme,
+            ),
+        '/Appearance': (context) => SettingsAppearancePage(
+              isDarkMode: isDarkMode,
+              onThemeChanged: _toggleTheme,
+            ),
       },
-      //home: const HomePage(), // This is the main screen of your app
     );
   }
 }
