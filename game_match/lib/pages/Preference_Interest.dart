@@ -25,7 +25,7 @@ class PreferenceInterestPage extends StatelessWidget {
             ),
           ),
           centerTitle: true,
-          backgroundColor: const Color(0xFF74ACD5), // Use fixed app bar color
+          backgroundColor: const Color(0xFF74ACD5),
           elevation: 0,
           leading: IconButton(
             icon: const Icon(Icons.menu, color: Colors.black),
@@ -57,7 +57,7 @@ class PreferenceInterestPage extends StatelessWidget {
                     subtitle: 'Edit and Save genre preferences',
                     icon: Icons.tune,
                     onPressed: () {
-                      // Add navigation logic here
+                      // Add navigation here
                     },
                     isDarkMode: isDarkMode, // Pass dark mode status
                   ),
@@ -88,14 +88,14 @@ class CustomButton extends StatelessWidget {
   final String subtitle;
   final IconData icon;
   final VoidCallback onPressed;
-  final bool isDarkMode; // Add dark mode flag
+  final bool isDarkMode;
 
   const CustomButton({
     required this.title,
     required this.subtitle,
     required this.icon,
     required this.onPressed,
-    required this.isDarkMode, // Receive dark mode flag
+    required this.isDarkMode,
   });
 
   @override
@@ -116,8 +116,9 @@ class CustomButton extends StatelessWidget {
       child: ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
-          backgroundColor: isDarkMode ? const Color.fromARGB(255, 50, 50, 50) : Colors.white, // Adapt background color
-          foregroundColor: isDarkMode ? Colors.white : Colors.black, // Adapt text color
+          // Change colors depending on theme
+          backgroundColor: isDarkMode ? const Color.fromARGB(255, 50, 50, 50) : Colors.white,
+          foregroundColor: isDarkMode ? Colors.white : Colors.black,
           padding: const EdgeInsets.all(25),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(15),
@@ -129,7 +130,7 @@ class CustomButton extends StatelessWidget {
             Icon(
               icon,
               size: 40,
-              color: isDarkMode ? Colors.white : Colors.black, // Adapt icon color
+              color: isDarkMode ? Colors.white : Colors.black,
             ),
             const SizedBox(width: 20),
             Expanded(
@@ -141,7 +142,7 @@ class CustomButton extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      color: isDarkMode ? Colors.white : Colors.black, // Adapt text color
+                      color: isDarkMode ? Colors.white : Colors.black,
                     ),
                   ),
                   const SizedBox(height: 5),
@@ -149,7 +150,7 @@ class CustomButton extends StatelessWidget {
                     subtitle,
                     style: TextStyle(
                       fontSize: 14,
-                      color: isDarkMode ? Colors.grey[300] : Colors.black54, // Adapt subtitle color
+                      color: isDarkMode ? Colors.grey[300] : Colors.black54,
                     ),
                   ),
                 ],

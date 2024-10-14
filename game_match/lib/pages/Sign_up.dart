@@ -59,7 +59,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
                 Image.asset(
-                  'lib/assets/gamematchlogoresize.png', // Image added at the top of the form
+                  'assets/images/gamematchlogoresize.png', // Image added at the top of the form
                   height: 100, // Set the height of the image
                 ),
                 const SizedBox(height: 20),

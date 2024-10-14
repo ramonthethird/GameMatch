@@ -57,7 +57,10 @@ class _GameMatchAppState extends State<GameMatchApp> {
       themeMode: isDarkMode ? ThemeMode.dark : ThemeMode.light,
       theme: ThemeData.light(), // Light theme
       darkTheme: ThemeData.dark(), // Dark theme
-      home: LoginPage(),
+      home: SideBar(
+              onThemeChanged: _toggleTheme,
+              isDarkMode: isDarkMode,
+            ),
       //home: GameListScreen(), // This is to test that games are loading from API
       routes: {
         '/Sign_in': (context) => const SignUp(),
