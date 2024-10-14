@@ -1,11 +1,19 @@
 import 'package:flutter/material.dart';
 
 class SideBar extends StatelessWidget {
-  const SideBar({super.key});
+  final ValueChanged<bool> onThemeChanged; // Callback to change the theme
+  final bool isDarkMode; // Pass the current theme mode
+
+  const SideBar({
+    super.key,
+    required this.onThemeChanged, // Accept the callback
+    required this.isDarkMode, // Accept the current mode
+  });
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: isDarkMode ? Colors.black : Colors.white, // Background color based on theme
       body: Align(
         alignment: Alignment.topLeft,
         child: Column(
@@ -14,7 +22,7 @@ class SideBar extends StatelessWidget {
           children: [
             Container(
               padding: const EdgeInsets.all(10),
-              color: const Color(0xFF74ACD5),
+              color: isDarkMode ? const Color(0xFF74ACD5) : const Color(0xFF74ACD5), // Adjust the header color based on theme
               width: 200,
           child: Row(
             children: [
@@ -25,7 +33,7 @@ class SideBar extends StatelessWidget {
                     },
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.all(10),
-                      backgroundColor: const Color(0xFF74ACD5),
+                      backgroundColor: isDarkMode ? const Color(0xFF74ACD5) : const Color(0xFF74ACD5), // Adjust background color
                       fixedSize: const Size(80, 80),
                       alignment: Alignment.centerLeft,
                       shape: RoundedRectangleBorder(
@@ -38,7 +46,6 @@ class SideBar extends StatelessWidget {
                       decoration: const BoxDecoration(
                         image: DecorationImage(
                           image: AssetImage('assets/images/profile.png'),
-                          //fit: BoxFit.cover,
                         ),
                       ),
                     ),
@@ -50,12 +57,18 @@ class SideBar extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text("User Name"),
+                          Text(
+                            "User Name",
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: Colors.black54, // Keep username in white for visibility
+                            ),
+                          ),
                           Text(
                             "Diamond Tier",
                             style: TextStyle(
                               fontSize: 12,
-                              color: Colors.black54,
+                              color: Colors.black54, // Light grey for tier in dark mode
                             ),
                           ),
                         ],
@@ -65,185 +78,81 @@ class SideBar extends StatelessWidget {
                 ],
               ),
             ),
-            ElevatedButton.icon(
-              icon: const Icon(Icons.favorite),
-              label: const Text("Swipe page"),
-              onPressed: () {},
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.all(10),
-                backgroundColor: Colors.white,
-                fixedSize: const Size(200, 50),
-                textStyle: const TextStyle(
-                    fontSize: 16,
-                    color: Colors.black,
-                    fontWeight: FontWeight.bold),
-                foregroundColor: Colors.black, // make the text color black
-                alignment: Alignment.centerLeft, // align the text to the left
-                side: const BorderSide(
-                    color: Colors.black, width: 0), // add a border
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(
-                        0)), // make the button rectangular
-              ),
-            ),
-            ElevatedButton.icon(
-              icon: const Icon(Icons.room_preferences),
-              label: const Text("Preference"),
-              onPressed: () {
-                Navigator.pushNamed(context, '/Preference_&_Interest');
-              },
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.all(10),
-                backgroundColor: Colors.white,
-                fixedSize: const Size(200, 50),
-                textStyle: const TextStyle(
-                    fontSize: 16,
-                    color: Colors.black,
-                    fontWeight: FontWeight.bold),
-                foregroundColor: Colors.black, // make the text color black
-                alignment: Alignment.centerLeft, // align the text to the left
-                side: const BorderSide(color: Colors.black, width: 0),
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(
-                        0)), // make the button rectangular
-                //alignment: Alignment.center, // align the text to the center
-              ), //will be used to navigate to the next page
-            ),
-            ElevatedButton.icon(
-              icon: const Icon(Icons.subscriptions),
-              label: const Text("Subscription"),
-              onPressed: () {},
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.all(10),
-                backgroundColor: Colors.white,
-                fixedSize: const Size(200, 50),
-                textStyle: const TextStyle(
-                    fontSize: 16,
-                    color: Colors.black,
-                    fontWeight: FontWeight.bold),
-                foregroundColor: Colors.black, // make the text color black
-                alignment: Alignment.centerLeft, // align the text to the left
-                side: const BorderSide(
-                    color: Colors.black, width: 0), // add a border
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(
-                        0)), // make the button rectangular
-                //alignment: Alignment.center, // align the text to the center
-              ), //will be used to navigate to the next page
-            ),
-            ElevatedButton.icon(
-              icon: const Icon(Icons.newspaper_rounded),
-              label: const Text("News"),
-              onPressed: () {},
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.all(10),
-                backgroundColor: Colors.white,
-                fixedSize: const Size(200, 50),
-                textStyle: const TextStyle(
-                    fontSize: 16,
-                    color: Colors.black,
-                    fontWeight: FontWeight.bold),
-                foregroundColor: Colors.black, // make the text color black
-                alignment: Alignment.centerLeft, // align the text to the left
-                side: const BorderSide(
-                    color: Colors.black, width: 0), // add a border
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(
-                        0)), // make the button rectangular
-                //alignment: Alignment.center, // align the text to the center
-              ), //will be used to navigate to the next page
-            ),
-            ElevatedButton.icon(
-              icon: const Icon(Icons.interests),
-              label: const Text("Wishlist"),
-              onPressed: () {},
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.all(10),
-                backgroundColor: Colors.white,
-                fixedSize: const Size(200, 50),
-                textStyle: const TextStyle(
-                    fontSize: 16,
-                    color: Colors.black,
-                    fontWeight: FontWeight.bold),
-                foregroundColor: Colors.black, // make the text color black
-                alignment: Alignment.centerLeft, // align the text to the left
-                side: const BorderSide(
-                    color: Colors.black, width: 0), // add a border
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(
-                        0)), // make the button rectangular
-                //alignment: Alignment.center, // align the text to the center
-              ), //will be used to navigate to the next page
-            ),
-            ElevatedButton.icon(
-              icon: const Icon(Icons.settings),
-              label: const Text("Settings"),
-              onPressed: () {
-                Navigator.pushNamed(context, '/Settings');
-              },
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.all(10),
-                backgroundColor: Colors.white,
-                fixedSize: const Size(200, 50),
-                textStyle: const TextStyle(
-                    fontSize: 16,
-                    color: Colors.black,
-                    fontWeight: FontWeight.bold),
-                foregroundColor: Colors.black, // make the text color black
-                alignment: Alignment.centerLeft, // align the text to the left
-                side: const BorderSide(
-                    color: Colors.black, width: 0), // add a border
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(
-                        0)), // make the button rectangular
-                //alignment: Alignment.center, // align the text to the center
-              ), //will be used to navigate to the next page
-            ),
-            ElevatedButton.icon(
-              icon: const Icon(Icons.logout),
-              label: const Text("Log out"),
-              onPressed: () {
-                // show a dialog to confirm log out
-                showDialog(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return AlertDialog(
-                      content: const Text("Are you sure you want to log out?"),
-                      actions: [
-                        TextButton(
-                          child: const Text("No"),
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                          },
+            buildMenuButton(context, Icons.favorite, "Swipe page", () {}),
+            buildMenuButton(context, Icons.room_preferences, "Preference", () {
+              Navigator.pushNamed(context, '/Preference_&_Interest');
+            }),
+            buildMenuButton(context, Icons.subscriptions, "Subscription", () {}),
+            buildMenuButton(context, Icons.newspaper_rounded, "News", () {}),
+            buildMenuButton(context, Icons.interests, "Wishlist", () {}),
+            buildMenuButton(context, Icons.settings, "Settings", () {
+              Navigator.pushNamed(context, '/Settings');
+            }),
+            buildMenuButton(context, Icons.logout, "Log out", () {
+              showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return AlertDialog(
+                    backgroundColor: isDarkMode ? Colors.grey[850] : Colors.white,
+                    content: Text(
+                      "Are you sure you want to log out?",
+                      style: TextStyle(color: isDarkMode ? Colors.white : Colors.black),
+                    ),
+                    actions: [
+                      TextButton(
+                        child: Text(
+                          "No",
+                          style: TextStyle(color: isDarkMode ? Colors.white : Colors.black),
+
                         ),
-                        TextButton(
-                          child: const Text("Yes"),
-                          onPressed: () {},
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                      ),
+                      TextButton(
+                        child: Text(
+                          "Yes",
+                          style: TextStyle(color: isDarkMode ? Colors.white : Colors.black),
                         ),
-                      ],
-                    );
-                  },
-                );
-              },
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.all(10),
-                backgroundColor: Colors.white,
-                fixedSize: const Size(200, 50),
-                textStyle: const TextStyle(
-                    fontSize: 16,
-                    color: Colors.black,
-                    fontWeight: FontWeight.bold),
-                foregroundColor: Colors.black, // make the text color black
-                alignment: Alignment.centerLeft, // align the text to the left
-                side: const BorderSide(
-                    color: Colors.black, width: 0), // add a border
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(
-                        0)), // make the button rectangular
-                //alignment: Alignment.center, // align the text to the center
-              ), //will be used to navigate to the next page
-            ),
+                        onPressed: () {},
+                      ),
+                    ],
+                  );
+                },
+              );
+            }),
           ],
+        ),
+      ),
+    );
+  }
+
+  ElevatedButton buildMenuButton(BuildContext context, IconData icon, String label, VoidCallback onPressed) {
+    return ElevatedButton.icon(
+      icon: Icon(
+        icon,
+        color: isDarkMode ? Colors.white : Colors.black, // Icon color based on theme
+      ),
+      label: Text(
+        label,
+        style: TextStyle(
+          fontSize: 16,
+          color: isDarkMode ? Colors.white : Colors.black, // Text color based on theme
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+      onPressed: onPressed,
+      style: ElevatedButton.styleFrom(
+        padding: const EdgeInsets.all(10),
+        backgroundColor: isDarkMode ? Colors.black : Colors.white, // Button background based on theme
+        fixedSize: const Size(200, 50),
+        alignment: Alignment.centerLeft, // Align the text to the left
+        side: BorderSide(
+          color: isDarkMode ? Colors.white : Colors.black, // Border color based on theme
+          width: 1.0,
+        ),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(0), // Keep buttons rectangular
         ),
       ),
     );

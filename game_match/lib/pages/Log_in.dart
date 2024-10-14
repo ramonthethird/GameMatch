@@ -1,5 +1,5 @@
-// still needs to edit for consolidation
 
+// still needs to edit for consolidation
 
 import 'package:flutter/material.dart';
 import 'package:login_ui_1/recoverusername.dart';  // Import the recovery page
@@ -88,10 +88,10 @@ class _MyLoginPageState extends State<MyLoginPage> {
   
               GestureDetector(
                 onTap: () {
-            
+                  // navigate to the RecoverUsernamePage
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const UsernameRecoveryPage()), // Change name to reflect new UsernameRecoveryPage
+                    MaterialPageRoute(builder: (context) => const UsernameRecoveryPage()), // Ensure RecoverUsernamePage is imported and declared
                   );
                 },
 

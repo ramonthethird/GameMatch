@@ -2,7 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:game_match/pages/Side_bar.dart';
 
 class PreferenceInterestPage extends StatelessWidget {
-  const PreferenceInterestPage({super.key});
+  final bool isDarkMode; // Accept current theme mode
+  final ValueChanged<bool> onThemeChanged; // Theme change callback
+
+  const PreferenceInterestPage({
+    Key? key,
+    required this.isDarkMode, // Add dark mode parameter
+    required this.onThemeChanged, // Add theme change callback
+  }) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -10,52 +18,47 @@ class PreferenceInterestPage extends StatelessWidget {
         preferredSize: const Size.fromHeight(60.0),
         child: AppBar(
           title: const Text(
-            'Preferences & Interests', // AppBar Title
+            'Preferences & Interests',
             style: TextStyle(
-              color: Colors.black, fontSize: 24
+              color: Colors.black, 
+              fontSize: 24,
             ),
           ),
           centerTitle: true,
-          backgroundColor: const Color(0xFF74ACD5),
+          backgroundColor: const Color(0xFF74ACD5), // Use fixed app bar color
           elevation: 0,
           leading: IconButton(
-            icon: const Icon(Icons.menu),
+            icon: const Icon(Icons.menu, color: Colors.black),
             onPressed: () {
-              //Scaffold.of(context).openDrawer();
-              Navigator.pop(context,"/SideBar"); // Open/Return to sidebar
-
+              Navigator.pop(context, "/SideBar"); // Open/Return to sidebar
             },
           ),
         ),
       ),
-      
       body: Stack(
         children: [
           Container(
             height: 0,
             decoration: const BoxDecoration(
               color: Color(0xFF74ACD5),
-              borderRadius: BorderRadius.only(
-              ),
             ),
           ),
-
           Padding(
-            padding: const EdgeInsets.only(top: 20), // Adjust padding to control content position
+            padding: const EdgeInsets.only(top: 20),
             child: Center(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  const SizedBox(height: 15), // Space below AppBar
-
+                  const SizedBox(height: 15),
                   // Manage Preference button
                   CustomButton(
                     title: 'Manage preferences',
                     subtitle: 'Edit and Save genre preferences',
                     icon: Icons.tune, // Preference icon
                     onPressed: () {
-                      // Navigate to Preference page (put code here)
+                      // Add navigation logic here
                     },
+                    isDarkMode: isDarkMode, // Pass dark mode status
                   ),
                   const SizedBox(height: 15),
 
@@ -67,6 +70,7 @@ class PreferenceInterestPage extends StatelessWidget {
                     onPressed: () {
                       Navigator.pushNamed(context, '/Interest'); // Navigate to Interest page
                     },
+                    isDarkMode: isDarkMode, // Pass dark mode status
                   ),
                 ],
               ),
@@ -84,12 +88,14 @@ class CustomButton extends StatelessWidget {
   final String subtitle;
   final IconData icon;
   final VoidCallback onPressed;
+  final bool isDarkMode; // Add dark mode flag
 
   const CustomButton({
     required this.title,
     required this.subtitle,
     required this.icon,
     required this.onPressed,
+    required this.isDarkMode, // Receive dark mode flag
   });
 
   @override
@@ -109,9 +115,9 @@ class CustomButton extends StatelessWidget {
       ),
       child: ElevatedButton(
         onPressed: onPressed,
-        style: ElevatedButton.styleFrom( // Effect when clicking button
-          backgroundColor: Colors.white,
-          foregroundColor: Colors.black,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: isDarkMode ? const Color.fromARGB(255, 50, 50, 50) : Colors.white, // Adapt background color
+          foregroundColor: isDarkMode ? Colors.white : Colors.black, // Adapt text color
           padding: const EdgeInsets.all(25),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(15),
@@ -120,7 +126,11 @@ class CustomButton extends StatelessWidget {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Icon(icon, size: 40, color: Colors.black),
+            Icon(
+              icon,
+              size: 40,
+              color: isDarkMode ? Colors.white : Colors.black, // Adapt icon color
+            ),
             const SizedBox(width: 20),
             Expanded(
               child: Column(
@@ -131,7 +141,7 @@ class CustomButton extends StatelessWidget {
                     style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      color: Colors.black,
+                      color: isDarkMode ? Colors.white : Colors.black, // Adapt text color
                     ),
                   ),
                   const SizedBox(height: 5),
@@ -139,7 +149,7 @@ class CustomButton extends StatelessWidget {
                     subtitle,
                     style: const TextStyle(
                       fontSize: 14,
-                      color: Colors.black54,
+                      color: isDarkMode ? Colors.grey[300] : Colors.black54, // Adapt subtitle color
                     ),
                   ),
                 ],

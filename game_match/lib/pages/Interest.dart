@@ -114,7 +114,7 @@ class _InterestsPageState extends State<InterestsPage> {
         centerTitle: true,
         backgroundColor: const Color(0xFF74ACD5),
         leading: IconButton(
-          icon: const Icon(Icons.menu), // Sidebar Icon
+          icon: const Icon(Icons.menu, color: Colors.black), // Sidebar Icon
           onPressed: () {
             //Scaffold.of(context).openDrawer();
             Navigator.pushNamed(context,"/side_bar"); // Open/Return to sidebar
