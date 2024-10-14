@@ -54,7 +54,7 @@ class _MyLoginPageState extends State<MyLoginPage> {
               Padding(
                 padding: const EdgeInsets.only(top: 40.0),
                 child: Image.asset(
-                  'images/gamematchlogoresize.png',
+                  'assets/images/gamematchlogoresize.png',
                   height: 260,
                   width: 260,
                 ),
