@@ -1,30 +1,32 @@
 import 'package:flutter/material.dart';
-import 'package:game_match/pages/add_game.dart';
 import 'api_service.dart';
 import 'game_model.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'wishlist_model.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 
+// The main screen displaying the list of games
 class GameListScreen extends StatefulWidget {
   @override
   _GameListScreenState createState() => _GameListScreenState();
 }
 
+// The state class for the GameListScreen
 class _GameListScreenState extends State<GameListScreen> {
   final ApiService apiService = ApiService();
-  final FirestoreService firestoreService = FirestoreService();
   List<Game> games = [];
 
+  // Called when the widget is first inserted into the widget tree
   @override
   void initState() {
     super.initState();
     _fetchGames();
   }
 
+  // Function to fetch games from the API
   Future<void> _fetchGames() async {
     try {
+      // Fetch games using the APIService
       List<Game> fetchedGames = await apiService.fetchGames();
+      // Update the state
       setState(() {
         games = fetchedGames;
       });
@@ -36,43 +38,14 @@ class _GameListScreenState extends State<GameListScreen> {
     }
   }
 
-  // trying to add a game to wishlist and firebase
-  Future<void> addToWishlist(Game game) async {
-    WishlistGame wishlistGame = WishlistGame(
-      id: game.name, // Use a unique identifier if possible
-      name: game.name,
-      coverUrl: game.coverUrl ?? '',
-      url: game.websites?.isNotEmpty == true
-          ? game.websites!.first
-          : '', // Example: Using the first URL
-    );
-
-    try {
-      // Reference to the wishlist collection for the user
-      final userId =
-          'example_user_id'; // Replace with actual user ID or authentication logic
-      await FirebaseFirestore.instance
-          .collection('wishlists')
-          .doc(userId)
-          .collection('games')
-          .doc(wishlistGame.id)
-          .set(wishlistGame.toJson());
-
-      print('Game added to wishlist: ${wishlistGame.name}');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('${wishlistGame.name} added to wishlist!')),
-      );
-    } catch (e) {
-      print('Error adding to wishlist: $e');
-    }
-  }
-
+  // Build method to construct the UI
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text('Game Info'),
       ),
+      // Check if games list is empty, if so, show a loading
       body: games.isEmpty
           ? Center(
               child:
@@ -83,9 +56,10 @@ class _GameListScreenState extends State<GameListScreen> {
               itemBuilder: (context, index) {
                 final game = games[index];
                 return ListTile(
+                  // Show the game cover image if available, otherwise show a default icon
                   leading: game.coverUrl != null
                       ? Image.network(
-                          game.coverUrl!, // Show cover image if available
+                          game.coverUrl!, // Show cover image from URL
                           errorBuilder: (context, error, stackTrace) {
                             return Icon(Icons.image_not_supported);
                           },
@@ -95,14 +69,19 @@ class _GameListScreenState extends State<GameListScreen> {
                   subtitle: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      // Game summary or fallback message if unavailable
                       Text(
                           'Description: ${game.summary ?? 'No description available'}'),
+                      // Game genres or fallback message if unavailable
                       Text(
                           'Genres: ${game.genres?.join(', ') ?? 'Unknown genres'}'),
+                      // Game platforms or fallback message if unavailable
                       Text(
                           'Platforms: ${game.platforms?.join(',') ?? 'Unknown platforms'}'),
+                      // Game release dates or fallback message if unavailable
                       Text(
                           'Release Date: ${game.releaseDates?.join(',') ?? 'Unknown'}'),
+                      // Display the website URL if available
                       if (game.websites != null &&
                           game.websites!.isNotEmpty) ...[
                         SizedBox(height: 8),

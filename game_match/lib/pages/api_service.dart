@@ -68,7 +68,7 @@ class ApiService {
     final Uri url = Uri.parse('https://api.igdb.com/v4/games');
     final String body = '''
     fields name, summary, genres.name, cover.url, platforms.name, release_dates.human, websites.url;
-    limit 10;
+    limit 30;
     ''';
 
     try {
