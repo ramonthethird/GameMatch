@@ -19,6 +19,8 @@ import 'game_model.dart';
 * */
 
 class PreferencePage extends StatelessWidget {
+  const PreferencePage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -28,6 +30,8 @@ class PreferencePage extends StatelessWidget {
 }
 
 class GenrePreferencePage extends StatefulWidget {
+  const GenrePreferencePage({super.key});
+
   @override
   _GenrePreferencePageState createState() => _GenrePreferencePageState();
 }
@@ -56,14 +60,14 @@ class _GenrePreferencePageState extends State<GenrePreferencePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Genre Preference Page')),
+      appBar: AppBar(title: const Text('Genre Preference Page')),
       body: Column(
         children: [
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: TextField(
               controller: searchController,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 labelText: 'Search Video Game Genre',
                 border: OutlineInputBorder(),
                 prefixIcon: Icon(Icons.search),
@@ -81,15 +85,15 @@ class _GenrePreferencePageState extends State<GenrePreferencePage> {
               },
             ),
           ),
-          Padding(
-              padding: const EdgeInsets.all(8.0),
+          const Padding(
+              padding: EdgeInsets.all(8.0),
               child: Text('Scroll to view more genres. \nSearch for genres not displayed on the screen.',)
           ),
           Expanded(
             child: GridView.builder(
               padding: const EdgeInsets.all(10.0),
               itemCount: genres.length,
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2,
                 childAspectRatio: 3,
                 crossAxisSpacing: 10,
@@ -105,7 +109,7 @@ class _GenrePreferencePageState extends State<GenrePreferencePage> {
                       backgroundColor: selectedGenres.contains(genre)
                           ? Colors.blue
                           : Colors.white60,
-                      minimumSize: Size(100, 40),
+                      minimumSize: const Size(100, 40),
                     ),
                     child: Text(genre),
                   ),
@@ -113,7 +117,7 @@ class _GenrePreferencePageState extends State<GenrePreferencePage> {
               },
             ),
           ),
-          Divider(
+          const Divider(
             thickness: 2,
             color: Colors.grey,
           ),
@@ -133,11 +137,11 @@ class _GenrePreferencePageState extends State<GenrePreferencePage> {
                         ),
                       ),
                     );
-                  }, 
-                  child: Text('More'),
+                  },
                   style: ElevatedButton.styleFrom(
-                    minimumSize: Size(150, 40),
-                  ),
+                    minimumSize: const Size(150, 40),
+                  ), 
+                  child: Text('More'),
                 ),
                 ElevatedButton(
                   onPressed: () {
@@ -145,10 +149,10 @@ class _GenrePreferencePageState extends State<GenrePreferencePage> {
                       selectedGenres.clear();
                     });
                   },
-                  child: Text('Reset'),
                   style: ElevatedButton.styleFrom(
-                    minimumSize: Size(150, 40),
+                    minimumSize: const Size(150, 40),
                   ),
+                  child: Text('Reset'),
                 ),
               ],
             ),
@@ -164,12 +168,12 @@ class SearchGenrePage extends StatelessWidget {
   final String searchQuery;
   final Function(String) onGenreSelected;
 
-  SearchGenrePage({required this.searchQuery, required this.onGenreSelected});
+  const SearchGenrePage({super.key, required this.searchQuery, required this.onGenreSelected});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Search Genres')),
+      appBar: AppBar(title: const Text('Search Genres')),
       body: Center(
         child: Column(
           children: [
@@ -179,7 +183,7 @@ class SearchGenrePage extends StatelessWidget {
                 onGenreSelected(searchQuery);
                 Navigator.pop(context);
               },
-              icon: Icon(Icons.add),
+              icon: const Icon(Icons.add),
               label: Text(searchQuery),
             )
           ],
@@ -195,12 +199,12 @@ class MoreGenresPage extends StatelessWidget {
   final List<String> selectedGenres;
   final Function(String) onGenresUnselected;
 
-  MoreGenresPage({required this.selectedGenres, required this.onGenresUnselected});
+  const MoreGenresPage({super.key, required this.selectedGenres, required this.onGenresUnselected});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('View All Selected Genres')),
+      appBar: AppBar(title: const Text('View All Selected Genres')),
       body: ListView.builder(
         itemCount: selectedGenres.length,
         itemBuilder: (context, index) {
@@ -208,11 +212,11 @@ class MoreGenresPage extends StatelessWidget {
           return ListTile(
             title: Text(genre),
             trailing: IconButton(
-              icon: Icon(Icons.remove_circle),
+              icon: const Icon(Icons.remove_circle),
               onPressed: () {
                 onGenresUnselected(genre);
                 ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Removing Genre'))
+                    const SnackBar(content: Text('Removing Genre'))
                 );
               },
             ),

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 class SettingsPrivacyPage extends StatelessWidget {
+  const SettingsPrivacyPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -9,18 +11,18 @@ class SettingsPrivacyPage extends StatelessWidget {
         backgroundColor: const Color(0xFF74ACD5),
         centerTitle: true,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.black,),
+          icon: const Icon(Icons.arrow_back, color: Colors.black,),
           onPressed: () {
             Navigator.pop(context); // Go back to Settings Page
           },
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
+      body: const Padding(
+        padding: EdgeInsets.all(16.0),
         child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: const [
+            children: [
               Text(
                 'Privacy Policy',
                 style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),

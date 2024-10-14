@@ -3,7 +3,7 @@ import 'ApiService.dart';
 import 'dart:convert';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
-import 'main.dart';
+//import 'main.dart';
 import 'preference_page.dart';
 import 'game_model.dart';
 import 'genre_model.dart';
@@ -38,6 +38,8 @@ class PreferencePage extends StatelessWidget {
 
 // main screen for the prefernce page
 class GenrePreferencePage extends StatefulWidget {
+  const GenrePreferencePage({super.key});
+
   @override
   _GenrePreferencePageState createState() => _GenrePreferencePageState();
 }
@@ -104,6 +106,7 @@ class _GenrePreferencePageState extends State<GenrePreferencePage> {
                     ),
                   );
                 },
+
               ),
             ),
 
@@ -127,7 +130,7 @@ class _GenrePreferencePageState extends State<GenrePreferencePage> {
                       backgroundColor: selectedGenres.contains(genre)
                           ? Colors.blue
                           : Colors.white60,
-                      minimumSize: Size(100, 40),
+                      minimumSize: const Size(100, 40),
                     ),
                       child: Text(genre),
                     ),
@@ -189,18 +192,30 @@ class _GenrePreferencePageState extends State<GenrePreferencePage> {
   }
 }
 
+class GenreSearchPage extends StatefulWidget {
+  const GenreSearchPage({super.key});
+
+  @override
+  _GenreSearchPageState createState() => _GenreSearchPageState();
+}
+class _GenreSearchPageState extends State<GenreSearchPage> {
+  @override
+  
+}
+
 
 // for the search bar / search page to look up specific genre names
 class SearchPage extends StatelessWidget {
   final String searchQuery;
   final Function(String) onGenreSelected;
 
-  SearchPage({required this.searchQuery, required this.onGenreSelected});
+  const SearchGenrePage({super.key, required this.searchQuery, required this.onGenreSelected});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Search Video Game Genres')),
+
+      appBar: AppBar(title: const Text('Search Genres')),
       body: Center(
         child: Column(
           children: [
@@ -209,7 +224,7 @@ class SearchPage extends StatelessWidget {
               onPressed: () {
                 onGenreSelected(searchQuery);
               },
-              icon: Icon(Icons.add),
+              icon: const Icon(Icons.add),
               label: Text(searchQuery),
             ),
           ],
@@ -295,25 +310,28 @@ class MoreGenresPage extends StatelessWidget {
   final List<String> selectedGenres;
   final Function(String) onGenresUnselected;
 
-  MoreGenresPage({required this.selectedGenres, required this.onGenresUnselected});
+  const MoreGenresPage({super.key, required this.selectedGenres, required this.onGenresUnselected});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('View All Selected Genres')),
+      appBar: AppBar(title: const Text('View All Selected Genres')),
       body: ListView.builder(
         itemCount: selectedGenres.length,
         itemBuilder: (context, index) {
           String genre = selectedGenres[index];
           return ListTile(
-              title: Text(genre),
-              trailing: IconButton(
-                icon: Icon(Icons.remove_circle),
-                onPressed: () {
-                  onGenresUnselected(genre);
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Removing Genre')));
-                },
-              )
+            title: Text(genre),
+            trailing: IconButton(
+              icon: const Icon(Icons.remove_circle),
+              onPressed: () {
+                onGenresUnselected(genre);
+                ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Removing Genre'))
+                );
+              },
+            ),
+
           );
         },
       ),
