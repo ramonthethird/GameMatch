@@ -24,8 +24,8 @@ class SideBar extends StatelessWidget {
               padding: const EdgeInsets.all(10),
               color: isDarkMode ? const Color(0xFF74ACD5) : const Color(0xFF74ACD5), // Adjust the header color based on theme
               width: 200,
-              child: Row(
-                children: [
+          child: Row(
+            children: [
                   ElevatedButton(
                     onPressed: () {
                       // navigate to the profile page
@@ -103,6 +103,7 @@ class SideBar extends StatelessWidget {
                         child: Text(
                           "No",
                           style: TextStyle(color: isDarkMode ? Colors.white : Colors.black),
+
                         ),
                         onPressed: () {
                           Navigator.of(context).pop();

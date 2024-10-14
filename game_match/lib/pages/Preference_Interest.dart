@@ -50,12 +50,11 @@ class PreferenceInterestPage extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   const SizedBox(height: 15),
-                  
                   // Manage Preference button
                   CustomButton(
                     title: 'Manage preferences',
                     subtitle: 'Edit and Save genre preferences',
-                    icon: Icons.tune,
+                    icon: Icons.tune, // Preference icon
                     onPressed: () {
                       // Add navigation logic here
                     },
@@ -67,7 +66,7 @@ class PreferenceInterestPage extends StatelessWidget {
                   CustomButton(
                     title: 'Manage interests & other options',
                     subtitle: 'Edit and Save other filter options',
-                    icon: Icons.filter_list,
+                    icon: Icons.filter_list, // Interest icon
                     onPressed: () {
                       Navigator.pushNamed(context, '/Interest'); // Navigate to Interest page
                     },
@@ -83,6 +82,7 @@ class PreferenceInterestPage extends StatelessWidget {
   }
 }
 
+// Customize buttons for effects
 class CustomButton extends StatelessWidget {
   final String title;
   final String subtitle;
@@ -104,7 +104,7 @@ class CustomButton extends StatelessWidget {
       margin: const EdgeInsets.symmetric(horizontal: 20),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(15),
-        boxShadow: [
+        boxShadow: [ // Add shadows
           BoxShadow(
             color: Colors.grey.withOpacity(0.3),
             spreadRadius: 2,
@@ -138,7 +138,7 @@ class CustomButton extends StatelessWidget {
                 children: [
                   Text(
                     title,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                       color: isDarkMode ? Colors.white : Colors.black, // Adapt text color
@@ -147,7 +147,7 @@ class CustomButton extends StatelessWidget {
                   const SizedBox(height: 5),
                   Text(
                     subtitle,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 14,
                       color: isDarkMode ? Colors.grey[300] : Colors.black54, // Adapt subtitle color
                     ),

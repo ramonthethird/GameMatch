@@ -1,3 +1,6 @@
+
+// still needs to edit for consolidation
+
 import 'package:flutter/material.dart';
 import 'package:login_ui_1/recoverusername.dart';  // Import the recovery page
 
@@ -51,7 +54,7 @@ class _MyLoginPageState extends State<MyLoginPage> {
               Padding(
                 padding: const EdgeInsets.only(top: 40.0),
                 child: Image.asset(
-                  'images/gamematchlogoresize.png',
+                  'assets/images/gamematchlogoresize.png',
                   height: 260,
                   width: 260,
                 ),

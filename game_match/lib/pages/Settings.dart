@@ -90,6 +90,7 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
+  // Settings Options
   Widget buildSettingsOption(BuildContext context, String title, Widget page) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 1.0, vertical: 0.1),
