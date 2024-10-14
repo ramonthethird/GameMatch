@@ -2,14 +2,15 @@
 // still needs to edit for consolidation
 
 import 'package:flutter/material.dart';
-import 'package:login_ui_1/recoverusername.dart';  // Import the recovery page
+import 'package:game_match/pages/Side_bar.dart';
+//import 'package:login_ui_1/recoverusername.dart';  // Import the recovery page
 
-void main() {
-  runApp(const MyApp());
-}
+// void main() {
+//   runApp(const MyApp());
+// }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class LoginPage extends StatelessWidget {
+  const LoginPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -89,10 +90,10 @@ class _MyLoginPageState extends State<MyLoginPage> {
               GestureDetector(
                 onTap: () {
                   // navigate to the RecoverUsernamePage
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const UsernameRecoveryPage()), // Ensure RecoverUsernamePage is imported and declared
-                  );
+                  // Navigator.push(
+                  //   context,
+                  //   MaterialPageRoute(builder: (context) => const UsernameRecoveryPage()), // Ensure RecoverUsernamePage is imported and declared
+                  // );
                 },
 
                 
@@ -148,15 +149,17 @@ class _MyLoginPageState extends State<MyLoginPage> {
 
 
 
-              Container(
-                width: 140,
-                height: 30,
-                decoration: BoxDecoration(
-                  color: Colors.lightBlueAccent,
-                  borderRadius: BorderRadius.all(Radius.circular(2.5)),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.pushNamed(context, '/side_bar');
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.lightBlueAccent, // Button background color
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(2.5), // Rounded corners
+                  ),
+                  fixedSize: Size(140, 30), // Fixed width and height
                 ),
-
-                
                 child: const Center(
                   child: Text(
                     'continue',
@@ -168,6 +171,7 @@ class _MyLoginPageState extends State<MyLoginPage> {
                   ),
                 ),
               ),
+              
 
               
               const SizedBox(height: 20),

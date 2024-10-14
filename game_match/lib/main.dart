@@ -11,6 +11,7 @@ import 'pages/Edit_profile.dart';
 import 'pages/Sign_up.dart';
 import 'pages/Settings.dart';
 import 'pages/Settings_Appearance.dart';
+import 'pages/Log_in.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -56,10 +57,7 @@ class _GameMatchAppState extends State<GameMatchApp> {
       themeMode: isDarkMode ? ThemeMode.dark : ThemeMode.light,
       theme: ThemeData.light(), // Light theme
       darkTheme: ThemeData.dark(), // Dark theme
-      home: SideBar(
-        isDarkMode: isDarkMode, // Pass the current theme state
-        onThemeChanged: _toggleTheme, // Pass the theme toggle function
-      ),
+      home: LoginPage(),
       //home: GameListScreen(), // This is to test that games are loading from API
       routes: {
         '/Sign_in': (context) => const SignUp(),
@@ -82,6 +80,7 @@ class _GameMatchAppState extends State<GameMatchApp> {
               isDarkMode: isDarkMode,
               onThemeChanged: _toggleTheme,
             ),
+        '/Login' : (context) => LoginPage(),
       },
     );
   }
