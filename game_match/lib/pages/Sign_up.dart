@@ -1,169 +1,176 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
-void main() {
-  runApp(const MyApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(); // Initialize Firebase
+  runApp(const SignUp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+// Main SignUp widget that sets up the MaterialApp
+class SignUp extends StatelessWidget {
+  const SignUp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Game Match Sign Up',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
-      ),
-      home: const SignUp(),
+      debugShowCheckedModeBanner: false,
+      home: const SignUpScreen(),
     );
   }
 }
 
-class SignUp extends StatefulWidget {
-  const SignUp({super.key});
+// SignUpScreen StatefulWidget that handles user registration
+class SignUpScreen extends StatefulWidget {
+  const SignUpScreen({super.key});
 
   @override
   _SignUpScreenState createState() => _SignUpScreenState();
 }
 
-class _SignUpScreenState extends State<SignUp> {
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  late String email, username, password, confirmPassword;
-
-  void _trySubmit() {
-    final isValid = _formKey.currentState!.validate();
-    FocusScope.of(context).unfocus();
-
-    if (isValid) {
-      _formKey.currentState!.save();
-      // Normally you'd do something with the data, like sending it to a backend
-      print('Email: $email, Username: $username, Password: $password');
-    }
-  }
+// State class for SignUpScreen that contains the form and logic
+class _SignUpScreenState extends State<SignUpScreen> {
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>(); // Key to track form state
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController usernameController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+  final TextEditingController confirmPasswordController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      //appBar: AppBar(title: const Text('Create an Account')),
       appBar: AppBar(
-        title: const Text('Create an Account'),
-        // Adding a back button in the AppBar's leading widget
+        title: const Text('Create an Account', style: TextStyle(color: Colors.black)),
+        backgroundColor: Colors.white,
+        elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.of(context).pop(), // This will pop the current route off the navigator.
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () => Navigator.of(context).pop(), // Navigate back when tapped
         ),
       ),
-
-      body: Center(
-        child: Card(
-          margin: const EdgeInsets.all(20),
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(16),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  Image.asset(
-                    'assets/GameMatch Logo Black.png',
-                    height: 100, // Set your desired height
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: <Widget>[
+                Image.asset(
+                  'lib/assets/gamematchlogoresize.png', // Image added at the top of the form
+                  height: 100, // Set the height of the image
+                ),
+                const SizedBox(height: 20),
+                TextFormField(
+                  controller: emailController,
+                  decoration: const InputDecoration(
+                    labelText: 'Email',
+                    border: OutlineInputBorder(),
                   ),
-                  const SizedBox(height: 20),
-                  TextFormField(
-                    decoration: const InputDecoration(
-                        labelText: 'Email',
-                        border: OutlineInputBorder(),
-                        filled: true,
-                        fillColor: Colors.white),
-                    keyboardType: TextInputType.emailAddress,
-                    validator: (value) {
-                      if (value!.isEmpty || !value.contains('@')) {
-                        return 'Please enter a valid email address.';
-                      }
-                      return null;
-                    },
-                    onSaved: (value) {
-                      email = value!;
-                    },
+                ),
+                const SizedBox(height: 20),
+                TextFormField(
+                  controller: usernameController,
+                  decoration: const InputDecoration(
+                    labelText: 'Username',
+                    border: OutlineInputBorder(),
                   ),
-                  const SizedBox(height: 12),
-                  TextFormField(
-                    decoration: const InputDecoration(
-                        labelText: 'Username',
-                        border: OutlineInputBorder(),
-                        filled: true,
-                        fillColor: Colors.white),
-                    validator: (value) {
-                      if (value!.isEmpty || value.length < 4) {
-                        return 'Please enter at least 4 characters.';
-                      }
-                      return null;
-                    },
-                    onSaved: (value) {
-                      username = value!;
-                    },
+                ),
+                const SizedBox(height: 20),
+                TextFormField(
+                  controller: passwordController,
+                  obscureText: true, // Hide the text for password fields
+                  decoration: const InputDecoration(
+                    labelText: 'Password',
+                    border: OutlineInputBorder(),
                   ),
-                  const SizedBox(height: 12),
-                  TextFormField(
-                    decoration: const InputDecoration(
-                        labelText: 'Password',
-                        border: OutlineInputBorder(),
-                        filled: true,
-                        fillColor: Colors.white),
-                    obscureText: true,
-                    validator: (value) {
-                      if (value!.isEmpty || value.length < 8) {
-                        return 'Password must be at least 8 characters long.';
-                      }
-                      return null;
-                    },
-                    onSaved: (value) {
-                      password = value!;
-                    },
+                ),
+                const SizedBox(height: 20),
+                TextFormField(
+                  controller: confirmPasswordController,
+                  obscureText: true,
+                  decoration: const InputDecoration(
+                    labelText: 'Confirm Password',
+                    border: OutlineInputBorder(),
                   ),
-                  const SizedBox(height: 12),
-                  TextFormField(
-                    decoration: const InputDecoration(
-                        labelText: 'Confirm Password',
-                        border: OutlineInputBorder(),
-                        filled: true,
-                        fillColor: Colors.white),
-                    obscureText: true,
-                    validator: (value) {
-                      if (value != password) {
-                        return 'Passwords do not match.';
-                      }
-                      return null;
-                    },
-                    onSaved: (value) {
-                      confirmPassword = value!;
-                    },
+                  validator: (value) { // Validator to ensure passwords match
+                    if (value != passwordController.text) {
+                      return 'Passwords do not match';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 40),
+                ElevatedButton(
+                  onPressed: _trySubmit, // Button to trigger form submission
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue,
                   ),
-                  const SizedBox(height: 20),
-                  SizedBox(
-                    width: double.infinity,
-                    height: 50,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.lightBlueAccent,
-                        shape: const RoundedRectangleBorder(
-                          borderRadius: BorderRadius.zero,
-                        ),
-                      ),
-                      onPressed: () {
-                        _trySubmit();
-                        Navigator.pushNamed(context, '/Interest');
-                      },
-                      child: const Text('Sign Up'),
-                    ),
-                  ),
-                ],
-              ),
+                  child: const Text('Sign Up'),
+                ),
+              ],
             ),
           ),
         ),
       ),
     );
+  }
+
+  // Function to handle form submission
+  Future<void> _trySubmit() async {
+    if (_formKey.currentState!.validate()) { // Check if the form is valid
+      _formKey.currentState!.save(); // Save the form
+      try {
+        // Attempt to create a user with Firebase Auth
+        UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+          email: emailController.text,
+          password: passwordController.text,
+        );
+
+        // Store additional user data in Firestore
+        await FirebaseFirestore.instance.collection('users').doc(userCredential.user!.uid).set({
+          'username': usernameController.text,
+          'email': emailController.text,
+          'creationDate': FieldValue.serverTimestamp(), // Store the timestamp of account creation
+        });
+
+        // Show a success message
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Successfully signed up! Welcome, ${usernameController.text}!'),
+            backgroundColor: Colors.green,
+          ),
+        );
+
+      } on FirebaseAuthException catch (e) {
+        // Handle errors from Firebase
+        var errorMessage = 'An error occurred, please check your credentials!';
+        if (e.code == 'weak-password') {
+          errorMessage = 'The password provided is too weak. Must have at least 8 characters';
+        } else if (e.code == 'email-already-in-use') {
+          errorMessage = 'The account already exists for that email.';
+        }
+
+        // Show an error message
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(errorMessage),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    // Clean up the controllers when the widget is disposed
+    emailController.dispose();
+    usernameController.dispose();
+    passwordController.dispose();
+    confirmPasswordController.dispose();
+    super.dispose();
   }
 }
