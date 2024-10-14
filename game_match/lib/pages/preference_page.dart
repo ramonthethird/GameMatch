@@ -8,6 +8,8 @@ import 'package:http/http.dart' as http;
 import 'main.dart';
 import 'preference_page.dart';
 import 'game_model.dart';
+import 'genre_model.dart';
+import 'side_bar.dart';
 
 /*
 * side bar navigation icon/button
