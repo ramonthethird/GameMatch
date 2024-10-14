@@ -88,10 +88,10 @@ class _MyLoginPageState extends State<MyLoginPage> {
   
               GestureDetector(
                 onTap: () {
-                  // navigate to the RecoverUsernamePage
+            
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const UsernameRecoveryPage()), // Ensure RecoverUsernamePage is imported and declared
+                    MaterialPageRoute(builder: (context) => const UsernameRecoveryPage()), // Change name to reflect new UsernameRecoveryPage
                   );
                 },
 
