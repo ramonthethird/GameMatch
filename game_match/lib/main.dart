@@ -22,6 +22,8 @@ void main() async {
 }
 
 class GameMatchApp extends StatefulWidget {
+  const GameMatchApp({super.key});
+
   @override
   _GameMatchAppState createState() => _GameMatchAppState();
 }
@@ -57,20 +59,19 @@ class _GameMatchAppState extends State<GameMatchApp> {
       themeMode: isDarkMode ? ThemeMode.dark : ThemeMode.light,
       theme: ThemeData.light(), // Light theme
       darkTheme: ThemeData.dark(), // Dark theme
-      home: SideBar(
-              onThemeChanged: _toggleTheme,
-              isDarkMode: isDarkMode,
+      home:const  MyLoginPage(
+              title: 'Login'
             ),
       //home: GameListScreen(), // This is to test that games are loading from API
       routes: {
-        '/Sign_in': (context) => const SignUp(),
-        '/side_bar': (context) => SideBar(
+        '/Sign_up': (context) => const SignUp(),
+        '/Side_bar': (context) => SideBar(
               onThemeChanged: _toggleTheme,
               isDarkMode: isDarkMode,
             ),
-        '/Profile': (context) => Profile(),
-        '/Interest': (context) => InterestsPage(),
-        '/Edit_profile': (context) => EditProfile(),
+        '/Profile': (context) => const Profile(),
+        '/Interest': (context) => const InterestsPage(),
+        '/Edit_profile': (context) => const EditProfile(),
         '/Preference_&_Interest': (context) => PreferenceInterestPage(
               onThemeChanged: _toggleTheme,
               isDarkMode: isDarkMode,
@@ -83,7 +84,8 @@ class _GameMatchAppState extends State<GameMatchApp> {
               isDarkMode: isDarkMode,
               onThemeChanged: _toggleTheme,
             ),
-        '/Login' : (context) => LoginPage(),
+        '/Login': (context) => const MyLoginPage(title: 'Login'),
+        
       },
     );
   }

@@ -9,7 +9,7 @@ class SettingsPage extends StatefulWidget {
   final bool isDarkMode;
   final ValueChanged<bool> onThemeChanged;
 
-  const SettingsPage({Key? key, required this.isDarkMode, required this.onThemeChanged}) : super(key: key);
+  const SettingsPage({super.key, required this.isDarkMode, required this.onThemeChanged});
 
   @override
   _SettingsPageState createState() => _SettingsPageState();

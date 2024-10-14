@@ -155,13 +155,13 @@ class _InterestsPageState extends State<InterestsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Interests', style: TextStyle(color: Colors.black, fontSize: 24)), // AppBar title
+        title: const Text('Interests', style: TextStyle(color: Colors.black, fontSize: 24)), // AppBar title
         centerTitle: true,
         backgroundColor: const Color(0xFF74ACD5),
         leading: IconButton(
           icon: const Icon(Icons.menu, color: Colors.black), // Sidebar Icon
           onPressed: () {
-            Navigator.pushNamed(context, "/side_bar"); // Open/Return to sidebar
+            Navigator.pushNamed(context, "/Side_bar"); // Open/Return to sidebar
           },
         ),
       ),
@@ -170,7 +170,7 @@ class _InterestsPageState extends State<InterestsPage> {
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: _isLoading 
-          ? Center(child: CircularProgressIndicator()) // Show loading indicator
+          ? const Center(child: CircularProgressIndicator()) // Show loading indicator
           : Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
@@ -277,19 +277,19 @@ class _InterestsPageState extends State<InterestsPage> {
                 // Save Button
                 ElevatedButton(
                   onPressed: _saveInterests,
-                  child: Text(
-                    'Save',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                    ),
-                  ),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blue,
                     padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
                     textStyle: const TextStyle(fontSize: 18),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  child: Text(
+                    'Save',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
                     ),
                   ),
                 )

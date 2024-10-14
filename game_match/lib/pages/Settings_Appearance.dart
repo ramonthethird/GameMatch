@@ -5,10 +5,10 @@ class SettingsAppearancePage extends StatefulWidget {
   final ValueChanged<bool> onThemeChanged; // Pass the callback to toggle the theme globally
 
   const SettingsAppearancePage({
-    Key? key,
+    super.key,
     required this.isDarkMode,
     required this.onThemeChanged,
-  }) : super(key: key);
+  });
 
   @override
   _SettingsAppearancePageState createState() => _SettingsAppearancePageState();

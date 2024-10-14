@@ -9,20 +9,20 @@ import 'package:game_match/pages/Side_bar.dart';
 //   runApp(const MyApp());
 // }
 
-class LoginPage extends StatelessWidget {
-  const LoginPage({super.key});
+//class LoginPage extends StatelessWidget {
+  //const LoginPage({super.key});
 
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Basic Login',
-      theme: ThemeData(
-        primarySwatch: Colors.grey,
-      ),
-      home: const MyLoginPage(title: 'My Main Login Page'),
-    );
-  }
-}
+  //@override
+  //Widget build(BuildContext context) {
+  // return MaterialApp(
+  //    title: 'Basic Login',
+   //   theme: ThemeData(
+  //     primarySwatch: Colors.grey,
+   //   ),
+   //   home: const MyLoginPage(title: 'My Main Login Page'),
+    //);
+ // }
+//}
 
 class MyLoginPage extends StatefulWidget {
   const MyLoginPage({super.key, required this.title});
@@ -56,15 +56,15 @@ class _MyLoginPageState extends State<MyLoginPage> {
                 padding: const EdgeInsets.only(top: 40.0),
                 child: Image.asset(
                   'assets/images/gamematchlogoresize.png',
-                  height: 260,
-                  width: 260,
+                  height: 100,
+                  width: 100,
                 ),
               ),
 
               const Text(
                 'Login',
                 style: TextStyle(
-                  fontSize: 40,
+                  fontSize: 30,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -148,29 +148,28 @@ class _MyLoginPageState extends State<MyLoginPage> {
               // const SizedBox(height: 20),
 
 
-
-              ElevatedButton(
+                ElevatedButton(
                 onPressed: () {
-                  Navigator.pushNamed(context, '/side_bar');
+                      Navigator.pushNamed(context, "/Side_bar"); // Ensure SideBar is imported and declared
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.lightBlueAccent, // Button background color
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(2.5), // Rounded corners
+                  borderRadius: BorderRadius.circular(2.5), // Rounded corners
                   ),
-                  fixedSize: Size(140, 30), // Fixed width and height
+                  fixedSize: const Size(140, 30), // Fixed width and height
                 ),
                 child: const Center(
                   child: Text(
-                    'continue',
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 14,
-                      fontWeight: FontWeight.normal,
-                    ),
+                  'continue',
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 14,
+                    fontWeight: FontWeight.normal,
+                  ),
                   ),
                 ),
-              ),
+                ),
               
 
               
@@ -187,7 +186,7 @@ class _MyLoginPageState extends State<MyLoginPage> {
                   ),
                   GestureDetector(
                     onTap: () {
-                      // Add sign-up functionality here
+                      Navigator.pushNamed(context, "/Sign_up"); // Ensure SignUpPage is imported and declared
                     },
                     child: const Text(
                       'Sign up',

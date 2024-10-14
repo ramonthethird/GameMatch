@@ -4,6 +4,8 @@ import 'game_model.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class GameListScreen extends StatefulWidget {
+  const GameListScreen({super.key});
+
   @override
   _GameListScreenState createState() => _GameListScreenState();
 }
@@ -36,10 +38,10 @@ class _GameListScreenState extends State<GameListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Game Info'),
+        title: const Text('Game Info'),
       ),
       body: games.isEmpty
-          ? Center(
+          ? const Center(
               child:
                   CircularProgressIndicator(), // Show loading spinner while data is fetched
             )
@@ -52,10 +54,10 @@ class _GameListScreenState extends State<GameListScreen> {
                       ? Image.network(
                           game.coverUrl!, // Show cover image if available
                           errorBuilder: (context, error, stackTrace) {
-                            return Icon(Icons.image_not_supported);
+                            return const Icon(Icons.image_not_supported);
                           },
                         )
-                      : Icon(Icons.image_not_supported),
+                      : const Icon(Icons.image_not_supported),
                   title: Text(game.name),
                   subtitle: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -63,16 +65,15 @@ class _GameListScreenState extends State<GameListScreen> {
                       Text(
                           'Description: ${game.summary ?? 'No description available'}'),
                       Text(
-                          'Genres: ${game.genres?.join(', ') ?? 'Unknown genres'}'),
+                          'Genres: ${game.genres.join(', ') ?? 'Unknown genres'}'),
                       Text(
-                          'Platforms: ${game.platforms?.join(',') ?? 'Unknown platforms'}'),
+                          'Platforms: ${game.platforms.join(',') ?? 'Unknown platforms'}'),
                       Text(
-                          'Release Date: ${game.releaseDates?.join(',') ?? 'Unknown'}'),
-                      if (game.websites != null &&
-                          game.websites!.isNotEmpty) ...[
-                        SizedBox(height: 8),
-                        Text('Official Website:'),
-                        for (var urlString in game.websites!)
+                          'Release Date: ${game.releaseDates.join(',') ?? 'Unknown'}'),
+                      if (game.websites.isNotEmpty) ...[
+                        const SizedBox(height: 8),
+                        const Text('Official Website:'),
+                        for (var urlString in game.websites)
                           TextButton(
                             onPressed: () async {
                               // Enusre the url is a Uri object

@@ -6,10 +6,10 @@ class PreferenceInterestPage extends StatelessWidget {
   final ValueChanged<bool> onThemeChanged; // Theme change callback
 
   const PreferenceInterestPage({
-    Key? key,
+    super.key,
     required this.isDarkMode, // Add dark mode parameter
     required this.onThemeChanged, // Add theme change callback
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -90,7 +90,7 @@ class CustomButton extends StatelessWidget {
   final VoidCallback onPressed;
   final bool isDarkMode;
 
-  const CustomButton({
+  const CustomButton({super.key, 
     required this.title,
     required this.subtitle,
     required this.icon,

@@ -16,7 +16,7 @@ class Profile extends StatelessWidget {
         icon: const Icon(Icons.settings),
         onPressed: () {
           // Navigate to Settings Page
-          Navigator.pushNamed(context, '/side_bar');
+          Navigator.pushNamed(context, '/Side_bar');
         },
           ),
         ],
