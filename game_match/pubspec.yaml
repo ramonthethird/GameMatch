@@ -38,6 +38,7 @@ dependencies:
   firebase_core: ^3.6.0
   cloud_firestore: ^5.4.4
   url_launcher: ^6.0.20
+  flutter_dotenv: ^5.0.2
 
   # this is to authenticate the API for IGDB
   http: ^0.13.5

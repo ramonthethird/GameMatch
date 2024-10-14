@@ -11,12 +11,16 @@ import 'pages/Edit_profile.dart'; // Import the edit profile page
 import 'pages/Preference_Interest.dart';
 import 'pages/Sign_up.dart';
 import 'pages/Settings.dart'; // Import the settings page
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  // Ensure dotenv is loaded before app runs
+  await dotenv.load(fileName: "lib/.env");
+
   runApp(const GameMatchApp());
 }
 
@@ -30,9 +34,8 @@ class GameMatchApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home:
-          const SideBar(), // This is the side bar page this is the main screen of your app for now
-      //home: GameListScreen(), // This is to test that games are loading from API
+      //home:    const SideBar(), // This is the side bar page this is the main screen of your app for now
+      home: GameListScreen(), // This is to test that games are loading from API
       routes: {
         '/Sign_in': (context) => const SignUp(), // This is the sign in page
         '/side_bar': (context) => const SideBar(), // This is the side bar page

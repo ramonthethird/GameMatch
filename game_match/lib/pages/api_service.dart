@@ -2,14 +2,15 @@ import 'dart:convert';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'game_model.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class ApiService {
   // Instance of FlutterSecureStorage for storing sensitive info securely
   final FlutterSecureStorage secureStorage = FlutterSecureStorage();
 
   // Twitch API client credentials
-  final String clientId = 'v5v1uyyo05m4ttc8yvd26yrwslfimc';
-  final String clientSecret = 'hu3w4pwpc344uwdp2k77xfjozbaxc5';
+  final String clientId = dotenv.env['CLIENT_ID'] ?? '';
+  final String clientSecret = dotenv.env['CLIENT-SECRET'] ?? '';
 
   // Base URL for IGDB API
   final String baseUrl = 'https://api.igdb.com/v4';
@@ -75,11 +76,9 @@ class ApiService {
       final response = await http.post(
         url,
         headers: {
-          'Client-ID': clientId, // Client ID as per instructions
-          'Authorization':
-              'Bearer $accessToken', // Include 'Bearer' as per instructions
-          'Content-Type':
-              'application/json', // Ensure the body is treated as JSON
+          'Client-ID': clientId,
+          'Authorization': 'Bearer $accessToken',
+          'Content-Type': 'application/json',
         },
         body: body,
       );
