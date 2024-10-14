@@ -96,7 +96,13 @@ class ApiService {
         // Convert JSON objects into a list of Game objects
         final List<Game> games = gameDataJson
             .map((dynamic json) => Game.fromJson(json as Map<String, dynamic>))
-            .toList();
+            .where((game) {
+          return game.name.isNotEmpty &&
+              game.coverUrl != null &&
+              game.summary != null &&
+              game.genres != null;
+        }).toList();
+
         return games;
       } else {
         print(
