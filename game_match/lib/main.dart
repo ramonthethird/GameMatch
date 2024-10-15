@@ -1,18 +1,18 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:game_match/pages/Preference_Interest.dart';
-import 'package:game_match/pages/game_info.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'firebase_options.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'pages/Profile.dart'; // Import the profile page
-import 'pages/Side_bar.dart'; // Import the side bar page
-import 'pages/Interest.dart'; // Import the interest page
-import 'pages/Edit_profile.dart'; // Import the edit profile page
 import 'pages/Preference_Interest.dart';
+import 'pages/game_info.dart';
+import 'pages/Profile.dart';
+import 'pages/Side_bar.dart';
+import 'pages/Interest.dart';
+import 'pages/Edit_profile.dart';
 import 'pages/Sign_up.dart';
-import 'pages/Settings.dart'; // Import the settings page
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'dart:io';
+import 'pages/Settings.dart';
+import 'pages/Settings_Appearance.dart';
+import 'pages/Log_in.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -21,33 +21,74 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  runApp(const GameMatchApp());
+  runApp(GameMatchApp());
 }
 
-class GameMatchApp extends StatelessWidget {
+class GameMatchApp extends StatefulWidget {
   const GameMatchApp({super.key});
+
+  @override
+  _GameMatchAppState createState() => _GameMatchAppState();
+}
+
+class _GameMatchAppState extends State<GameMatchApp> {
+  bool isDarkMode = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadThemePreference(); // Load theme when the app starts
+  }
+
+  Future<void> _loadThemePreference() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      isDarkMode = prefs.getBool('isDarkMode') ?? false;
+    });
+  }
+
+  void _toggleTheme(bool isDark) async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      isDarkMode = isDark; // Update theme mode in state
+    });
+    await prefs.setBool('isDarkMode', isDark); // Save theme mode to SharedPreferences
+  }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'GameMatch', // The title of your app
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      //home:    const SideBar(), // This is the side bar page this is the main screen of your app for now
-      home: GameListScreen(), // This is to test that games are loading from API
+      title: 'GameMatch',
+      themeMode: isDarkMode ? ThemeMode.dark : ThemeMode.light,
+      theme: ThemeData.light(), // Light theme
+      darkTheme: ThemeData.dark(), // Dark theme
+      home:const  MyLoginPage(
+              title: 'Login'
+            ),
+      //home: GameListScreen(), // This is to test that games are loading from API
       routes: {
-        '/Sign_in': (context) => const SignUp(), // This is the sign in page
-        '/side_bar': (context) => const SideBar(), // This is the side bar page
-        '/Profile': (context) => const Profile(), // This is the profile page
-        '/Interest': (context) =>
-            const InterestsPage(), // This is the interest page
-        '/Edit_profile': (context) =>
-            const EditProfile(), // This is the edit profile page
-        '/Preference_&_Interest': (context) =>
-            const PreferenceInterestPage(), // This is the interest page
-        '/Settings': (context) =>
-            const SettingsPage(), // This is the settings page
+        '/Sign_up': (context) => const SignUp(),
+        '/Side_bar': (context) => SideBar(
+              onThemeChanged: _toggleTheme,
+              isDarkMode: isDarkMode,
+            ),
+        '/Profile': (context) => const Profile(),
+        '/Interest': (context) => const InterestsPage(),
+        '/Edit_profile': (context) => const EditProfile(),
+        '/Preference_&_Interest': (context) => PreferenceInterestPage(
+              onThemeChanged: _toggleTheme,
+              isDarkMode: isDarkMode,
+        ),
+        '/Settings': (context) => SettingsPage(
+              isDarkMode: isDarkMode,
+              onThemeChanged: _toggleTheme,
+            ),
+        '/Appearance': (context) => SettingsAppearancePage(
+              isDarkMode: isDarkMode,
+              onThemeChanged: _toggleTheme,
+            ),
+        '/Login': (context) => const MyLoginPage(title: 'Login'),
+        
       },
     );
   }

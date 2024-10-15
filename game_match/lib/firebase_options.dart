@@ -17,29 +17,17 @@ import 'package:flutter/foundation.dart'
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
     if (kIsWeb) {
-      throw UnsupportedError(
-        'DefaultFirebaseOptions have not been configured for web - '
-        'you can reconfigure this by running the FlutterFire CLI again.',
-      );
+      return web;
     }
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
         return android;
       case TargetPlatform.iOS:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for ios - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return ios;
       case TargetPlatform.macOS:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for macos - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return macos;
       case TargetPlatform.windows:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for windows - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return windows;
       case TargetPlatform.linux:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for linux - '
@@ -59,4 +47,43 @@ class DefaultFirebaseOptions {
     projectId: 'gamematch-e492c',
     storageBucket: 'gamematch-e492c.appspot.com',
   );
+
+  static const FirebaseOptions web = FirebaseOptions(
+    apiKey: 'AIzaSyB8MlrUKy9ec1l5i_iBzpBpwkqK6wo9Jy4',
+    appId: '1:861037100165:web:88e54a510aae364b0c3dec',
+    messagingSenderId: '861037100165',
+    projectId: 'gamematch-e492c',
+    authDomain: 'gamematch-e492c.firebaseapp.com',
+    storageBucket: 'gamematch-e492c.appspot.com',
+    measurementId: 'G-L69DEW9WGR',
+  );
+
+  static const FirebaseOptions macos = FirebaseOptions(
+    apiKey: 'AIzaSyDiVQZMPLHzFBDQI4n3-By3Cgioa8Rvi0w',
+    appId: '1:861037100165:ios:bf21baebecf6487c0c3dec',
+    messagingSenderId: '861037100165',
+    projectId: 'gamematch-e492c',
+    storageBucket: 'gamematch-e492c.appspot.com',
+    iosBundleId: 'com.example.gameMatch',
+  );
+
+  static const FirebaseOptions ios = FirebaseOptions(
+    apiKey: 'AIzaSyDiVQZMPLHzFBDQI4n3-By3Cgioa8Rvi0w',
+    appId: '1:861037100165:ios:bf21baebecf6487c0c3dec',
+    messagingSenderId: '861037100165',
+    projectId: 'gamematch-e492c',
+    storageBucket: 'gamematch-e492c.appspot.com',
+    iosBundleId: 'com.example.gameMatch',
+  );
+
+  static const FirebaseOptions windows = FirebaseOptions(
+    apiKey: 'AIzaSyB8MlrUKy9ec1l5i_iBzpBpwkqK6wo9Jy4',
+    appId: '1:861037100165:web:502c06a9367b38630c3dec',
+    messagingSenderId: '861037100165',
+    projectId: 'gamematch-e492c',
+    authDomain: 'gamematch-e492c.firebaseapp.com',
+    storageBucket: 'gamematch-e492c.appspot.com',
+    measurementId: 'G-TT1Q593LPJ',
+  );
+
 }
