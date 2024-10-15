@@ -45,13 +45,11 @@ class Game {
     return Game(
       name: json['name'] as String? ?? 'No title',
       summary: json['summary'] as String? ?? 'No description available',
-      genres: genres, // No longer nullable
-      coverUrl: json['cover'] != null
-          ? 'https:${json['cover']['url']}' // Append https: to the cover URL
-          : null,
-      platforms: platforms, // No longer nullable
-      releaseDates: releaseDates, // No longer nullable
-      websites: websites, // No longer nullable
+      genres: genres,
+      coverUrl: json['cover'] != null ? 'https:${json['cover']['url']}' : null,
+      platforms: platforms,
+      releaseDates: releaseDates,
+      websites: websites,
     );
   }
 }
