@@ -12,15 +12,15 @@ import 'pages/Preference_Interest.dart';
 import 'pages/Sign_up.dart';
 import 'pages/Settings.dart'; // Import the settings page
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'dart:io';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  // Ensure dotenv is loaded before app runs
+  await dotenv.load(fileName: ".env");
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  // Ensure dotenv is loaded before app runs
-  await dotenv.load(fileName: "lib/.env");
-
   runApp(const GameMatchApp());
 }
 

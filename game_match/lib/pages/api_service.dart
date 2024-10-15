@@ -9,8 +9,8 @@ class ApiService {
   final FlutterSecureStorage secureStorage = FlutterSecureStorage();
 
   // Twitch API client credentials
-  final String clientId = dotenv.env['CLIENT_ID'] ?? '';
-  final String clientSecret = dotenv.env['CLIENT-SECRET'] ?? '';
+  final String clientId = dotenv.env['CLIENT_ID']!;
+  final String clientSecret = dotenv.env['CLIENT_SECRET']!;
 
   // Base URL for IGDB API
   final String baseUrl = 'https://api.igdb.com/v4';
