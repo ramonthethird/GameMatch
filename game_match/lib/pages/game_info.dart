@@ -5,6 +5,8 @@ import 'package:url_launcher/url_launcher.dart';
 
 // The main screen displaying the list of games
 class GameListScreen extends StatefulWidget {
+  const GameListScreen({super.key});
+
   @override
   _GameListScreenState createState() => _GameListScreenState();
 }
@@ -43,11 +45,11 @@ class _GameListScreenState extends State<GameListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Game Info'),
+        title: const Text('Game Info'),
       ),
       // Check if games list is empty, if so, show a loading
       body: games.isEmpty
-          ? Center(
+          ? const Center(
               child:
                   CircularProgressIndicator(), // Show loading spinner while data is fetched
             )
@@ -61,10 +63,10 @@ class _GameListScreenState extends State<GameListScreen> {
                       ? Image.network(
                           game.coverUrl!, // Show cover image from URL
                           errorBuilder: (context, error, stackTrace) {
-                            return Icon(Icons.image_not_supported);
+                            return const Icon(Icons.image_not_supported);
                           },
                         )
-                      : Icon(Icons.image_not_supported),
+                      : const Icon(Icons.image_not_supported),
                   title: Text(game.name),
                   subtitle: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,

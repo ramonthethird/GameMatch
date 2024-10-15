@@ -67,7 +67,7 @@ class ApiService {
 
     // API endpoint to fetch game data
     final Uri url = Uri.parse('https://api.igdb.com/v4/games');
-    final String body = '''
+    const String body = '''
     fields name, summary, genres.name, cover.url, platforms.name, release_dates.human, websites.url;
     limit 30;
     ''';
