@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class PasswordRecoveryPage extends StatefulWidget {
   const PasswordRecoveryPage({super.key});
@@ -8,8 +9,27 @@ class PasswordRecoveryPage extends StatefulWidget {
 }
 
 class _PasswordRecoveryPageState extends State<PasswordRecoveryPage> {
-  // TextEditingController for email input field
   final TextEditingController _emailController = TextEditingController();
+
+  // Method to send password reset email
+  Future<void> _sendPasswordResetEmail() async {
+    try {
+      await FirebaseAuth.instance.sendPasswordResetEmail(email: _emailController.text);
+
+      // Show a success message to the user
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Password reset email sent!')),
+      );
+      // Optionally, navigate back or clear the text field
+      _emailController.clear();
+    } catch (e) {
+
+      // Show an error message if there's an issue
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: ${e.toString()}')),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -25,83 +45,84 @@ class _PasswordRecoveryPageState extends State<PasswordRecoveryPage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             children: <Widget>[
-              // Same logo as the login page
               Padding(
                 padding: const EdgeInsets.only(top: 40.0),
                 child: Image.asset(
-                  'images/gamematchlogoresize.png', // Same image as the login page
+                  'assets/images/gamematchlogoresize.png',
                   height: 260,
                   width: 260,
                 ),
               ),
 
+
               const SizedBox(height: 16),
 
+
               Container(
-                alignment: Alignment.center, // Center the text within the container
+                alignment: Alignment.center,
                 child: const Text(
                   'Recover your Password',
                   style: TextStyle(
-                    fontSize: 40, // Same font size as the "Login" text
+                    fontSize: 40,
                     fontWeight: FontWeight.bold,
                   ),
                   textAlign: TextAlign.center,
                 ),
               ),
 
+
               const SizedBox(height: 10),
 
-              // Subtitle text
+
               const Text(
                 'Please enter the email associated with your account. Your password will be emailed to you shortly.',
                 style: TextStyle(
-                  fontSize: 14, // Smaller font size for the subtitle
-                  color: Colors.black87, // Lighter color for the subtitle
+                  fontSize: 14,
+                  color: Colors.black87,
                 ),
-                textAlign: TextAlign.center, // Center align the subtitle
+                textAlign: TextAlign.center,
               ),
+
+
 
               const SizedBox(height: 32),
 
-              // TextField for email input
+
               SizedBox(
                 height: 40,
-                width: 325, // Same width as the login page
+                width: 325,
                 child: TextField(
                   controller: _emailController,
                   decoration: const InputDecoration(
-                    labelText: 'Enter your Email', // Email input label
+                    labelText: 'Enter your Email',
                     border: OutlineInputBorder(),
                     contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
                   ),
                 ),
               ),
-
               const SizedBox(height: 20),
-
-              // "Get Password" button, same style as "Continue" button from the main page
-              Container(
-                width: 140,
-                height: 30,
-                decoration: BoxDecoration(
-                  color: Colors.lightBlueAccent, // Same color as "continue" button
-                  borderRadius: BorderRadius.all(Radius.circular(2.5)),
+              ElevatedButton(
+                onPressed: _sendPasswordResetEmail, // Call the method to send email
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.lightBlueAccent,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(2.5),
+                  ),
+                  fixedSize: const Size(140, 30),
                 ),
+
                 child: const Center(
                   child: Text(
                     'Get Password',
                     style: TextStyle(
-                      color: Colors.black, // Same black color for text
+                      color: Colors.black,
                       fontSize: 14,
                       fontWeight: FontWeight.normal,
                     ),
                   ),
                 ),
               ),
-
               const SizedBox(height: 20),
-
-  
             ],
           ),
         ),
