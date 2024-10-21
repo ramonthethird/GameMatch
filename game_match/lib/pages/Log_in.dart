@@ -1,28 +1,8 @@
-
-// still needs to edit for consolidation
-
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:game_match/pages/Side_bar.dart';
-//import 'package:login_ui_1/recoverusername.dart';  // Import the recovery page
-
-// void main() {
-//   runApp(const MyApp());
-// }
-
-//class LoginPage extends StatelessWidget {
-  //const LoginPage({super.key});
-
-  //@override
-  //Widget build(BuildContext context) {
-  // return MaterialApp(
-  //    title: 'Basic Login',
-   //   theme: ThemeData(
-  //     primarySwatch: Colors.grey,
-   //   ),
-   //   home: const MyLoginPage(title: 'My Main Login Page'),
-    //);
- // }
-//}
+import 'package:game_match/pages/recoverusername.dart';
+import 'package:game_match/pages/recoverpassword.dart';
 
 class MyLoginPage extends StatefulWidget {
   const MyLoginPage({super.key, required this.title});
@@ -33,9 +13,38 @@ class MyLoginPage extends StatefulWidget {
   State<MyLoginPage> createState() => _MyLoginPageState();
 }
 
+// Initialize here for firebase and sign in func
 class _MyLoginPageState extends State<MyLoginPage> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  // Put method for sign in figure out firebase auth
+  Future<void> _signIn() async {
+    String username = _usernameController.text.trim();
+    String password = _passwordController.text.trim();
+
+    try {
+      UserCredential userCredential = await _auth.signInWithEmailAndPassword(
+        email: username,  // Make sure the username is an email address bc firebase doesn't allow direct usern input
+        password: password,
+      );
+      // If the sign in is successful, navigate to the sidebar
+      Navigator.pushNamed(context, "/Side_bar");
+    } on FirebaseAuthException catch (e) { 
+      // Put auth errors below from doc
+      String message = 'An error occurred. Please try again.';
+      if (e.code == 'user-not-found') {
+        message = 'No user found for that email.';
+      } else if (e.code == 'wrong-password') {
+        message = 'Wrong password provided for that user.';
+      }
+      // Show def error message in snackbar
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(message)),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -44,7 +53,6 @@ class _MyLoginPageState extends State<MyLoginPage> {
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text(widget.title),
       ),
-      
       resizeToAvoidBottomInset: true,
       body: SingleChildScrollView(
         child: Padding(
@@ -56,11 +64,10 @@ class _MyLoginPageState extends State<MyLoginPage> {
                 padding: const EdgeInsets.only(top: 40.0),
                 child: Image.asset(
                   'assets/images/gamematchlogoresize.png',
-                  height: 100,
-                  width: 100,
+                  height: 260,
+                  width: 260,
                 ),
               ),
-
               const Text(
                 'Login',
                 style: TextStyle(
@@ -68,35 +75,28 @@ class _MyLoginPageState extends State<MyLoginPage> {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-
               const SizedBox(height: 32),
-
               SizedBox(
                 height: 40,
                 width: 325,
                 child: TextField(
                   controller: _usernameController,
                   decoration: const InputDecoration(
-                    labelText: 'Enter your Username',
+                    labelText: 'Enter your Email', // Changed to "Email" to account for firebase
                     border: OutlineInputBorder(),
                     contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
                   ),
+                  keyboardType: TextInputType.emailAddress,
                 ),
               ),
-              
               const SizedBox(height: 2),
-
-  
               GestureDetector(
                 onTap: () {
-                  // navigate to the RecoverUsernamePage
-                  // Navigator.push(
-                  //   context,
-                  //   MaterialPageRoute(builder: (context) => const UsernameRecoveryPage()), // Ensure RecoverUsernamePage is imported and declared
-                  // );
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const UsernameRecoveryPage()),
+                  );
                 },
-
-                
                 child: const Padding(
                   padding: EdgeInsets.only(left: 30),
                   child: Align(
@@ -105,13 +105,12 @@ class _MyLoginPageState extends State<MyLoginPage> {
                       'Forgot your Username?',
                       style: TextStyle(
                         fontSize: 17,
-                        color: Colors.blue, // blue color
+                        color: Colors.blue,
                       ),
                     ),
                   ),
                 ),
               ),
-
               const SizedBox(height: 32),
               SizedBox(
                 height: 40,
@@ -123,60 +122,58 @@ class _MyLoginPageState extends State<MyLoginPage> {
                     border: OutlineInputBorder(),
                     contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
                   ),
+                  obscureText: true, // Hide password text
                 ),
               ),
-
-              
               const SizedBox(height: 2),
-              const Padding(
-                padding: EdgeInsets.only(left: 30),
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    'Forgot your Password?',
-                    style: TextStyle(
-                      fontSize: 17,
-                      color: Colors.blue,
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const PasswordRecoveryPage()),
+                  );
+                },
+                child: const Padding(
+                  padding: EdgeInsets.only(left: 30),
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      'Forgot your Password?',
+                      style: TextStyle(
+                        fontSize: 17,
+                        color: Colors.blue,
+                      ),
                     ),
                   ),
                 ),
               ),
-
-              
               const SizedBox(height: 40),
-
-              // const SizedBox(height: 20),
-
-
-                ElevatedButton(
-                onPressed: () {
-                      Navigator.pushNamed(context, "/Side_bar"); // Ensure SideBar is imported and declared
-                },
+              ElevatedButton(
+                onPressed: _signIn,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.lightBlueAccent, // Button background color
+                  backgroundColor: Colors.lightBlueAccent,
                   shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(2.5), // Rounded corners
+                    borderRadius: BorderRadius.circular(2.5),
                   ),
-                  fixedSize: const Size(140, 30), // Fixed width and height
+                  fixedSize: const Size(140, 30),
                 ),
                 child: const Center(
                   child: Text(
-                  'continue',
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 14,
-                    fontWeight: FontWeight.normal,
-                  ),
+                    'Continue',
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 14,
+                      fontWeight: FontWeight.normal,
+                    ),
                   ),
                 ),
-                ),
-              
-
-              
+              ),
               const SizedBox(height: 20),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
+                  
                   const Text(
                     "Don't have an account? ",
                     style: TextStyle(
@@ -184,9 +181,10 @@ class _MyLoginPageState extends State<MyLoginPage> {
                       fontSize: 16,
                     ),
                   ),
+                  
                   GestureDetector(
                     onTap: () {
-                      Navigator.pushNamed(context, "/Sign_up"); // Ensure SignUpPage is imported and declared
+                      Navigator.pushNamed(context, "/Sign_up");
                     },
                     child: const Text(
                       'Sign up',
