@@ -24,12 +24,23 @@ class Game {
   factory Game.fromJson(Map<String, dynamic> json) {
     // Parse screenshots if available
     List<String> screenshotUrls = [];
-    if (json['screenshots'] != null) {
+    if (json['screenshots'] != null &&
+        (json['screenshots'] as List).isNotEmpty) {
       screenshotUrls = (json['screenshots'] as List<dynamic>)
           .map((s) =>
               'https://images.igdb.com/igdb/image/upload/t_720p/${s['image_id']}.jpg')
           .toList();
     }
+
+    // Parse cover URL
+    String? coverUrl;
+    if (json['cover'] != null && json['cover']['image_id'] != null) {
+      coverUrl =
+          'https://images.igdb.com/igdb/image/upload/t_720p/${json['cover']['image_id']}.jpg';
+    }
+
+    // log the screenshot URLs for each game
+    print('Screenshot URL for ${json['name']}: $screenshotUrls');
 
     // Safely map genres, providing an empty list if null
     List<String> genres = (json['genres'] as List<dynamic>?)
@@ -56,20 +67,20 @@ class Game {
         [];
 
     // Adjust the image URL to fetch higher resolution images
-    String? coverUrl;
+    String? highRescoverUrl;
     if (json['cover'] != null) {
       final imageId = json['cover']['url'].split('/').last;
-      coverUrl = 'https://images.igdb.com/igdb/image/upload/t_720p/$imageId';
+      highRescoverUrl =
+          'https://images.igdb.com/igdb/image/upload/t_720p/$imageId';
     } else {
-      coverUrl = null;
+      highRescoverUrl = null;
     }
 
     return Game(
       name: json['name'] as String? ?? 'No title',
       summary: json['summary'] as String? ?? 'No description available',
       genres: genres,
-      coverUrl: coverUrl,
-      //coverUrl: json['cover'] != null ? 'https:${json['cover']['url']}' : null,
+      coverUrl: highRescoverUrl ?? coverUrl,
       platforms: platforms,
       releaseDates: releaseDates,
       websites: websites,

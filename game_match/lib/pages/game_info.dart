@@ -120,6 +120,9 @@ class _GameListScreenState extends State<GameListScreen> {
               itemCount: games.length,
               itemBuilder: (context, index) {
                 final game = games[index];
+                // log the screenshot in the UI
+                print(
+                    'Rendering screenshots for ${game.name}: ${game.screenshotUrls}');
                 return ListTile(
                   // Show the game cover image if available, otherwise show a default icon
                   leading: game.coverUrl != null

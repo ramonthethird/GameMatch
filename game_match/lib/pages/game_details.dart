@@ -124,21 +124,4 @@ class GameDetailsScreen extends StatelessWidget {
       ),
     );
   }
-
-  // void main() {
-  //   Game sampleGame = Game(
-  //     name: 'The Witcher 3: Wild Hunt',
-  //     summary:
-  //         'The Witcher 3: Wild Hunt is an open-world RPG developed by CD Projekt Red. Players control Geralt of Rivia, a monster hunter known as a Witcher, as he searches for his adopted daughter. The game features a rich storyline, complex characters, and a vast world filled with quests and adventures.',
-  //     genres: ['RPG', 'Open World'],
-  //     coverUrl: 'https://example.com/witcher3.jpg',
-  //     websites: ['https://thewitcher.com'],
-  //     platforms: ['PC', 'PlayStation', 'Xbox'],
-  //     releaseDates: ['May 19, 2015'],
-  //     price: 39.99,
-  //   );
-  //   runApp(MaterialApp(
-  //     home: GameDetailsScreen(game: sampleGame),
-  //   ));
-  // }
 }

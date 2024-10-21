@@ -67,11 +67,12 @@ class ApiService {
     }
 
     // API endpoint to fetch game data
+    // 48 for playstation and 49 for xbox
     final Uri url = Uri.parse('https://api.igdb.com/v4/games');
     const String body = '''
     fields name, summary, genres.name, cover.url, platforms.name, release_dates.human, websites.url, tags, screenshots.image_id;
-    where platforms = (6,48,49);
-    limit 30;
+    where platforms = (6);
+    limit 50;
     ''';
 
     try {
@@ -99,16 +100,23 @@ class ApiService {
             .map((dynamic json) => Game.fromJson(json as Map<String, dynamic>))
             .where((game) {
           // filter games to have screenshots, a non-empty summary, and a release date from 2020 and onwards
+          // for cover URLs
+          if (game.coverUrl == null || game.coverUrl!.isEmpty) {
+            return false;
+          }
           // for screenshots
-          if (game.screenshotUrls == null || game.summary!.isEmpty) {
+          if (game.screenshotUrls == null || game.screenshotUrls!.isEmpty) {
+            print('${game.name} has no screenshots, skipping');
             return false;
           }
           // for game description
           if (game.summary == null || game.summary!.isEmpty) {
+            print('${game.name} has no description, skipping');
             return false;
           }
           // for release date
           if (game.releaseDates == null || game.releaseDates.isEmpty) {
+            print('${game.name} has no release date, skipping');
             return false;
           }
           String releaseDateStr = game.releaseDates.first;
@@ -191,9 +199,26 @@ class ApiService {
 
   // CheapShark API
 
+  // Get CheapShark IDs for IGDB games and batch fetch prices
+  Future<void> fetchPricesForIGDBGames(List<Game> igdbGames) async {
+    // Fetch CheapShark game IDs for each IGDB game
+    List<int> cheapSharkIds = await getCheapSharkIds(igdbGames);
+
+    // Fetch prices for all games in a single batch request
+    Map<String, double> prices =
+        await fetchPricesForMultipleGames(cheapSharkIds);
+
+    // Update each game object with its price
+    for (var game in igdbGames) {
+      final gameId = await fetchGameIDFromCheapShark(game.name);
+      if (gameId != null && prices.containsKey(gameId.toString())) {
+        game.updatePrice(prices[gameId.toString()]);
+      }
+    }
+  }
+
   // Fetch CheapShark game ID by title
   Future<int?> fetchGameIDFromCheapShark(String gameTitle) async {
-    //final Uri url = Uri.parse('https://www.cheapshark.com/api/1.0/games?title=$gameTitle&limit=1');
     final Uri url = Uri.parse(
         'https://www.cheapshark.com/api/1.0/games?title=$gameTitle&limit=1&exact=1');
 
@@ -233,6 +258,7 @@ class ApiService {
     final String idsString = gameIds.join(',');
     final Uri url =
         Uri.parse('https://www.cheapshark.com/api/1.0/games?ids=$idsString');
+
     // log the url being fetched
     print('Fetching prices from URL: $url');
 
@@ -279,23 +305,9 @@ class ApiService {
         print('No CheapShark ID found for $gameId');
       }
     }
+    // delay to avoid rate-limiting
+    await Future.delayed(Duration(milliseconds: 500));
     print('CheapShark IDs fetched: $cheapSharkIds');
     return cheapSharkIds;
   }
-
-  // // clean up special characters
-  // String cleanTitle(String title) {
-  //   return title.replaceAll(RegExp(r'[^\w\s]'), '').toLowerCase();
-  // }
-
-  // // Remove edition tags from the game title
-  // String removeEditionTags(String title) {
-  //   return title
-  //       .replaceAll(
-  //           RegExp(
-  //               r'\b(Edition|Remastered|Ultimate|Complete|GOTY|Game of the Year)\b',
-  //               caseSensitive: false),
-  //           '')
-  //       .trim();
-  // }
 }
