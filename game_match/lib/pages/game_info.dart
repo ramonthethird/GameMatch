@@ -15,12 +15,27 @@ class GameListScreen extends StatefulWidget {
 class _GameListScreenState extends State<GameListScreen> {
   final ApiService apiService = ApiService();
   List<Game> games = [];
+  List<dynamic> platforms = [];
 
   // Called when the widget is first inserted into the widget tree
   @override
   void initState() {
     super.initState();
-    _fetchGames();
+    _fetchPlatformsAndGames();
+  }
+
+  Future<void> _fetchPlatformsAndGames() async {
+    await _fetchPlatforms();
+    await _fetchGames();
+  }
+
+  // Fetch platforms to find steam ID
+  Future<void> _fetchPlatforms() async {
+    platforms = await apiService.fetchPlatforms();
+    var steamPlatforms = platforms
+        .where((p) => p['name'].toString().toLowerCase().contains('steam'));
+    print('Steam Platforms: $steamPlatforms');
+    setState(() {});
   }
 
   // Function to fetch games from the API
@@ -28,15 +43,63 @@ class _GameListScreenState extends State<GameListScreen> {
     try {
       // Fetch games using the APIService
       List<Game> fetchedGames = await apiService.fetchGames();
+
+      // Fetch prices from CheapShark for the fetched games
+      if (fetchedGames.isNotEmpty) {
+        await _fetchPricesForGames(fetchedGames);
+      }
+
       // Update the state
       setState(() {
         games = fetchedGames;
       });
+
       if (games.isEmpty) {
         print('No games found in the response.');
       }
     } catch (e) {
       print('Error fetching games: $e');
+    }
+  }
+
+  // Function to fetch prices for games using GameShark API
+  Future<void> _fetchPricesForGames(List<Game> fetchedGames) async {
+    try {
+      // Fetch CheapShark IDs for the games
+      List<int> cheapSharksIds = [];
+
+      // Fetch the CheapShark game IDs for each game
+      for (var game in fetchedGames) {
+        final gameId = await apiService.fetchGameIDFromCheapShark(game.name);
+        if (gameId != null) {
+          cheapSharksIds.add(gameId);
+        } else {
+          print('No CheapShark IDs found for ${game.name}');
+        }
+      }
+
+      // If no valid IDs are found skip price fetching
+      if (cheapSharksIds.isEmpty) {
+        print('No valid CheapShark IDs found, skippng price fetching');
+        return;
+      }
+
+      // Call the API to fetch prices for these games
+      Map<String, double> prices =
+          await apiService.fetchPricesForMultipleGames(cheapSharksIds);
+
+      // Update the prices for these games
+      for (var game in fetchedGames) {
+        final gameId = await apiService.fetchGameIDFromCheapShark(game.name);
+        if (gameId != null && prices.containsKey(gameId.toString())) {
+          game.updatePrice(prices[gameId.toString()]);
+        }
+      }
+      setState(() {
+        games = fetchedGames;
+      });
+    } catch (e) {
+      print('Error fetching game price: $e');
     }
   }
 
@@ -83,6 +146,9 @@ class _GameListScreenState extends State<GameListScreen> {
                       // Game release dates or fallback message if unavailable
                       Text(
                           'Release Date: ${game.releaseDates?.join(',') ?? 'Unknown'}'),
+                      // Display the price
+                      Text(
+                          'Price: ${game.price != null && game.price! > 0 ? '\$${game.price!.toStringAsFixed(2)}' : 'Price not available'}'),
                       // Display the website URL if available
                       if (game.websites != null &&
                           game.websites!.isNotEmpty) ...[
@@ -103,6 +169,34 @@ class _GameListScreenState extends State<GameListScreen> {
                             child: Text(urlString),
                           ),
                       ],
+
+                      // Display screenshots if available
+                      if (game.screenshotUrls != null &&
+                          game.screenshotUrls!.isNotEmpty) ...[
+                        const SizedBox(height: 8),
+                        const Text('Screenshots:'),
+                        SizedBox(
+                            height: 150,
+                            child: ListView.builder(
+                              scrollDirection: Axis.horizontal,
+                              itemCount: game.screenshotUrls!.length,
+                              itemBuilder: (context, screenshotIndex) {
+                                final screenshotUrl =
+                                    game.screenshotUrls![screenshotIndex];
+                                return Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Image.network(
+                                    screenshotUrl,
+                                    height: 150,
+                                    errorBuilder: (context, error, stackTrace) {
+                                      return const Icon(
+                                          Icons.image_not_supported);
+                                    },
+                                  ),
+                                );
+                              },
+                            ))
+                      ]
                     ],
                   ),
                 );

@@ -1,5 +1,8 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:game_match/pages/game_details.dart';
+import 'package:game_match/pages/game_swipe.dart';
+import 'package:game_match/test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'firebase_options.dart';
 import 'pages/Preference_Interest.dart';
@@ -13,6 +16,8 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'pages/Settings.dart';
 import 'pages/Settings_Appearance.dart';
 import 'pages/Log_in.dart';
+import 'pages/game_details.dart';
+import 'pages/game_model.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -52,7 +57,8 @@ class _GameMatchAppState extends State<GameMatchApp> {
     setState(() {
       isDarkMode = isDark; // Update theme mode in state
     });
-    await prefs.setBool('isDarkMode', isDark); // Save theme mode to SharedPreferences
+    await prefs.setBool(
+        'isDarkMode', isDark); // Save theme mode to SharedPreferences
   }
 
   @override
@@ -62,10 +68,8 @@ class _GameMatchAppState extends State<GameMatchApp> {
       themeMode: isDarkMode ? ThemeMode.dark : ThemeMode.light,
       theme: ThemeData.light(), // Light theme
       darkTheme: ThemeData.dark(), // Dark theme
-      home:const  MyLoginPage(
-              title: 'Login'
-            ),
-      //home: GameListScreen(), // This is to test that games are loading from API
+      //home:const  MyLoginPage(title: 'Login'),
+      home: GameListScreen(), // This is to test that games are loading from API
       routes: {
         '/Sign_up': (context) => const SignUp(),
         '/Side_bar': (context) => SideBar(
@@ -78,7 +82,7 @@ class _GameMatchAppState extends State<GameMatchApp> {
         '/Preference_&_Interest': (context) => PreferenceInterestPage(
               onThemeChanged: _toggleTheme,
               isDarkMode: isDarkMode,
-        ),
+            ),
         '/Settings': (context) => SettingsPage(
               isDarkMode: isDarkMode,
               onThemeChanged: _toggleTheme,
@@ -88,7 +92,10 @@ class _GameMatchAppState extends State<GameMatchApp> {
               onThemeChanged: _toggleTheme,
             ),
         '/Login': (context) => const MyLoginPage(title: 'Login'),
-        
+        '/GameDetails': (context) {
+          final game = ModalRoute.of(context)!.settings.arguments as Game;
+          return GameDetailsScreen(game: game);
+        },
       },
     );
   }

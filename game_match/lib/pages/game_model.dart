@@ -6,18 +6,31 @@ class Game {
   final List<String> websites;
   final List<String> platforms;
   final List<String> releaseDates;
+  double? price;
+  List<String>? screenshotUrls;
 
   Game({
     required this.name,
-    this.summary,
+    required this.summary,
     required this.genres,
     this.coverUrl,
     required this.websites,
     required this.platforms,
     required this.releaseDates,
+    this.price,
+    this.screenshotUrls,
   });
 
   factory Game.fromJson(Map<String, dynamic> json) {
+    // Parse screenshots if available
+    List<String> screenshotUrls = [];
+    if (json['screenshots'] != null) {
+      screenshotUrls = (json['screenshots'] as List<dynamic>)
+          .map((s) =>
+              'https://images.igdb.com/igdb/image/upload/t_720p/${s['image_id']}.jpg')
+          .toList();
+    }
+
     // Safely map genres, providing an empty list if null
     List<String> genres = (json['genres'] as List<dynamic>?)
             ?.map((genre) => genre['name'] as String)
@@ -42,14 +55,30 @@ class Game {
             .toList() ??
         [];
 
+    // Adjust the image URL to fetch higher resolution images
+    String? coverUrl;
+    if (json['cover'] != null) {
+      final imageId = json['cover']['url'].split('/').last;
+      coverUrl = 'https://images.igdb.com/igdb/image/upload/t_720p/$imageId';
+    } else {
+      coverUrl = null;
+    }
+
     return Game(
       name: json['name'] as String? ?? 'No title',
       summary: json['summary'] as String? ?? 'No description available',
       genres: genres,
-      coverUrl: json['cover'] != null ? 'https:${json['cover']['url']}' : null,
+      coverUrl: coverUrl,
+      //coverUrl: json['cover'] != null ? 'https:${json['cover']['url']}' : null,
       platforms: platforms,
       releaseDates: releaseDates,
       websites: websites,
+      price: null,
+      screenshotUrls: screenshotUrls,
     );
+  }
+  // Method to update the price after fetching from CheapShark
+  void updatePrice(double? newPrice) {
+    price = newPrice;
   }
 }
