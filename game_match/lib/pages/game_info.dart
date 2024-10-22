@@ -62,67 +62,42 @@ class _GameListScreenState extends State<GameListScreen> {
     }
   }
 
-  // Function to fetch prices for games using GameShark API
+  // Function to fetch prices for games using CheapShark API
   Future<void> _fetchPricesForGames(List<Game> fetchedGames) async {
     try {
       // Fetch CheapShark IDs for the games
-      List<int> cheapSharksIds = [];
+      await apiService.fetchPricesForIGDBGames(fetchedGames);
 
-      // Fetch the CheapShark game IDs for each game
-      for (var game in fetchedGames) {
-        final gameId = await apiService.fetchGameIDFromCheapShark(game.name);
-        if (gameId != null) {
-          cheapSharksIds.add(gameId);
-        } else {
-          print('No CheapShark IDs found for ${game.name}');
-        }
-      }
+      // Only keep games that have a valid price (price > 0)
+      fetchedGames
+          .removeWhere((game) => game.price == null || game.price! <= 0);
 
-      // If no valid IDs are found skip price fetching
-      if (cheapSharksIds.isEmpty) {
-        print('No valid CheapShark IDs found, skippng price fetching');
-        return;
-      }
-
-      // Call the API to fetch prices for these games
-      Map<String, double> prices =
-          await apiService.fetchPricesForMultipleGames(cheapSharksIds);
-
-      // Update the prices for these games
-      for (var game in fetchedGames) {
-        final gameId = await apiService.fetchGameIDFromCheapShark(game.name);
-        if (gameId != null && prices.containsKey(gameId.toString())) {
-          game.updatePrice(prices[gameId.toString()]);
-        }
-      }
+      // Update the state with the filtered games
       setState(() {
         games = fetchedGames;
       });
     } catch (e) {
-      print('Error fetching game price: $e');
+      print('Error fetching game prices: $e');
     }
   }
 
-  // Build method to construct the UI
+// Build method to construct the UI
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Game Info'),
       ),
-      // Check if games list is empty, if so, show a loading
+      // Check if games list is empty, if so, show a loading spinner
       body: games.isEmpty
           ? const Center(
-              child:
-                  CircularProgressIndicator(), // Show loading spinner while data is fetched
+              child: CircularProgressIndicator(), // Show loading spinner
             )
           : ListView.builder(
               itemCount: games.length,
               itemBuilder: (context, index) {
                 final game = games[index];
-                // log the screenshot in the UI
-                print(
-                    'Rendering screenshots for ${game.name}: ${game.screenshotUrls}');
+
                 return ListTile(
                   // Show the game cover image if available, otherwise show a default icon
                   leading: game.coverUrl != null
@@ -150,8 +125,7 @@ class _GameListScreenState extends State<GameListScreen> {
                       Text(
                           'Release Date: ${game.releaseDates?.join(',') ?? 'Unknown'}'),
                       // Display the price
-                      Text(
-                          'Price: ${game.price != null && game.price! > 0 ? '\$${game.price!.toStringAsFixed(2)}' : 'Price not available'}'),
+                      Text('Price: \$${game.price!.toStringAsFixed(2)}'),
                       // Display the website URL if available
                       if (game.websites != null &&
                           game.websites!.isNotEmpty) ...[
@@ -160,9 +134,7 @@ class _GameListScreenState extends State<GameListScreen> {
                         for (var urlString in game.websites!)
                           TextButton(
                             onPressed: () async {
-                              // Enusre the url is a Uri object
                               final Uri url = Uri.parse(urlString);
-                              // Check if url can launch
                               if (await canLaunchUrl(url)) {
                                 await launchUrl(url);
                               } else {
@@ -179,26 +151,27 @@ class _GameListScreenState extends State<GameListScreen> {
                         const SizedBox(height: 8),
                         const Text('Screenshots:'),
                         SizedBox(
-                            height: 150,
-                            child: ListView.builder(
-                              scrollDirection: Axis.horizontal,
-                              itemCount: game.screenshotUrls!.length,
-                              itemBuilder: (context, screenshotIndex) {
-                                final screenshotUrl =
-                                    game.screenshotUrls![screenshotIndex];
-                                return Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Image.network(
-                                    screenshotUrl,
-                                    height: 150,
-                                    errorBuilder: (context, error, stackTrace) {
-                                      return const Icon(
-                                          Icons.image_not_supported);
-                                    },
-                                  ),
-                                );
-                              },
-                            ))
+                          height: 150,
+                          child: ListView.builder(
+                            scrollDirection: Axis.horizontal,
+                            itemCount: game.screenshotUrls!.length,
+                            itemBuilder: (context, screenshotIndex) {
+                              final screenshotUrl =
+                                  game.screenshotUrls![screenshotIndex];
+                              return Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Image.network(
+                                  screenshotUrl,
+                                  height: 150,
+                                  errorBuilder: (context, error, stackTrace) {
+                                    return const Icon(
+                                        Icons.image_not_supported);
+                                  },
+                                ),
+                              );
+                            },
+                          ),
+                        )
                       ]
                     ],
                   ),

@@ -7,6 +7,7 @@ class Game {
   final List<String> platforms;
   final List<String> releaseDates;
   double? price;
+  bool isFree = false;
   List<String>? screenshotUrls;
 
   Game({
@@ -91,5 +92,8 @@ class Game {
   // Method to update the price after fetching from CheapShark
   void updatePrice(double? newPrice) {
     price = newPrice;
+    if (newPrice == 0.0) {
+      isFree = true;
+    }
   }
 }

@@ -72,7 +72,7 @@ class ApiService {
     const String body = '''
     fields name, summary, genres.name, cover.url, platforms.name, release_dates.human, websites.url, tags, screenshots.image_id;
     where platforms = (6);
-    limit 50;
+    limit 100;
     ''';
 
     try {
@@ -198,23 +198,80 @@ class ApiService {
   }
 
   // CheapShark API
+  Map<String, int?> gameIdCache = {};
 
   // Get CheapShark IDs for IGDB games and batch fetch prices
   Future<void> fetchPricesForIGDBGames(List<Game> igdbGames) async {
     // Fetch CheapShark game IDs for each IGDB game
-    List<int> cheapSharkIds = await getCheapSharkIds(igdbGames);
+    List<int> cheapSharkIds = await getCachedCheapSharkIds(igdbGames);
 
     // Fetch prices for all games in a single batch request
+    if (cheapSharkIds.isEmpty) {
+      print('No valid CheapShark IDs found. No games to update with prices.');
+      return;
+    }
+
     Map<String, double> prices =
         await fetchPricesForMultipleGames(cheapSharkIds);
 
-    // Update each game object with its price
+    // Remove games that do not have a valid CheapShark ID or a valid price
+    igdbGames.removeWhere((game) {
+      final gameId = gameIdCache[game.name];
+
+      // Skip games without a valid CheapShark ID
+      if (gameId == null || !prices.containsKey(gameId.toString())) {
+        print('Skipping game without a valid CheapShark ID: ${game.name}');
+        return true; // Remove this game
+      }
+
+      // If a valid ID is found, update the game's price
+      double price = prices[gameId.toString()] ?? 0.0;
+      if (price == 0.0) {
+        print('${game.name} is free or has no price, skipping.');
+        return true; // Remove this game if price is 0
+      }
+
+      // Update game price if valid
+      game.updatePrice(price);
+      return false; // Keep the game if it has a valid price
+    });
+
+    print('Finished processing games with valid CheapShark IDs.');
+  }
+
+  // Fetch Cached CheapShark IDs or Fetch Them from API if Not Cached
+  Future<List<int>> getCachedCheapSharkIds(List<Game> igdbGames) async {
+    List<int> cheapSharkIds = [];
+
     for (var game in igdbGames) {
-      final gameId = await fetchGameIDFromCheapShark(game.name);
-      if (gameId != null && prices.containsKey(gameId.toString())) {
-        game.updatePrice(prices[gameId.toString()]);
+      // Check if the game ID is already cached to avoid redundant API calls
+      if (gameIdCache.containsKey(game.name)) {
+        final cachedId = gameIdCache[game.name];
+        if (cachedId != null) {
+          cheapSharkIds.add(cachedId);
+          print('Using cached ID for ${game.name}: $cachedId');
+        } else {
+          print('Cached ID for ${game.name} is null. Skipping...');
+        }
+      } else {
+        // If not cached, fetch from the API and store in cache
+        final gameId = await fetchGameIDFromCheapShark(game.name);
+        if (gameId != null) {
+          gameIdCache[game.name] = gameId; // Cache the result
+          cheapSharkIds.add(gameId);
+          print('Fetched and cached ID for ${game.name}: $gameId');
+        } else {
+          // skip games that have no valid ID
+          print('No CheapShark ID found for ${game.name}');
+        }
+
+        // Introduce a small delay to avoid hitting rate limits
+        await Future.delayed(Duration(milliseconds: 500));
       }
     }
+
+    print('CheapShark IDs fetched: $cheapSharkIds');
+    return cheapSharkIds;
   }
 
   // Fetch CheapShark game ID by title
@@ -226,7 +283,17 @@ class ApiService {
     print('Fetching CheapShark game ID for $gameTitle from URL: $url');
 
     try {
-      final response = await http.get(url);
+      final response = await http.get(url).timeout(Duration(seconds: 10));
+
+      // Handle rate limit error
+      if (response.statusCode == 429) {
+        print('Rate limit hit, waiting for 60 seconds...');
+        // wait before retrying
+        await Future.delayed(Duration(seconds: 60));
+        // retry after delay
+        return fetchGameIDFromCheapShark(gameTitle);
+      }
+
       print('Response Status Code for $gameTitle: ${response.statusCode}');
       print('Response Body for $gameTitle: ${response.body}');
       if (response.statusCode == 200) {
