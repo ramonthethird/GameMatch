@@ -6,47 +6,32 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:intl/intl.dart';
 
 class ApiService {
-  // Instance of FlutterSecureStorage for storing sensitive info securely
   final FlutterSecureStorage secureStorage = FlutterSecureStorage();
-
-  // Twitch API client credentials
   final String clientId = dotenv.env['CLIENT_ID']!;
   final String clientSecret = dotenv.env['CLIENT_SECRET']!;
-
-  // Base URL for IGDB API
   final String baseUrl = 'https://api.igdb.com/v4';
 
-  // Function to store the access token
   Future<void> storeAccessToken(String token) async {
-    print('Storing access token: $token');
     await secureStorage.write(key: 'access_token', value: token);
   }
 
-  // Function to retrieve the access token from secure storage
   Future<String?> retrieveAccessToken() async {
-    final token = await secureStorage.read(key: 'access_token');
-    print('Retrieved access token: $token');
-    return token;
+    return await secureStorage.read(key: 'access_token');
   }
 
-  // Function to autheticate and get an access token from the API
   Future<void> authenticate() async {
     final Uri url = Uri.parse(
         'https://id.twitch.tv/oauth2/token?client_id=$clientId&client_secret=$clientSecret&grant_type=client_credentials');
 
     try {
-      // POST request to fetch the access token
       final response = await http.post(url);
 
-      print('Authentication Response: ${response.body}');
-
-      //Check if the request was successful
       if (response.statusCode == 200) {
         final Map<String, dynamic> tokenData = json.decode(response.body);
         await storeAccessToken(tokenData['access_token']);
-        print('Access token stored successfully');
       } else {
         print('Failed to fetch token: ${response.statusCode} ${response.body}');
+        throw Exception('Failed to authenticate with Twitch API');
       }
     } catch (error) {
       print('Error fetching token: $error');
@@ -54,25 +39,21 @@ class ApiService {
     }
   }
 
-  // Function to fetch a list of games from the IGDB API
   Future<List<Game>> fetchGames() async {
-    // Retrieve access token from secure storage
     final String? accessToken = await retrieveAccessToken();
 
-    // If no token available authenticate and fetch a new token
+    // If no token available, authenticate and fetch a new one
     if (accessToken == null) {
-      print('Access token is null. Please fetch a new one.');
-      await authenticate(); // Authenticate if the token is not available
-      return [];
+      print('Access token is null. Fetching a new one...');
+      await authenticate();
+      return fetchGames(); // Retry fetching games after authentication
     }
 
-    // API endpoint to fetch game data
-    // 48 for playstation and 49 for xbox
-    final Uri url = Uri.parse('https://api.igdb.com/v4/games');
+    final Uri url = Uri.parse('$baseUrl/games');
     const String body = '''
-    fields name, summary, genres.name, cover.url, platforms.name, release_dates.human, websites.url, tags, screenshots.image_id;
+    fields name, summary, genres.name, cover.url, platforms.name, release_dates.human, websites.url, tags, screenshots.image_id, involved_companies.company.name;
     where platforms = (6);
-    limit 100;
+    limit 50;
     ''';
 
     try {
@@ -86,35 +67,23 @@ class ApiService {
         body: body,
       );
 
-      print('Response Status Code: ${response.statusCode}');
-      print('Response Body: ${response.body}');
-
-      // If request is successful
       if (response.statusCode == 200) {
-        print('Response Body: ${response.body}');
-        // Decode the response body into a list of dynamic JSON objects
         final List<dynamic> gameDataJson = json.decode(response.body);
 
-        // Convert JSON objects into a list of Game objects
         final List<Game> games = gameDataJson
             .map((dynamic json) => Game.fromJson(json as Map<String, dynamic>))
             .where((game) {
-          // filter games to have screenshots, a non-empty summary, and a release date from 2020 and onwards
-          // for cover URLs
           if (game.coverUrl == null || game.coverUrl!.isEmpty) {
             return false;
           }
-          // for screenshots
           if (game.screenshotUrls == null || game.screenshotUrls!.isEmpty) {
             print('${game.name} has no screenshots, skipping');
             return false;
           }
-          // for game description
           if (game.summary == null || game.summary!.isEmpty) {
             print('${game.name} has no description, skipping');
             return false;
           }
-          // for release date
           if (game.releaseDates == null || game.releaseDates.isEmpty) {
             print('${game.name} has no release date, skipping');
             return false;
@@ -125,6 +94,11 @@ class ApiService {
         }).toList();
 
         return games;
+      } else if (response.statusCode == 401) {
+        // If the access token has expired or is invalid, re-authenticate
+        print('Access token expired. Re-authenticating...');
+        await authenticate();
+        return fetchGames(); // Retry fetching games after re-authentication
       } else {
         print(
             'Failed to fetch game data: ${response.statusCode} ${response.body}');
@@ -136,22 +110,18 @@ class ApiService {
     }
   }
 
-  // Helper function to parse the release date
   DateTime? _parseReleaseDate(String dateStr) {
     try {
-      // Handle special cases
       if (dateStr == "TBD") {
         print('Release date is TBD, skipping');
         return null;
       }
 
-      // If the date string is only a year, parse it manually
       if (RegExp(r'^\d{4}$').hasMatch(dateStr)) {
         int year = int.parse(dateStr);
         return DateTime(year);
       }
 
-      // For dates formatted MMM dd yyyy
       final DateFormat format = DateFormat('MMM dd, yyyy');
       return format.parse(dateStr);
     } catch (e) {

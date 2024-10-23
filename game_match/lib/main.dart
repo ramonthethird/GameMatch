@@ -1,7 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:game_match/pages/game_details.dart';
-import 'package:game_match/pages/game_swipe.dart';
+import 'package:game_match/pages/Swipe.dart';
 import 'package:game_match/test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'firebase_options.dart';
@@ -16,8 +15,8 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'pages/Settings.dart';
 import 'pages/Settings_Appearance.dart';
 import 'pages/Log_in.dart';
-import 'pages/game_details.dart';
 import 'pages/game_model.dart';
+import 'pages/Swipe.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -68,8 +67,8 @@ class _GameMatchAppState extends State<GameMatchApp> {
       themeMode: isDarkMode ? ThemeMode.dark : ThemeMode.light,
       theme: ThemeData.light(), // Light theme
       darkTheme: ThemeData.dark(), // Dark theme
-      //home:const  MyLoginPage(title: 'Login'),
-      home: GameListScreen(), // This is to test that games are loading from API
+      home: const MyLoginPage(title: 'Login'),
+      //home: SwipePage(), // This is to test that games are loading from API
       routes: {
         '/Sign_up': (context) => const SignUp(),
         '/Side_bar': (context) => SideBar(
@@ -94,7 +93,7 @@ class _GameMatchAppState extends State<GameMatchApp> {
         '/Login': (context) => const MyLoginPage(title: 'Login'),
         '/GameDetails': (context) {
           final game = ModalRoute.of(context)!.settings.arguments as Game;
-          return GameDetailsScreen(game: game);
+          return GameDetailScreen(gameId: game.id);
         },
       },
     );

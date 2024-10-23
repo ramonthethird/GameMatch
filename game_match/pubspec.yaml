@@ -43,6 +43,9 @@ dependencies:
   firebase_auth: 5.3.1
   cached_network_image: ^3.2.1
   intl: ^0.17.0
+  font_awesome_flutter: ^10.4.0
+  card_swiper: ^3.0.1
+  flutter_card_swiper: ^2.0.4
   # this is to authenticate the API for IGDB
   http: ^0.13.5
 
@@ -90,7 +93,12 @@ flutter:
   # "family" key with the font family name, and a "fonts" key with a
   # list giving the asset and other descriptors for the font. For
   # example:
-  # fonts:
+  fonts:
+    - family: SignikaNegative
+      fonts:
+        - asset: fonts/static/SignikaNegative-Regular.ttf
+        - asset: fonts/static/SignikaNegative-Bold.ttf
+          weight: 700
   #   - family: Schyler
   #     fonts:
   #       - asset: fonts/Schyler-Regular.ttf
