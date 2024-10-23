@@ -18,10 +18,10 @@ class _UsernameRecoveryPageState extends State<UsernameRecoveryPage> {
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: const Text('Recover Username'),
       ),
-      resizeToAvoidBottomInset: true,
+      resizeToAvoidBottomInset: true, // Add same function for keyboard pop up error
 
 
-      body: SingleChildScrollView(
+      body: SingleChildScrollView( // Wrap with singlechildscrollview
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
@@ -32,7 +32,7 @@ class _UsernameRecoveryPageState extends State<UsernameRecoveryPage> {
               Padding(
                 padding: const EdgeInsets.only(top: 40.0),
                 child: Image.asset(
-                  'assets/images/gamematchlogoresize.png', // Same image as the login page
+                  'images/gamematchlogoresize.png', // Same image as the login page
                   height: 260,
                   width: 260,
                 ),
@@ -41,11 +41,11 @@ class _UsernameRecoveryPageState extends State<UsernameRecoveryPage> {
               const SizedBox(height: 16),
 
               Container(
-                alignment: Alignment.center, // Center this bc its shifted
+                alignment: Alignment.center, // Center the text within the container
                 child: const Text(
                   'Recover your Username',
                   style: TextStyle(
-                    fontSize: 40, // same font size with login
+                    fontSize: 40, // same font size as the "Login" text
                     fontWeight: FontWeight.bold,
                   ),
                   textAlign: TextAlign.center,
@@ -54,27 +54,27 @@ class _UsernameRecoveryPageState extends State<UsernameRecoveryPage> {
 
               const SizedBox(height: 10),
 
-              // Put subtitle and description here
+              // Subtitle text
               const Text(
-                'Please enter the email associated with your account. Your username will be emailed to you shortly.',
+                'Please enter the email associated with your account. Your password will be emailed to you shortly.',
                 style: TextStyle(
-                  fontSize: 14, // Smaller
-                  color: Colors.black87, // Slightly lighter color
+                  fontSize: 14, // Smaller font size for the subtitle
+                  color: Colors.black87, // Lighter color for the subtitle
                 ),
-                textAlign: TextAlign.center, // Shift it to center
+                textAlign: TextAlign.center, // Center align the subtitle
               ),
 
 
               const SizedBox(height: 32),
 
-              // Email input
+              // TextField for email input
               SizedBox(
                 height: 40,
-                width: 325, // Same width as login page?
+                width: 325, // same width as login page
                 child: TextField(
                   controller: _emailController,
                   decoration: const InputDecoration(
-                    labelText: 'Enter your Email', // Email input label
+                    labelText: 'Enter your Email', // email input label
                     border: OutlineInputBorder(),
                     contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
                   ),
@@ -83,7 +83,7 @@ class _UsernameRecoveryPageState extends State<UsernameRecoveryPage> {
 
               const SizedBox(height: 20),
 
-              // Continue button cohesiveness check
+              // "Get Username" button, same style as "Continue" button from main page
               Container(
                 width: 140,
                 height: 30,
@@ -104,8 +104,6 @@ class _UsernameRecoveryPageState extends State<UsernameRecoveryPage> {
               ),
 
               const SizedBox(height: 20),
-
-              // put more backend logic here?
             ],
           ),
         ),

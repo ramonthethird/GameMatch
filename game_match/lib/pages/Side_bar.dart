@@ -116,7 +116,7 @@ class SideBar extends StatelessWidget {
                           style: TextStyle(color: isDarkMode ? Colors.white : Colors.black),
                         ),
                         onPressed: () {
-                          Navigator.pushNamed(context, "/Log_in"); 
+                          Navigator.pushNamed(context, "/Login");
                         },
                       ),
                     ],

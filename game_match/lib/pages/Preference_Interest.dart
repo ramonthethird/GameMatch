@@ -142,7 +142,7 @@ class CustomButton extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      color: isDarkMode ? Colors.white : Colors.black,
+                      //color: isDarkMode ? Colors.white : Colors.black, // Adapt text color
                     ),
                   ),
                   const SizedBox(height: 5),
@@ -150,7 +150,7 @@ class CustomButton extends StatelessWidget {
                     subtitle,
                     style: TextStyle(
                       fontSize: 14,
-                      color: isDarkMode ? Colors.grey[300] : Colors.black54,
+                      //color: isDarkMode ? Colors.grey[300] : Colors.black54, // Adapt subtitle color
                     ),
                   ),
                 ],

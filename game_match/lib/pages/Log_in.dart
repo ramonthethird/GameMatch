@@ -13,13 +13,13 @@ class MyLoginPage extends StatefulWidget {
   State<MyLoginPage> createState() => _MyLoginPageState();
 }
 
-// Initialize here for firebase and sign in func
+// Initialize here
 class _MyLoginPageState extends State<MyLoginPage> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  // Put method for sign in figure out firebase auth
+  // Method to sign in the user
   Future<void> _signIn() async {
     String username = _usernameController.text.trim();
     String password = _passwordController.text.trim();
@@ -29,17 +29,17 @@ class _MyLoginPageState extends State<MyLoginPage> {
         email: username,  // Make sure the username is an email address bc firebase doesn't allow direct usern input
         password: password,
       );
-      // If the sign in is successful, navigate to the sidebar
+      // If the sign-in is successful, navigate to the SideBar
       Navigator.pushNamed(context, "/Side_bar");
-    } on FirebaseAuthException catch (e) { 
-      // Put auth errors below from doc
+    } on FirebaseAuthException catch (e) {
+      // Handle authentication errors
       String message = 'An error occurred. Please try again.';
       if (e.code == 'user-not-found') {
         message = 'No user found for that email.';
       } else if (e.code == 'wrong-password') {
         message = 'Wrong password provided for that user.';
       }
-      // Show def error message in snackbar
+      // Show error message in a Snackbar
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(message)),
       );
@@ -82,11 +82,11 @@ class _MyLoginPageState extends State<MyLoginPage> {
                 child: TextField(
                   controller: _usernameController,
                   decoration: const InputDecoration(
-                    labelText: 'Enter your Email', // Changed to "Email" to account for firebase
+                    labelText: 'Enter your Email', // Changed to "Email"
                     border: OutlineInputBorder(),
                     contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
                   ),
-                  keyboardType: TextInputType.emailAddress,
+                  keyboardType: TextInputType.emailAddress, // Use email keyboard
                 ),
               ),
               const SizedBox(height: 2),
@@ -122,7 +122,7 @@ class _MyLoginPageState extends State<MyLoginPage> {
                     border: OutlineInputBorder(),
                     contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
                   ),
-                  obscureText: true, // Hide password text
+                  obscureText: true, // Hide password input
                 ),
               ),
               const SizedBox(height: 2),
@@ -150,7 +150,7 @@ class _MyLoginPageState extends State<MyLoginPage> {
               ),
               const SizedBox(height: 40),
               ElevatedButton(
-                onPressed: _signIn,
+                onPressed: _signIn, // Call the sign-in method
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.lightBlueAccent,
                   shape: RoundedRectangleBorder(
@@ -177,7 +177,7 @@ class _MyLoginPageState extends State<MyLoginPage> {
                   const Text(
                     "Don't have an account? ",
                     style: TextStyle(
-                      color: Colors.black,
+                      //color: Colors.black,
                       fontSize: 16,
                     ),
                   ),

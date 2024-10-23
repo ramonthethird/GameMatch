@@ -11,20 +11,20 @@ class PasswordRecoveryPage extends StatefulWidget {
 class _PasswordRecoveryPageState extends State<PasswordRecoveryPage> {
   final TextEditingController _emailController = TextEditingController();
 
-  // Send Password Reset Function
+  // Method to send password reset email
   Future<void> _sendPasswordResetEmail() async {
     try {
       await FirebaseAuth.instance.sendPasswordResetEmail(email: _emailController.text);
 
-      // Success message here
+      // Show a success message to the user
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Password reset email sent!')),
       );
-      // Give option for navigate back or clear the text field (from doc)
+      // Optionally, navigate back or clear the text field
       _emailController.clear();
     } catch (e) {
 
-      // Show default error message when error happens
+      // Show an error message if there's an issue
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error: ${e.toString()}')),
       );
@@ -102,11 +102,12 @@ class _PasswordRecoveryPageState extends State<PasswordRecoveryPage> {
               ),
               const SizedBox(height: 20),
               ElevatedButton(
-                onPressed: _sendPasswordResetEmail, // Send password reset email here
+                onPressed: _sendPasswordResetEmail, // Call the method to send email
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.lightBlueAccent, 
+                  backgroundColor: Colors.lightBlueAccent,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(2.5), // Cohesive check
+                    borderRadius: BorderRadius.circular(2.5),
+
                   ),
                   fixedSize: const Size(140, 30),
                 ),
