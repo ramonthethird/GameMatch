@@ -176,7 +176,7 @@ class _MyLoginPageState extends State<MyLoginPage> {
                   const Text(
                     "Don't have an account? ",
                     style: TextStyle(
-                      color: Colors.black,
+                      //color: Colors.black,
                       fontSize: 16,
                     ),
                   ),

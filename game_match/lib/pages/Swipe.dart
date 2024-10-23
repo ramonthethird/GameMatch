@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:game_match/pages/game_info.dart';
 import 'api_service.dart';
 import 'game_model.dart';
 import 'package:game_match/firestore_service.dart';
-import 'View_Reviews.dart';
 import 'dart:async';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class SwipePage extends StatefulWidget {
+  const SwipePage({Key? key}) : super(key: key);
+
   @override
   _SwipePageState createState() => _SwipePageState();
 }
@@ -16,9 +18,10 @@ class _SwipePageState extends State<SwipePage> with TickerProviderStateMixin {
   final FirestoreService _firestoreService = FirestoreService();
   List<Game> games = [];
   List<Game> swipedGames = [];
+  Game? selectedGame;
   Offset _swipeOffset = Offset.zero;
   double _rotationAngle = 0.0;
-  double _opacity = 1.0; // Opacity for fade effect
+  double _opacity = 1.0;
   int _currentIndex = 0;
   AnimationController? _heartAnimationController;
   AnimationController? _heartbrokenAnimationController;
@@ -28,7 +31,7 @@ class _SwipePageState extends State<SwipePage> with TickerProviderStateMixin {
   Animation<double>? _heartbrokenScaleAnimation;
   bool _showHeart = false;
   bool _showHeartbroken = false;
-  bool _showSwipeInstruction = true; // To track whether to show the instruction or not
+  bool _showSwipeInstruction = true;
   AnimationController? _instructionFadeController;
   Animation<double>? _instructionFadeAnimation;
   AnimationController? _instructionAnimationController;
@@ -44,29 +47,37 @@ class _SwipePageState extends State<SwipePage> with TickerProviderStateMixin {
       duration: const Duration(milliseconds: 700),
     );
     _heartFadeAnimation = Tween<double>(begin: 1.0, end: 0.0).animate(
-      CurvedAnimation(parent: _heartAnimationController!, curve: Interval(0.5, 1.0, curve: Curves.easeOut)),
+      CurvedAnimation(
+          parent: _heartAnimationController!,
+          curve: const Interval(0.5, 1.0, curve: Curves.easeOut)),
     );
     _heartScaleAnimation = Tween<double>(begin: 0.0, end: 1.2).animate(
-      CurvedAnimation(parent: _heartAnimationController!, curve: Interval(0.0, 0.5, curve: Curves.easeOutBack)),
+      CurvedAnimation(
+          parent: _heartAnimationController!,
+          curve: const Interval(0.0, 0.5, curve: Curves.easeOutBack)),
     );
     _heartbrokenAnimationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 700),
     );
     _heartbrokenFadeAnimation = Tween<double>(begin: 1.0, end: 0.0).animate(
-      CurvedAnimation(parent: _heartbrokenAnimationController!, curve: Interval(0.5, 1.0, curve: Curves.easeOut)),
+      CurvedAnimation(
+          parent: _heartbrokenAnimationController!,
+          curve: const Interval(0.5, 1.0, curve: Curves.easeOut)),
     );
     _heartbrokenScaleAnimation = Tween<double>(begin: 0.0, end: 1.2).animate(
-      CurvedAnimation(parent: _heartbrokenAnimationController!, curve: Interval(0.0, 0.5, curve: Curves.easeOutBack)),
+      CurvedAnimation(
+          parent: _heartbrokenAnimationController!,
+          curve: const Interval(0.0, 0.5, curve: Curves.easeOutBack)),
     );
 
-    // Instruction animation setup
     _instructionFadeController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 500),
     );
     _instructionFadeAnimation = Tween<double>(begin: 1.0, end: 0.0).animate(
-      CurvedAnimation(parent: _instructionFadeController!, curve: Curves.easeOut),
+      CurvedAnimation(
+          parent: _instructionFadeController!, curve: Curves.easeOut),
     );
 
     _instructionAnimationController = AnimationController(
@@ -75,8 +86,8 @@ class _SwipePageState extends State<SwipePage> with TickerProviderStateMixin {
     )..repeat(reverse: true);
 
     _instructionWagAnimation = Tween<Offset>(
-      begin: const Offset(-0.05, 0.0), // Slight left movement
-      end: const Offset(0.05, 0.0), // Slight right movement
+      begin: const Offset(-0.05, 0.0),
+      end: const Offset(0.05, 0.0),
     ).animate(CurvedAnimation(
       parent: _instructionAnimationController!,
       curve: Curves.easeInOut,
@@ -85,47 +96,85 @@ class _SwipePageState extends State<SwipePage> with TickerProviderStateMixin {
 
   Future<void> _fetchGames() async {
     try {
-      List<Game> fetchedGames = await apiService.fetchGames();
-      setState(() {
-        games = fetchedGames;
-      });
+      // Try to load games from Firestore first
+      List<Game> firestoreGames = await _firestoreService.loadGames();
+
+      if (firestoreGames.isNotEmpty) {
+        setState(() {
+          games = firestoreGames;
+          selectedGame = games[0];
+        });
+        print('Games loaded from Firestore');
+      } else {
+        // If Firestore is empty, fetch games from the API
+        print('No games in Firestore, fetching from API...');
+        List<Game> fetchedGames = await apiService.fetchGames();
+
+        if (fetchedGames.isNotEmpty) {
+          await _fetchPricesForGames(fetchedGames);
+
+          setState(() {
+            games = fetchedGames;
+            selectedGame = games[0];
+          });
+
+          // Save the fetched games to Firestore for caching
+          await _firestoreService.saveGames(fetchedGames);
+          print('Games saved to Firestore');
+        }
+      }
+
+      if (selectedGame == null) {
+        print('No game found');
+      }
     } catch (e) {
       print('Error fetching games: $e');
     }
   }
 
+  Future<void> _fetchPricesForGames(List<Game> fetchedGames) async {
+    try {
+      await apiService.fetchPricesForIGDBGames(fetchedGames);
+      fetchedGames.removeWhere((game) => game.price == null || game.price! <= 0);
+      setState(() {
+        games = fetchedGames;
+      });
+    } catch (e) {
+      print('Error fetching game prices: $e');
+    }
+  }
+
   void _fadeOutInstruction() {
-  if (_showSwipeInstruction) {
-    _instructionFadeController!.forward().then((_) {
+    if (_showSwipeInstruction) {
+      _instructionFadeController!.forward().then((_) {
+        setState(() {
+          _showSwipeInstruction = false;
+        });
+      });
+    }
+  }
+
+  void _onPanUpdate(DragUpdateDetails details) {
+    if (_showSwipeInstruction) {
       setState(() {
         _showSwipeInstruction = false;
       });
-    });
-  }
-}
-
-void _onPanUpdate(DragUpdateDetails details) {
-  if (_showSwipeInstruction) {
+    }
     setState(() {
-      _showSwipeInstruction = false;
+      _swipeOffset += details.delta;
+      _rotationAngle = _swipeOffset.dx / 300;
+      _opacity = 1 - (_swipeOffset.dx.abs() / MediaQuery.of(context).size.width);
     });
   }
-  setState(() {
-    _swipeOffset += details.delta;
-    _rotationAngle = _swipeOffset.dx / 300;
-    _opacity = 1 - (_swipeOffset.dx.abs() / MediaQuery.of(context).size.width);
-  });
-}
 
-@override
-void dispose() {
-  _instructionFadeController?.dispose();
-  _instructionAnimationController?.dispose();
-  // Dispose of the other controllers
-  _heartAnimationController?.dispose();
-  _heartbrokenAnimationController?.dispose();
-  super.dispose();
-}
+  @override
+  void dispose() {
+    _instructionFadeController?.dispose();
+    _instructionAnimationController?.dispose();
+    _heartAnimationController?.dispose();
+    _heartbrokenAnimationController?.dispose();
+    super.dispose();
+  }
 
   void _onPanEnd(DragEndDetails details) {
     if (_swipeOffset.dx > 150 || _swipeOffset.dx < -150) {
@@ -134,7 +183,7 @@ void dispose() {
       setState(() {
         _swipeOffset = Offset.zero;
         _rotationAngle = 0.0;
-        _opacity = 1.0; // Reset opacity
+        _opacity = 1.0;
       });
     }
   }
@@ -148,7 +197,7 @@ void dispose() {
 
     setState(() {
       _swipeOffset = Offset(endX, endY);
-      _opacity = 0.0; // Fade out the card
+      _opacity = 0.0;
     });
 
     Future.delayed(const Duration(milliseconds: 300), () {
@@ -172,15 +221,15 @@ void dispose() {
             SnackBar(
               content: Text('${games[_currentIndex].name} added to wishlist!'),
               backgroundColor: Colors.green,
-              duration: Duration(seconds: 2),
+              duration: const Duration(seconds: 2),
             ),
           );
         } catch (e) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Failed to add game to wishlist. Try again.'),
+              content: const Text('Failed to add game to wishlist. Try again.'),
               backgroundColor: Colors.red,
-              duration: Duration(seconds: 2),
+              duration: const Duration(seconds: 2),
             ),
           );
         }
@@ -221,17 +270,17 @@ void dispose() {
         await _firestoreService.removeFromWishlist(lastSwipedGame.id);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Action has been reverted.'),
+            content: const Text('Action has been reverted.'),
             backgroundColor: Colors.orange,
-            duration: Duration(seconds: 2),
+            duration: const Duration(seconds: 2),
           ),
         );
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Failed to revert action.'),
+            content: const Text('Failed to revert action.'),
             backgroundColor: Colors.red,
-            duration: Duration(seconds: 2),
+            duration: const Duration(seconds: 2),
           ),
         );
       }
@@ -240,7 +289,7 @@ void dispose() {
         games.insert(_currentIndex, swipedGames.removeLast());
         _swipeOffset = Offset.zero;
         _rotationAngle = 0.0;
-        _opacity = 1.0; // Reset opacity
+        _opacity = 1.0;
       });
     }
   }
@@ -252,17 +301,10 @@ void dispose() {
         games.removeAt(index);
         _swipeOffset = Offset.zero;
         _rotationAngle = 0.0;
-        _opacity = 1.0; // Reset opacity
+        _opacity = 1.0;
       });
     }
   }
-
-  // @override
-  // void dispose() {
-  //   _heartAnimationController?.dispose();
-  //   _heartbrokenAnimationController?.dispose();
-  //   super.dispose();
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -297,7 +339,8 @@ void dispose() {
               Expanded(
                 flex: 4,
                 child: Stack(
-                  children: games.asMap().entries.toList().reversed.map((entry) {
+                  children:
+                      games.asMap().entries.toList().reversed.map((entry) {
                     int index = entry.key;
                     Game game = entry.value;
 
@@ -310,9 +353,12 @@ void dispose() {
                         child: Opacity(
                           opacity: index == _currentIndex ? _opacity : 1.0,
                           child: Transform.translate(
-                            offset: index == _currentIndex ? _swipeOffset : Offset.zero,
+                            offset: index == _currentIndex
+                                ? _swipeOffset
+                                : Offset.zero,
                             child: Transform.rotate(
-                              angle: index == _currentIndex ? _rotationAngle : 0.0,
+                              angle:
+                                  index == _currentIndex ? _rotationAngle : 0.0,
                               child: Card(
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(20),
@@ -326,7 +372,9 @@ void dispose() {
                                         child: Image.network(
                                           game.coverUrl ?? '',
                                           fit: BoxFit.cover,
-                                          errorBuilder: (context, error, stackTrace) => const Center(
+                                          errorBuilder:
+                                              (context, error, stackTrace) =>
+                                                  const Center(
                                             child: Icon(
                                               Icons.image_not_supported,
                                               size: 150,
@@ -376,7 +424,10 @@ void dispose() {
                                             Navigator.push(
                                               context,
                                               MaterialPageRoute(
-                                                builder: (context) => ViewReviewsPage(gameId: game.id),
+                                                builder: (context) =>
+                                                    GameDetailScreen(
+                                                        gameId:
+                                                            game.id),
                                               ),
                                             );
                                           },
@@ -426,79 +477,107 @@ void dispose() {
                               children: [
                                 Text(
                                   'Platforms:',
-                                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color.fromARGB(255, 240, 98, 146)),
+                                  style: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                      color: Color.fromARGB(255, 240, 98, 146)),
                                 ),
                                 if (games.isNotEmpty)
                                   ...games.first.platforms.map((platform) {
-                                    if (platform.toLowerCase().contains('playstation')) {
+                                    if (platform
+                                        .toLowerCase()
+                                        .contains('playstation')) {
                                       return Row(
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
-                                          const FaIcon(FontAwesomeIcons.playstation, size: 20),
+                                          const FaIcon(
+                                              FontAwesomeIcons.playstation,
+                                              size: 20),
                                           const SizedBox(width: 4),
                                           Text(
                                             platform,
-                                            style: const TextStyle(fontSize: 16),
+                                            style:
+                                                const TextStyle(fontSize: 16),
                                           ),
                                         ],
                                       );
-                                    } else if (platform.toLowerCase().contains('xbox')) {
+                                    } else if (platform
+                                        .toLowerCase()
+                                        .contains('xbox')) {
                                       return Row(
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
-                                          const FaIcon(FontAwesomeIcons.xbox, size: 20),
+                                          const FaIcon(FontAwesomeIcons.xbox,
+                                              size: 20),
                                           const SizedBox(width: 4),
                                           Text(
                                             platform,
-                                            style: const TextStyle(fontSize: 16),
+                                            style:
+                                                const TextStyle(fontSize: 16),
                                           ),
                                         ],
                                       );
-                                    } else if (platform.toLowerCase().contains('pc')) {
+                                    } else if (platform
+                                        .toLowerCase()
+                                        .contains('pc')) {
                                       return Row(
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
-                                          const FaIcon(FontAwesomeIcons.desktop, size: 20),
+                                          const FaIcon(FontAwesomeIcons.desktop,
+                                              size: 20),
                                           const SizedBox(width: 4),
                                           Text(
                                             platform,
-                                            style: const TextStyle(fontSize: 16),
+                                            style:
+                                                const TextStyle(fontSize: 16),
                                           ),
                                         ],
                                       );
-                                    } else if (platform.toLowerCase().contains('android')) {
+                                    } else if (platform
+                                        .toLowerCase()
+                                        .contains('android')) {
                                       return Row(
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
-                                          const FaIcon(FontAwesomeIcons.android, size: 20),
+                                          const FaIcon(FontAwesomeIcons.android,
+                                              size: 20),
                                           const SizedBox(width: 4),
                                           Text(
                                             platform,
-                                            style: const TextStyle(fontSize: 16),
+                                            style:
+                                                const TextStyle(fontSize: 16),
                                           ),
                                         ],
                                       );
-                                    } else if (platform.toLowerCase().contains('ios')) {
+                                    } else if (platform
+                                        .toLowerCase()
+                                        .contains('ios')) {
                                       return Row(
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
-                                          const FaIcon(FontAwesomeIcons.apple, size: 20),
+                                          const FaIcon(FontAwesomeIcons.apple,
+                                              size: 20),
                                           const SizedBox(width: 4),
                                           Text(
                                             platform,
-                                            style: const TextStyle(fontSize: 16),
+                                            style:
+                                                const TextStyle(fontSize: 16),
                                           ),
                                         ],
                                       );
-                                    } else if (platform.toLowerCase().contains('nintendo')) {
+                                    } else if (platform
+                                        .toLowerCase()
+                                        .contains('nintendo')) {
                                       return Row(
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
-                                          const FaIcon(FontAwesomeIcons.gamepad, size: 20),
+                                          const FaIcon(FontAwesomeIcons.gamepad,
+                                              size: 20),
                                           const SizedBox(width: 4),
                                           Text(
                                             platform,
-                                            style: const TextStyle(fontSize: 16),
+                                            style:
+                                                const TextStyle(fontSize: 16),
                                           ),
                                         ],
                                       );
@@ -506,16 +585,18 @@ void dispose() {
                                       return Row(
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
-                                          const FaIcon(Icons.videogame_asset, size: 20),
+                                          const FaIcon(Icons.videogame_asset,
+                                              size: 20),
                                           const SizedBox(width: 4),
                                           Text(
-                                          platform,
-                                          style: const TextStyle(fontSize: 16),
-                                        ),
-                                      ],
-                                    );
-                                  }
-                                }).toList(),
+                                            platform,
+                                            style:
+                                                const TextStyle(fontSize: 16),
+                                          ),
+                                        ],
+                                      );
+                                    }
+                                  }).toList(),
                               ],
                             ),
                           ),
@@ -524,7 +605,8 @@ void dispose() {
                       const SizedBox(height: 5),
                       Row(
                         children: [
-                          const Icon(Icons.calendar_today, size: 24), // Icon for release date
+                          const Icon(Icons.calendar_today,
+                              size: 24), // Icon for release date
                           const SizedBox(width: 8),
                           Text(
                             'Release Date: ',
@@ -536,10 +618,14 @@ void dispose() {
                           ),
                           Expanded(
                             child: Text(
-                              games.isNotEmpty ? games.first.releaseDates?.join(", ") ?? "Unknown" : " ",
+                              games.isNotEmpty
+                                  ? games.first.releaseDates?.join(", ") ??
+                                      "Unknown"
+                                  : " ",
                               style: const TextStyle(
                                 fontSize: 16,
-                                color: Colors.black, // Default color for fetched text
+                                color: Colors
+                                    .black, // Default color for fetched text
                               ),
                               overflow: TextOverflow.ellipsis,
                             ),
@@ -549,22 +635,28 @@ void dispose() {
                       const SizedBox(height: 5),
                       Row(
                         children: [
-                          const Icon(Icons.category, size: 24), // Icon for genres
+                          const Icon(Icons.category,
+                              size: 24), // Icon for genres
                           const SizedBox(width: 8),
                           Text(
                             'Genres: ',
                             style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
-                              color: Color.fromARGB(255, 240, 98, 146), // Color for "Genres"
+                              color: Color.fromARGB(
+                                  255, 240, 98, 146), // Color for "Genres"
                             ),
                           ),
                           Expanded(
                             child: Text(
-                              games.isNotEmpty ? games.first.genres?.join(", ") ?? "Unknown genres" : " ",
+                              games.isNotEmpty
+                                  ? games.first.genres?.join(", ") ??
+                                      "Unknown genres"
+                                  : " ",
                               style: const TextStyle(
                                 fontSize: 16,
-                                color: Colors.black, // Default color for fetched text
+                                color: Colors
+                                    .black, // Default color for fetched text
                               ),
                               overflow: TextOverflow.ellipsis,
                             ),
@@ -585,7 +677,8 @@ void dispose() {
                       heroTag: 'dislike',
                       backgroundColor: Colors.blue,
                       shape: const CircleBorder(),
-                      child: const Icon(Icons.heart_broken, color: Colors.white, size: 32),
+                      child: const Icon(Icons.heart_broken,
+                          color: Colors.white, size: 32),
                       onPressed: _onDislike,
                     ),
                     FloatingActionButton(
@@ -599,7 +692,8 @@ void dispose() {
                       heroTag: 'like',
                       backgroundColor: Colors.pink[300],
                       shape: const CircleBorder(),
-                      child: const Icon(Icons.favorite, color: Colors.white, size: 32),
+                      child: const Icon(Icons.favorite,
+                          color: Colors.white, size: 32),
                       onPressed: _onLike,
                     ),
                   ],
@@ -608,70 +702,74 @@ void dispose() {
             ],
           ),
           // Swiping instruction UI
-        if (_showSwipeInstruction)
-          Positioned(
-            left: MediaQuery.of(context).size.width / 1.8 - 80,
-            top: MediaQuery.of(context).size.height * 0.2,
-            child: SlideTransition(
-              position: _instructionWagAnimation!,
-              child: Column(
-                children: [
-                  Icon(
-                    Icons.swipe,
-                    size: 100,
-                    color: Colors.white,
-                  ),
-                  const SizedBox(height: 8),
-                  const Text(
-                    'Swipe to interact',
-                    style: TextStyle(
+          if (_showSwipeInstruction)
+            Positioned(
+              left: MediaQuery.of(context).size.width / 1.8 - 80,
+              top: MediaQuery.of(context).size.height * 0.2,
+              child: SlideTransition(
+                position: _instructionWagAnimation!,
+                child: Column(
+                  children: [
+                    Icon(
+                      Icons.swipe,
+                      size: 100,
                       color: Colors.white,
-                      fontSize: 16,
-                      shadows: [
-                        Shadow(
-                          offset: Offset(1.0, 1.0),
-                          blurRadius: 3.0,
-                          color: Colors.black,
-                        ),
-                      ],
                     ),
-                  ),
-                ],
+                    const SizedBox(height: 8),
+                    const Text(
+                      'Swipe to interact',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        shadows: [
+                          Shadow(
+                            offset: Offset(1.0, 1.0),
+                            blurRadius: 3.0,
+                            color: Colors.black,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
-          ),
           if (_showHeart)
-          Positioned(
-            left: MediaQuery.of(context).size.width / 2 - 75, // Adjust to position horizontally
-            top: MediaQuery.of(context).size.height / 3 - 75, // Adjust to position vertically
-            child: FadeTransition(
-              opacity: _heartFadeAnimation!,
-              child: ScaleTransition(
-                scale: _heartScaleAnimation!,
-                child: const Icon(
-                  Icons.favorite,
-                  color: Color.fromARGB(255, 240, 98, 146),
-                  size: 150,
+            Positioned(
+              left: MediaQuery.of(context).size.width / 2 -
+                  75, // Adjust to position horizontally
+              top: MediaQuery.of(context).size.height / 3 -
+                  75, // Adjust to position vertically
+              child: FadeTransition(
+                opacity: _heartFadeAnimation!,
+                child: ScaleTransition(
+                  scale: _heartScaleAnimation!,
+                  child: const Icon(
+                    Icons.favorite,
+                    color: Color.fromARGB(255, 240, 98, 146),
+                    size: 150,
+                  ),
                 ),
               ),
             ),
-          ),
           if (_showHeartbroken)
-          Positioned(
-            left: MediaQuery.of(context).size.width / 2 - 75, // Adjust to position horizontally
-            top: MediaQuery.of(context).size.height / 3 - 75, // Adjust to position vertically
-            child: FadeTransition(
-              opacity: _heartbrokenFadeAnimation!,
-              child: ScaleTransition(
-                scale: _heartbrokenScaleAnimation!,
-                child: const Icon(
-                  Icons.heart_broken,
-                  color: Colors.blue,
-                  size: 150,
+            Positioned(
+              left: MediaQuery.of(context).size.width / 2 -
+                  75, // Adjust to position horizontally
+              top: MediaQuery.of(context).size.height / 3 -
+                  75, // Adjust to position vertically
+              child: FadeTransition(
+                opacity: _heartbrokenFadeAnimation!,
+                child: ScaleTransition(
+                  scale: _heartbrokenScaleAnimation!,
+                  child: const Icon(
+                    Icons.heart_broken,
+                    color: Colors.blue,
+                    size: 150,
+                  ),
                 ),
               ),
             ),
-          ),
         ],
       ),
     );
