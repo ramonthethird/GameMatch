@@ -14,6 +14,9 @@ class _InterestsPageState extends State<InterestsPage> {
   String? dropdownValue2;
   String? dropdownValue3;
   String? dropdownValue4;
+  
+  // Loading state
+  bool _isLoading = false;
 
   bool _isLoading = false;
 
@@ -46,6 +49,8 @@ class _InterestsPageState extends State<InterestsPage> {
   ];
 
   final firestore = FirebaseFirestore.instance;
+
+  // User ID (set dynamically)
   late String userId;
 
   @override
@@ -116,6 +121,7 @@ class _InterestsPageState extends State<InterestsPage> {
           dropdownValue3 = interests['platform'];
           dropdownValue4 = interests['price'];
         });
+
       } else {
         print('No interests found for the user.');
       }

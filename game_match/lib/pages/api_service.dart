@@ -6,24 +6,33 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:intl/intl.dart';
 
 class ApiService {
+  // Instance of FlutterSecureStorage for storing sensitive info securely
   final FlutterSecureStorage secureStorage = FlutterSecureStorage();
+
+  // Twitch API client credentials
   final String clientId = dotenv.env['CLIENT_ID']!;
   final String clientSecret = dotenv.env['CLIENT_SECRET']!;
+
+  // Base URL for IGDB API
   final String baseUrl = 'https://api.igdb.com/v4';
 
+  // Function to store the access token
   Future<void> storeAccessToken(String token) async {
     await secureStorage.write(key: 'access_token', value: token);
   }
 
+  // Function to retrieve the access token from secure storage
   Future<String?> retrieveAccessToken() async {
     return await secureStorage.read(key: 'access_token');
   }
 
+  // Function to autheticate and get an access token from the API
   Future<void> authenticate() async {
     final Uri url = Uri.parse(
         'https://id.twitch.tv/oauth2/token?client_id=$clientId&client_secret=$clientSecret&grant_type=client_credentials');
 
     try {
+      // POST request to fetch the access token
       final response = await http.post(url);
 
       if (response.statusCode == 200) {
@@ -39,7 +48,9 @@ class ApiService {
     }
   }
 
+  // Function to fetch a list of games from the IGDB API
   Future<List<Game>> fetchGames() async {
+    // Retrieve access token from secure storage
     final String? accessToken = await retrieveAccessToken();
 
     // If no token available, authenticate and fetch a new one

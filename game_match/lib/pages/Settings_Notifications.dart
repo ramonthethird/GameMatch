@@ -5,10 +5,10 @@ class Settings_Notifications extends StatelessWidget {
   final ValueChanged<bool> onThemeChanged;
 
   const Settings_Notifications({
-    Key? key,
+    super.key,
     required this.isDarkMode,
     required this.onThemeChanged,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -27,10 +27,10 @@ class SettingsNotificationsPage extends StatefulWidget {
   final ValueChanged<bool> onThemeChanged;
 
   const SettingsNotificationsPage({
-    Key? key,
+    super.key,
     required this.isDarkMode,
     required this.onThemeChanged,
-  }) : super(key: key);
+  });
 
   @override
   _NotificationsPageState createState() => _NotificationsPageState();

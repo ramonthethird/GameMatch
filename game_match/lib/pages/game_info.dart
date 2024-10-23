@@ -14,10 +14,12 @@ class GameDetailScreen extends StatefulWidget {
 }
 
 class _GameDetailScreenState extends State<GameDetailScreen> {
+
   final ApiService apiService = ApiService();
   final FirestoreService _firestoreService = FirestoreService(); // Initialize FirestoreService
   Game? selectedGame;
 
+  // Called when the widget is first inserted into the widget tree
   @override
   void initState() {
     super.initState();
@@ -42,6 +44,7 @@ class _GameDetailScreenState extends State<GameDetailScreen> {
     }
   }
 
+  // Build method to construct the UI
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -102,6 +105,7 @@ class _GameDetailScreenState extends State<GameDetailScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
+                      // Game summary or fallback message if unavailable
                       Text(
                         '\$${selectedGame!.price!.toStringAsFixed(2)}',
                         style: const TextStyle(

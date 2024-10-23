@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:game_match/pages/Log_in.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -15,9 +16,9 @@ class SignUp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: const SignUpScreen(),
+      home: SignUpScreen(),
     );
   }
 }
@@ -47,7 +48,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => Navigator.of(context).pop(), // Navigate back when tapped
+            onPressed: () {
+            // Navigate to login screen when back button is pressed
+            }, 
         ),
       ),
       body: SingleChildScrollView(
@@ -59,7 +62,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
                 Image.asset(
-                  'lib/assets/gamematchlogoresize.png', // Image added at the top of the form
+                  'assets/images/gamematchlogoresize.png', // Image added at the top of the form
                   height: 100, // Set the height of the image
                 ),
                 const SizedBox(height: 20),
@@ -104,7 +107,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 ),
                 const SizedBox(height: 40),
                 ElevatedButton(
-                  onPressed: _trySubmit, // Button to trigger form submission
+                  onPressed: (){
+                    Navigator.pushNamed(context, '/Log_in');
+                  }, // Button to trigger form submission
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blue,
                   ),

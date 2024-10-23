@@ -107,6 +107,7 @@ class _PasswordRecoveryPageState extends State<PasswordRecoveryPage> {
                   backgroundColor: Colors.lightBlueAccent,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(2.5),
+
                   ),
                   fixedSize: const Size(140, 30),
                 ),

@@ -15,6 +15,7 @@ import 'pages/Side_bar.dart';
 import 'pages/Interest.dart';
 //import 'pages/Edit_profile.dart';
 import 'pages/Sign_up.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'pages/Settings.dart';
 import 'pages/Settings_Appearance.dart';
 import 'pages/Log_in.dart';

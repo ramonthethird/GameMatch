@@ -173,6 +173,7 @@ class _MyLoginPageState extends State<MyLoginPage> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
+                  
                   const Text(
                     "Don't have an account? ",
                     style: TextStyle(
@@ -180,6 +181,7 @@ class _MyLoginPageState extends State<MyLoginPage> {
                       fontSize: 16,
                     ),
                   ),
+                  
                   GestureDetector(
                     onTap: () {
                       Navigator.pushNamed(context, "/Sign_up");

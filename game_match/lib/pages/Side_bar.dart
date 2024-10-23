@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+
 class SideBar extends StatelessWidget {
   final ValueChanged<bool> onThemeChanged; // Callback to change the theme
   final bool isDarkMode; // Pass the current theme mode
@@ -58,7 +59,7 @@ class SideBar extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            "User Name",
+                            "John Doe",
                             style: TextStyle(
                               fontSize: 16,
                               color: Colors.black54, // Keep username in white for visibility
