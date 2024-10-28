@@ -347,6 +347,7 @@ class _SwipePageState extends State<SwipePage> with TickerProviderStateMixin {
       return Scaffold(
         appBar: AppBar(
           title: const Text('Swipe Games'),
+          centerTitle: true,
         ),
         body: const Center(
           child: CircularProgressIndicator(),
@@ -355,16 +356,13 @@ class _SwipePageState extends State<SwipePage> with TickerProviderStateMixin {
     }
 
     return Scaffold(
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(100.0),
-        child: AppBar(
-          centerTitle: true,
-          leading: const Icon(Icons.menu),
-          title: Image.asset(
-            'assets/images/gamematchlogoresize.png',
-            height: 50,
-            width: 50,
-          ),
+      appBar: AppBar(
+        centerTitle: true,
+        leading: const Icon(Icons.menu),
+        title: Image.asset(
+          'assets/images/gamematchlogoresize.png',
+          height: 50,
+          width: 50,
         ),
       ),
       body: Stack(
@@ -814,24 +812,94 @@ class CustomAdPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.grey[100], // Light background color
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            // Image has been removed since you don't have one
-            Text(
-              'This is a custom full-screen ad!',
-              style: TextStyle(fontSize: 24),
+        child: Card(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          elevation: 4,
+          margin: EdgeInsets.symmetric(horizontal: 24),
+          child: Padding(
+            padding: EdgeInsets.all(20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Title
+                Text(
+                  'Sponsored by NBA',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                SizedBox(height: 16),
+
+                // Image
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(10),
+                  child: Image.asset(
+                    'assets/images/nba-logo.png',
+                    width: 300,
+                    height: 300,
+                    fit: BoxFit.cover,
+                  ),
+                ),
+
+                SizedBox(height: 16),
+
+                // Description
+                Text(
+                  'GameMatch is proud to be sponsored by the NBA. This partnership allows us to bring you exclusive content, special events, and unique gaming experiences. Stay tuned for more exciting updates and opportunities to engage with your favorite NBA teams and players through our platform.',
+                  style: TextStyle(fontSize: 16, color: Colors.black87),
+                  textAlign: TextAlign.center,
+                ),
+
+                SizedBox(height: 20),
+
+                // Buttons
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    // Learn Button
+                    OutlinedButton(
+                      onPressed: () {
+                        // Handle Learn action
+                      },
+                      style: OutlinedButton.styleFrom(
+                        side: BorderSide(color: Colors.grey),
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      child: Text(
+                        'Learn',
+                        style: TextStyle(color: Colors.black54),
+                      ),
+                    ),
+
+                    // Close Button
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Color(0xFF41B1F1),
+                        foregroundColor: Colors.white,
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      child: Text('Close'),
+                    ),
+                  ],
+                ),
+              ],
             ),
-            SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pop(
-                    context); // Close the ad and return to the main screen
-              },
-              child: Text('Close Ad'),
-            ),
-          ],
+          ),
         ),
       ),
     );

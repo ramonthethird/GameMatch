@@ -142,7 +142,7 @@ class _GameDetailScreenState extends State<GameDetailScreen> {
                                   Uri.parse(selectedGame!.websiteUrl!);
                               if (await canLaunchUrl(url)) {
                                 await launchUrl(url,
-                                    mode: LaunchMode.externalApplication);
+                                    mode: LaunchMode.platformDefault);
                               } else {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(

@@ -89,6 +89,9 @@ flutter:
     - .env
     - assets/images/profile.png  # An image asset can refer to one or more resolution-specific "variants", see
     - assets/images/gamematchlogoresize.png
+    - assets/images/nba-logos.png
+    - assets/images/jp_morgan.png
+    - assets/images/crunchyroll_ad.png
   # https://flutter.dev/to/resolution-aware-images
 
   # For details regarding adding assets from package dependencies, see
