@@ -18,8 +18,6 @@ class _InterestsPageState extends State<InterestsPage> {
   // Loading state
   bool _isLoading = false;
 
-  bool _isLoading = false;
-
   final List<String> gameModes = [
     'Single Player',
     'Multiplayer',
