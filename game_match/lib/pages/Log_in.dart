@@ -1,32 +1,25 @@
-
-// still needs to edit for consolidation
-
 import 'package:flutter/material.dart';
-import 'package:game_match/pages/Side_bar.dart';
-//import 'package:login_ui_1/recoverusername.dart';  // Import the recovery page
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:game_match/pages/Sign_up.dart';
 
-// void main() {
-//   runApp(const MyApp());
-// }
+class LoginPage extends StatelessWidget {
+  const LoginPage({super.key});
 
-//class LoginPage extends StatelessWidget {
-  //const LoginPage({super.key});
-
-  //@override
-  //Widget build(BuildContext context) {
-  // return MaterialApp(
-  //    title: 'Basic Login',
-   //   theme: ThemeData(
-  //     primarySwatch: Colors.grey,
-   //   ),
-   //   home: const MyLoginPage(title: 'My Main Login Page'),
-    //);
- // }
-//}
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: const MyLoginPage(title: 'Login'),
+      routes: {
+        '/Post_home': (context) => const MyLoginPage(title: 'WelcomePage'), // Define the route for Post_home
+        '/Sign_up': (context) => const SignUpScreen(), // Ensure SignUpPage is imported and declared
+      },
+    );
+  }
+}
 
 class MyLoginPage extends StatefulWidget {
   const MyLoginPage({super.key, required this.title});
-
   final String title;
 
   @override
@@ -34,17 +27,37 @@ class MyLoginPage extends StatefulWidget {
 }
 
 class _MyLoginPageState extends State<MyLoginPage> {
-  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  String _errorMessage = '';
+
+  // Function to handle user login
+  Future<void> _login() async {
+    try {
+      UserCredential userCredential = await _auth.signInWithEmailAndPassword(
+        email: _emailController.text.trim(),
+        password: _passwordController.text.trim(),
+      );
+      // On successful login, navigate to the post-home page
+      Navigator.pushNamed(context, "/Post_home");
+    } catch (e) {
+      setState(() {
+        _errorMessage = e.toString();
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFF1F3F4),
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        backgroundColor: const Color(0xFFF1F3F4),
+        //backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text(widget.title),
       ),
-      
       resizeToAvoidBottomInset: true,
       body: SingleChildScrollView(
         child: Padding(
@@ -60,7 +73,6 @@ class _MyLoginPageState extends State<MyLoginPage> {
                   width: 100,
                 ),
               ),
-
               const Text(
                 'Login',
                 style: TextStyle(
@@ -68,65 +80,54 @@ class _MyLoginPageState extends State<MyLoginPage> {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-
               const SizedBox(height: 32),
-
               SizedBox(
                 height: 40,
                 width: 325,
                 child: TextField(
-                  controller: _usernameController,
+                  controller: _emailController,
                   decoration: const InputDecoration(
-                    labelText: 'Enter your Username',
+                    labelText: 'Enter your Email',
                     border: OutlineInputBorder(),
-                    contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                    contentPadding:
+                        EdgeInsets.symmetric(vertical: 10, horizontal: 10),
                   ),
                 ),
               ),
-              
               const SizedBox(height: 2),
-
-  
-              GestureDetector(
-                onTap: () {
-                  // navigate to the RecoverUsernamePage
-                  // Navigator.push(
-                  //   context,
-                  //   MaterialPageRoute(builder: (context) => const UsernameRecoveryPage()), // Ensure RecoverUsernamePage is imported and declared
-                  // );
+              TextButton(
+                onPressed: () {
+                  // Navigate to username recovery page
                 },
-
-                
                 child: const Padding(
-                  padding: EdgeInsets.only(left: 30),
+                  padding: EdgeInsets.only(left: 33),
                   child: Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
-                      'Forgot your Username?',
+                      'Forgot your Email?',
                       style: TextStyle(
                         fontSize: 17,
-                        color: Colors.blue, // blue color
+                        color: Colors.blue,
                       ),
                     ),
                   ),
                 ),
               ),
-
               const SizedBox(height: 32),
               SizedBox(
                 height: 40,
                 width: 325,
                 child: TextField(
                   controller: _passwordController,
+                  obscureText: true,
                   decoration: const InputDecoration(
                     labelText: 'Enter your Password',
                     border: OutlineInputBorder(),
-                    contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                    contentPadding:
+                        EdgeInsets.symmetric(vertical: 10, horizontal: 10),
                   ),
                 ),
               ),
-
-              
               const SizedBox(height: 2),
               const Padding(
                 padding: EdgeInsets.only(left: 30),
@@ -141,38 +142,38 @@ class _MyLoginPageState extends State<MyLoginPage> {
                   ),
                 ),
               ),
-
-              
               const SizedBox(height: 40),
-
-              // const SizedBox(height: 20),
-
-
-                ElevatedButton(
-                onPressed: () {
-                      Navigator.pushNamed(context, "/Side_bar"); // Ensure SideBar is imported and declared
-                },
+              ElevatedButton(
+                onPressed: _login,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.lightBlueAccent, // Button background color
+                  backgroundColor: Colors.lightBlueAccent,
                   shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(2.5), // Rounded corners
+                    borderRadius: BorderRadius.circular(2.5),
                   ),
-                  fixedSize: const Size(140, 30), // Fixed width and height
+                  fixedSize: const Size(140, 30),
                 ),
                 child: const Center(
                   child: Text(
-                  'continue',
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 14,
-                    fontWeight: FontWeight.normal,
-                  ),
+                    'Continue',
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 14,
+                      fontWeight: FontWeight.normal,
+                    ),
                   ),
                 ),
+              ),
+              if (_errorMessage.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.only(top: 20),
+                  child: Text(
+                    _errorMessage,
+                    style: const TextStyle(
+                      color: Colors.red,
+                      fontSize: 16,
+                    ),
+                  ),
                 ),
-              
-
-              
               const SizedBox(height: 20),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -184,9 +185,9 @@ class _MyLoginPageState extends State<MyLoginPage> {
                       fontSize: 16,
                     ),
                   ),
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.pushNamed(context, "/Sign_up"); // Ensure SignUpPage is imported and declared
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pushNamed(context, "/Sign_up");
                     },
                     child: const Text(
                       'Sign up',

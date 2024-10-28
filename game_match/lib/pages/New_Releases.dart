@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'api_service.dart'; // Make sure this imports your ApiService class
-import 'game_model.dart'; // Import your Game model
 import 'package:url_launcher/url_launcher.dart'; // Import url_launcher for opening links
+import 'api_service.dart'; // Make sure this imports ApiService class
+import 'game_model.dart'; // Import  Game model
 
 class NewReleasesGames extends StatefulWidget {
   const NewReleasesGames({super.key});
-
+  
   @override
   _NewReleasesGamesState createState() => _NewReleasesGamesState();
 }
@@ -17,13 +17,13 @@ class _NewReleasesGamesState extends State<NewReleasesGames> {
   @override
   void initState() {
     super.initState();
-    fetchTopRatedGames();
+    fetchNewGames();
   }
-
-  Future<void> fetchTopRatedGames() async {
+  // Fetch top games from the API
+  Future<void> fetchNewGames() async {
     ApiService apiService = ApiService();
     try {
-      final games = await apiService.fetchGames();
+      final games = await apiService.fetchNewReleases();
       setState(() {
         _games = games; // No need for casting since they are already Game type
         _isLoading = false;
@@ -34,11 +34,11 @@ class _NewReleasesGamesState extends State<NewReleasesGames> {
       });
     }
   }
-
+ // Launch the game's website URL
   Future<void> _launchURL(String url) async {
     final Uri uri = Uri.parse(url);
     if (await canLaunchUrl(uri)) {
-      await launchUrl(uri);
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
     } else {
       throw 'Could not launch $url';
     }
@@ -61,12 +61,13 @@ class _NewReleasesGamesState extends State<NewReleasesGames> {
                     itemCount: _games.length,
                     itemBuilder: (context, index) {
                       return Card(
-                        elevation: 4,
+                        elevation: 4, 
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
                         margin: const EdgeInsets.symmetric(vertical: 8),
                         child: InkWell(
+                          // Open the game's website when the card is tapped
                           onTap: () {
                             if (_games[index].websiteUrl != null) {
                               _launchURL(_games[index].websiteUrl!);
@@ -76,7 +77,8 @@ class _NewReleasesGamesState extends State<NewReleasesGames> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               ClipRRect(
-                                borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+                                borderRadius: const BorderRadius.vertical(
+                                    top: Radius.circular(12)),
                                 child: _games[index].coverUrl != null
                                     ? Image.network(
                                         _games[index].coverUrl!,
@@ -108,7 +110,8 @@ class _NewReleasesGamesState extends State<NewReleasesGames> {
                                     ),
                                     const SizedBox(height: 8),
                                     Text(
-                                      _games[index].summary ?? 'No summary available',
+                                      _games[index].summary ??
+                                          'No summary available',
                                       style: const TextStyle(fontSize: 14),
                                       maxLines: 3,
                                       overflow: TextOverflow.ellipsis,
@@ -116,7 +119,8 @@ class _NewReleasesGamesState extends State<NewReleasesGames> {
                                     const SizedBox(height: 8),
                                     Text(
                                       'Genres: ${_games[index].genres.join(', ')}',
-                                      style: const TextStyle(fontSize: 12, color: Colors.grey),
+                                      style: const TextStyle(
+                                          fontSize: 12, color: Colors.grey),
                                     ),
                                   ],
                                 ),

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:game_match/pages/Side_bar.dart';
 
 class PreferenceInterestPage extends StatelessWidget {
   final bool isDarkMode; // Accept current theme mode
@@ -50,14 +49,14 @@ class PreferenceInterestPage extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   const SizedBox(height: 15),
-                  
+                
                   // Manage Preference button
                   CustomButton(
                     title: 'Manage preferences',
                     subtitle: 'Edit and Save genre preferences',
                     icon: Icons.tune,
                     onPressed: () {
-                      // Add navigation here
+                     // Navigator.pushNamed(context, '/preference_page'); // Navigate to Preference page
                     },
                     isDarkMode: isDarkMode, // Pass dark mode status
                   ),
