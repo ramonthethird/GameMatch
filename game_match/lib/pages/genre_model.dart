@@ -1,32 +1,21 @@
-import 'package:flutter/material.dart';
+class Genre {
+  final int id;
+  final String name;
 
-class MoreGenresPage extends StatelessWidget {
-  final List<String> selectedGenres;
-  final Function(String) onGenresUnselected;
+  Genre({required this.id, required this.name});
 
-  const MoreGenresPage({super.key, required this.selectedGenres, required this.onGenresUnselected});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('View All Selected Genres')),
-      body: ListView.builder(
-        itemCount: selectedGenres.length,
-        itemBuilder: (context, index) {
-          String genre = selectedGenres[index];
-          return ListTile(
-            title: Text(genre),
-            trailing: IconButton(
-              icon: const Icon(Icons.remove_circle),
-              onPressed: () {
-                onGenresUnselected(genre);
-                ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Removing Genre')));
-              },
-            ),
-          );
-        },
-      ),
+  factory Genre.fromJson(Map<String, dynamic> json) {
+    return Genre(
+      id: json['id'],
+      name: json['name'],
     );
+  }
+
+// convert object to json
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+    };
   }
 }
