@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:game_match/firebase_options.dart';
 
 class InterestsPage extends StatefulWidget {
   const InterestsPage({super.key});
@@ -12,7 +10,6 @@ class InterestsPage extends StatefulWidget {
 }
 
 class _InterestsPageState extends State<InterestsPage> {
-  // Variables to hold selected values for each dropdown
   String? dropdownValue1;
   String? dropdownValue2;
   String? dropdownValue3;
@@ -49,7 +46,6 @@ class _InterestsPageState extends State<InterestsPage> {
     '\$50 - \$80'
   ];
 
-  // Firestore instance
   final firestore = FirebaseFirestore.instance;
 
   // User ID (set dynamically)
@@ -58,25 +54,22 @@ class _InterestsPageState extends State<InterestsPage> {
   @override
   void initState() {
     super.initState();
-    _getCurrentUserId(); // Get current user ID
-    _loadInterests(); // Load user's interests when the page initializes
+    _getCurrentUserId();
+    _loadInterests();
   }
 
-  // Get currently authenticated user's ID
   void _getCurrentUserId() {
     User? currentUser = FirebaseAuth.instance.currentUser;
     if (currentUser != null) {
-      userId = currentUser.uid; // Set userId to the authenticated user's ID
+      userId = currentUser.uid;
     } else {
-      // Error message in case user is not authenticated
       print('User not authenticated.');
     }
   }
 
-  // Save user interests to Firestore
   void _saveInterests() async {
     setState(() {
-      _isLoading = true; // Show loading indicator
+      _isLoading = true;
     });
 
     try {
@@ -87,44 +80,38 @@ class _InterestsPageState extends State<InterestsPage> {
           'platform': dropdownValue3 ?? '',
           'price': dropdownValue4 ?? '',
         }
-      }, SetOptions(merge: true)); // Merge with existing data
+      }, SetOptions(merge: true));
 
-      // Popup feedback for user
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Interests saved successfully!'), backgroundColor: Colors.green),
+        const SnackBar(
+          content: Text('Interests saved successfully!'),
+          backgroundColor: Colors.green,
+        ),
       );
-
-      // Print for debugging purposes
-      print('Interests saved successfully:');
-      print({
-        'gameMode': dropdownValue1,
-        'playerPerspective': dropdownValue2,
-        'platform': dropdownValue3,
-        'price': dropdownValue4,
-      });
     } catch (e) {
       print('Error saving interests: $e');
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Error saving interests.'), backgroundColor: Colors.red),
+        const SnackBar(
+          content: Text('Error saving interests.'),
+          backgroundColor: Colors.red,
+        ),
       );
     } finally {
       setState(() {
-        _isLoading = false; // Hide loading indicator
+        _isLoading = false;
       });
     }
   }
 
-  // Load user interests from Firestore
   void _loadInterests() async {
     setState(() {
-      _isLoading = true; // Show loading indicator
+      _isLoading = true;
     });
 
     try {
       DocumentSnapshot doc =
           await firestore.collection('users').doc(userId).get();
 
-      // If a user already has interests saved before, load them
       if (doc.exists && doc['interests'] != null) {
         Map<String, dynamic> interests = doc['interests'];
         setState(() {
@@ -140,38 +127,37 @@ class _InterestsPageState extends State<InterestsPage> {
       print('Error loading interests: $e');
     } finally {
       setState(() {
-        _isLoading = false; // Hide loading indicator
+        _isLoading = false;
       });
     }
   }
 
-  // SideBar button
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Interests', style: TextStyle(color: Colors.black, fontSize: 24)), // AppBar title
+        title: const Text(
+          'Interests',
+          style: TextStyle(color: Colors.black, fontSize: 24),
+        ),
         centerTitle: true,
         backgroundColor: const Color(0xFF74ACD5),
         leading: IconButton(
-          icon: const Icon(Icons.menu, color: Colors.black), // Sidebar Icon
+          icon: const Icon(Icons.menu, color: Colors.black),
           onPressed: () {
-            Navigator.pushNamed(context, "/Side_bar"); // Open/Return to sidebar
+            Navigator.pushNamed(context, "/Side_bar");
           },
         ),
       ),
-
-      // Header Title
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: _isLoading 
-          ? const Center(child: CircularProgressIndicator()) // Show loading indicator
-          : Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                const Align(
-                  alignment: Alignment.topCenter,
-                  child: Text(
+        child: _isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  const SizedBox(height: 20),
+                  const Text(
                     'Manage Interests',
                     style: TextStyle(
                       fontSize: 24,
