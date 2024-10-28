@@ -109,8 +109,8 @@ class _PasswordRecoveryPageState extends State<PasswordRecoveryPage> {
 
 
               Container(
-                width: 180, // Adjust as needed
-                height: 40, // Adjust as needed
+                width: 180, // consistency with other buttons?
+                height: 40,
                 child: ElevatedButton(
                   onPressed: _sendPasswordResetEmail,
                   style: ElevatedButton.styleFrom(
@@ -123,7 +123,7 @@ class _PasswordRecoveryPageState extends State<PasswordRecoveryPage> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: const [
                       Icon(
-                        Icons.email,
+                        Icons.email,   // Email icon for recovery buttons
                         color: Colors.white,
                         size: 16,
                       ),
