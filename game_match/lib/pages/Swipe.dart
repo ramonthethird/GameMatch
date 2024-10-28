@@ -16,6 +16,7 @@ class SwipePage extends StatefulWidget {
 class _SwipePageState extends State<SwipePage> with TickerProviderStateMixin {
   final ApiService apiService = ApiService();
   final FirestoreService _firestoreService = FirestoreService();
+  StreamSubscription? _firestoreSubscription;
   List<Game> games = [];
   List<Game> swipedGames = [];
   Game? selectedGame;
@@ -23,6 +24,9 @@ class _SwipePageState extends State<SwipePage> with TickerProviderStateMixin {
   double _rotationAngle = 0.0;
   double _opacity = 1.0;
   int _currentIndex = 0;
+  int _swipeCount = 0; // track the number of swipes
+  final int _swipeThreshold = 3; // number of swipes to trigger an ad
+
   AnimationController? _heartAnimationController;
   AnimationController? _heartbrokenAnimationController;
   Animation<double>? _heartFadeAnimation;
@@ -92,6 +96,26 @@ class _SwipePageState extends State<SwipePage> with TickerProviderStateMixin {
       parent: _instructionAnimationController!,
       curve: Curves.easeInOut,
     ));
+  }
+
+  void _showCustomAd() {
+    if (!mounted) return;
+
+    // Push the ad page on top of the current page without replacing it
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (ModalRoute.of(context)?.isCurrent ?? false) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => CustomAdPage()),
+        ).then((_) {
+          if (mounted) {
+            setState(() {
+              _swipeCount = 0; // Reset swipe count after ad
+            });
+          }
+        });
+      }
+    });
   }
 
   Future<void> _fetchGames() async {
@@ -175,6 +199,7 @@ class _SwipePageState extends State<SwipePage> with TickerProviderStateMixin {
     _instructionAnimationController?.dispose();
     _heartAnimationController?.dispose();
     _heartbrokenAnimationController?.dispose();
+    _firestoreSubscription?.cancel();
     super.dispose();
   }
 
@@ -304,6 +329,14 @@ class _SwipePageState extends State<SwipePage> with TickerProviderStateMixin {
         _swipeOffset = Offset.zero;
         _rotationAngle = 0.0;
         _opacity = 1.0;
+
+        // increment swipe count and check it custom ad should be shown
+        _swipeCount++;
+        if (_swipeCount >= _swipeThreshold) {
+          if (ModalRoute.of(context)?.isCurrent ?? false) {
+            _showCustomAd();
+          }
+        }
       });
     }
   }
@@ -772,6 +805,34 @@ class _SwipePageState extends State<SwipePage> with TickerProviderStateMixin {
               ),
             ),
         ],
+      ),
+    );
+  }
+}
+
+class CustomAdPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            // Image has been removed since you don't have one
+            Text(
+              'This is a custom full-screen ad!',
+              style: TextStyle(fontSize: 24),
+            ),
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(
+                    context); // Close the ad and return to the main screen
+              },
+              child: Text('Close Ad'),
+            ),
+          ],
+        ),
       ),
     );
   }

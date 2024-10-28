@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:game_match/pages/Swipe.dart';
@@ -20,12 +21,33 @@ import 'pages/Swipe.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
   // Ensure dotenv is loaded before app runs
   await dotenv.load(fileName: ".env");
+
+  // Initialize Firebase
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  runApp(GameMatchApp());
+
+  // Enable Firestore offline persistance
+  FirebaseFirestore.instance.settings =
+      const Settings(persistenceEnabled: true);
+
+  // Load the theme preference before the app starts
+  final prefs = await SharedPreferences.getInstance();
+  bool isDarkMode = prefs.getBool('isDarkMode') ?? false;
+
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+          create: (_) => ThemeNotifier(isDarkMode),
+        ),
+      ],
+      child: const GameMatchApp(),
+    ),
+  );
 }
 
 class GameMatchApp extends StatefulWidget {
@@ -62,39 +84,60 @@ class _GameMatchAppState extends State<GameMatchApp> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'GameMatch',
-      themeMode: isDarkMode ? ThemeMode.dark : ThemeMode.light,
-      theme: ThemeData.light(), // Light theme
-      darkTheme: ThemeData.dark(), // Dark theme
-      home: const MyLoginPage(title: 'Login'),
-      //home: SwipePage(), // This is to test that games are loading from API
-      routes: {
-        '/Sign_up': (context) => const SignUp(),
-        '/Side_bar': (context) => SideBar(
-              onThemeChanged: _toggleTheme,
-              isDarkMode: isDarkMode,
+    return Consumer<ThemeNotifier>(
+      builder: (context, themeNotifier, child) {
+        return MaterialApp(
+          title: 'GameMatch',
+          themeMode:
+              themeNotifier.isDarkMode ? ThemeMode.dark : ThemeMode.light,
+          theme: ThemeData(
+            brightness: Brightness.light,
+            fontFamily: 'SignikaNegative',
+            primarySwatch: Colors.blue,
+            scaffoldBackgroundColor: Colors.white,
+            appBarTheme: const AppBarTheme(
+              backgroundColor: Color(0xFF74ACD5),
+              foregroundColor: Colors.black,
             ),
-        '/Profile': (context) => const Profile(),
-        '/Interest': (context) => const InterestsPage(),
-        '/Edit_profile': (context) => const EditProfile(),
-        '/Preference_&_Interest': (context) => PreferenceInterestPage(
-              onThemeChanged: _toggleTheme,
-              isDarkMode: isDarkMode,
+          ),
+          darkTheme: ThemeData(
+            brightness: Brightness.dark,
+            fontFamily: 'SignikaNegative',
+            primarySwatch: Colors.blue,
+            scaffoldBackgroundColor: Colors.black,
+            appBarTheme: const AppBarTheme(
+              backgroundColor: Color(0xFF1E1E1E),
+              foregroundColor: Colors.white,
             ),
-        '/Settings': (context) => SettingsPage(
-              isDarkMode: isDarkMode,
-              onThemeChanged: _toggleTheme,
-            ),
-        '/Appearance': (context) => SettingsAppearancePage(
-              isDarkMode: isDarkMode,
-              onThemeChanged: _toggleTheme,
-            ),
-        '/Login': (context) => const MyLoginPage(title: 'Login'),
-        '/GameDetails': (context) {
-          final game = ModalRoute.of(context)!.settings.arguments as Game;
-          return GameDetailScreen(gameId: game.id);
-        },
+          ),
+          home: SwipePage(),
+          routes: {
+            '/Sign_up': (context) => const SignUp(),
+            '/Side_bar': (context) => SideBar(
+                  onThemeChanged: (bool isDarkMode) {
+                    themeNotifier.toggleTheme(isDarkMode);
+                  },
+                  isDarkMode: themeNotifier.isDarkMode,
+                ),
+            '/Profile': (context) => const Profile(),
+            '/Interest': (context) => const InterestsPage(),
+            // '/Edit_profile': (context) => const EditProfile(),
+            '/Preference_&_Interest': (context) => PreferenceInterestPage(
+                  onThemeChanged: (bool isDarkMode) {
+                    themeNotifier.toggleTheme(isDarkMode);
+                  },
+                  isDarkMode: themeNotifier.isDarkMode,
+                ),
+            '/Settings': (context) => SettingsPage(),
+            '/Appearance': (context) => SettingsAppearancePage(
+                  isDarkMode: themeNotifier.isDarkMode,
+                  onThemeChanged: (bool isDarkMode) {
+                    themeNotifier.toggleTheme(isDarkMode);
+                  },
+                ),
+            '/Login': (context) => const MyLoginPage(title: 'Login'),
+          },
+        );
       },
     );
   }

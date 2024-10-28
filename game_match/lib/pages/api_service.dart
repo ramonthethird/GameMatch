@@ -53,7 +53,7 @@ class ApiService {
     const String body = '''
     fields name, summary, genres.name, cover.url, platforms.name, release_dates.human, websites.url, tags, screenshots.image_id, involved_companies.company.name;
     where platforms = (6);
-    limit 50;
+    limit 100;
     ''';
 
     try {

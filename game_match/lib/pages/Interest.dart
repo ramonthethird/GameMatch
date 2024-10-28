@@ -17,11 +17,10 @@ class _InterestsPageState extends State<InterestsPage> {
   String? dropdownValue2;
   String? dropdownValue3;
   String? dropdownValue4;
-  
+
   // Loading state
   bool _isLoading = false;
 
-  // List of items for each dropdown
   final List<String> gameModes = [
     'Single Player',
     'Multiplayer',
@@ -122,8 +121,8 @@ class _InterestsPageState extends State<InterestsPage> {
     });
 
     try {
-      // Access firestore collection to get current user's data
-      DocumentSnapshot doc = await firestore.collection('users').doc(userId).get();
+      DocumentSnapshot doc =
+          await firestore.collection('users').doc(userId).get();
 
       // If a user already has interests saved before, load them
       if (doc.exists && doc['interests'] != null) {
@@ -134,10 +133,6 @@ class _InterestsPageState extends State<InterestsPage> {
           dropdownValue3 = interests['platform'];
           dropdownValue4 = interests['price'];
         });
-
-        // Print for debugging purposes
-        print('Interests loaded successfully:');
-        print(interests);
       } else {
         print('No interests found for the user.');
       }
@@ -183,118 +178,126 @@ class _InterestsPageState extends State<InterestsPage> {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                ),
-                const SizedBox(height: 40),
-
-                // Dropdown 1: Game Mode
-                const Text(
-                  'Game Mode', // Dropdown Title
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-                ),
-                DropdownButton<String>(
-                  value: dropdownValue1,
-                  hint: const Text('Select Game Mode'), // Dropdown Hint
-                  onChanged: (String? newValue) {
-                    setState(() {
-                      dropdownValue1 = newValue;
-                    });
-                  },
-                  items: gameModes.map<DropdownMenuItem<String>>((String value) {
-                    return DropdownMenuItem<String>(
-                      value: value,
-                      child: Text(value),
-                    );
-                  }).toList(),
-                ),
-                const SizedBox(height: 30),
-
-                // Dropdown 2: Player Perspective
-                const Text(
-                  'Player Perspective', // Dropdown Title
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-                ),
-                DropdownButton<String>(
-                  value: dropdownValue2,
-                  hint: const Text('Select Player Perspective'), //Dropdown Hint
-                  onChanged: (String? newValue) {
-                    setState(() {
-                      dropdownValue2 = newValue;
-                    });
-                  },
-                  items: playerPerspective.map<DropdownMenuItem<String>>((String value) {
-                    return DropdownMenuItem<String>(
-                      value: value,
-                      child: Text(value),
-                    );
-                  }).toList(),
-                ),
-                const SizedBox(height: 30),
-
-                // Dropdown 3: Platform
-                const Text(
-                  'Platform', // Dropdown Title
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-                ),
-                DropdownButton<String>(
-                  value: dropdownValue3,
-                  hint: const Text('Select Platform'), // Dropdown Hint
-                  onChanged: (String? newValue) {
-                    setState(() {
-                      dropdownValue3 = newValue;
-                    });
-                  },
-                  items: platforms.map<DropdownMenuItem<String>>((String value) {
-                    return DropdownMenuItem<String>(
-                      value: value,
-                      child: Text(value),
-                    );
-                  }).toList(),
-                ),
-                const SizedBox(height: 30),
-
-                // Dropdown 4: Price
-                const Text(
-                  'Price', // Dropdown Title
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-                ),
-                DropdownButton<String>(
-                  value: dropdownValue4,
-                  hint: const Text('Select Price'), // Dropdown Hint
-                  onChanged: (String? newValue) {
-                    setState(() {
-                      dropdownValue4 = newValue;
-                    });
-                  },
-                  items: price.map<DropdownMenuItem<String>>((String value) {
-                    return DropdownMenuItem<String>(
-                      value: value,
-                      child: Text(value),
-                    );
-                  }).toList(),
-                ),
-                const SizedBox(height: 30),
-
-                // Save Button
-                ElevatedButton(
-                  onPressed: _saveInterests,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
-                    padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
-                    textStyle: const TextStyle(fontSize: 18),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
+                  const SizedBox(
+                      height: 30), // Space between title and dropdowns
+                  _buildDropdownCard(
+                    icon: Icons.videogame_asset,
+                    label: 'Game Mode',
+                    value: dropdownValue1,
+                    items: gameModes,
+                    onChanged: (String? newValue) {
+                      setState(() {
+                        dropdownValue1 = newValue;
+                      });
+                    },
                   ),
-                  child: Text(
-                    'Save',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                    ),
+                  const SizedBox(height: 20),
+                  _buildDropdownCard(
+                    icon: Icons.visibility,
+                    label: 'Player Perspective',
+                    value: dropdownValue2,
+                    items: playerPerspective,
+                    onChanged: (String? newValue) {
+                      setState(() {
+                        dropdownValue2 = newValue;
+                      });
+                    },
                   ),
-                )
+                  const SizedBox(height: 20),
+                  _buildDropdownCard(
+                    icon: Icons.devices,
+                    label: 'Platform',
+                    value: dropdownValue3,
+                    items: platforms,
+                    onChanged: (String? newValue) {
+                      setState(() {
+                        dropdownValue3 = newValue;
+                      });
+                    },
+                  ),
+                  const SizedBox(height: 20),
+                  _buildDropdownCard(
+                    icon: Icons.attach_money,
+                    label: 'Price',
+                    value: dropdownValue4,
+                    items: price,
+                    onChanged: (String? newValue) {
+                      setState(() {
+                        dropdownValue4 = newValue;
+                      });
+                    },
+                  ),
+                  const SizedBox(height: 40),
+                  _buildSaveButton(),
+                ],
+              ),
+      ),
+    );
+  }
+
+  Widget _buildDropdownCard({
+    required IconData icon,
+    required String label,
+    required String? value,
+    required List<String> items,
+    required ValueChanged<String?> onChanged,
+  }) {
+    return Card(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      elevation: 2,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(icon, color: const Color(0xFF74ACD5)),
+                const SizedBox(width: 10),
+                Text(
+                  label,
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ],
             ),
+            DropdownButton<String>(
+              value: value,
+              hint: Text('Select $label'),
+              isExpanded: true,
+              onChanged: onChanged,
+              items: items.map<DropdownMenuItem<String>>((String item) {
+                return DropdownMenuItem<String>(
+                  value: item,
+                  child: Text(item),
+                );
+              }).toList(),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSaveButton() {
+    return ElevatedButton(
+      onPressed: _saveInterests,
+      style: ElevatedButton.styleFrom(
+        backgroundColor: const Color(0xFF74ACD5),
+        padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+        textStyle: const TextStyle(fontSize: 18),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+      ),
+      child: const Text(
+        'Save',
+        style: TextStyle(
+          color: Colors.white,
+          fontSize: 18,
+        ),
       ),
     );
   }

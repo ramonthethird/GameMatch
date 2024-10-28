@@ -135,12 +135,31 @@ class _GameDetailScreenState extends State<GameDetailScreen> {
                     children: [
                       ElevatedButton.icon(
                         onPressed: () async {
-                          final Uri url = Uri.parse(selectedGame!.websiteUrl!);
-                          if (await canLaunchUrl(url)) {
-                            await launchUrl(url,
-                                mode: LaunchMode.externalApplication);
+                          if (selectedGame!.websiteUrl != null &&
+                              selectedGame!.websiteUrl!.isNotEmpty) {
+                            try {
+                              final Uri url =
+                                  Uri.parse(selectedGame!.websiteUrl!);
+                              if (await canLaunchUrl(url)) {
+                                await launchUrl(url,
+                                    mode: LaunchMode.externalApplication);
+                              } else {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                      content:
+                                          Text('Could not launch the URL')),
+                                );
+                              }
+                            } catch (e) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text('Error: $e')),
+                              );
+                            }
                           } else {
-                            throw 'Could not launch $url';
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                  content: Text('Invalid or missing URL')),
+                            );
                           }
                         },
                         icon: const Icon(Icons.shopping_cart),
