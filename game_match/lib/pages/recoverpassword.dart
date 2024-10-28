@@ -11,20 +11,20 @@ class PasswordRecoveryPage extends StatefulWidget {
 class _PasswordRecoveryPageState extends State<PasswordRecoveryPage> {
   final TextEditingController _emailController = TextEditingController();
 
-  // Method to send password reset email
+  // Send Password Reset Function
   Future<void> _sendPasswordResetEmail() async {
     try {
       await FirebaseAuth.instance.sendPasswordResetEmail(email: _emailController.text);
 
-      // Show a success message to the user
+      // Success message here
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Password reset email sent!')),
       );
-      // Optionally, navigate back or clear the text field
+      // Give option for navigate back or clear the text field (from doc)
       _emailController.clear();
     } catch (e) {
 
-      // Show an error message if there's an issue
+      // Show default error message when error happens
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error: ${e.toString()}')),
       );
@@ -35,8 +35,12 @@ class _PasswordRecoveryPageState extends State<PasswordRecoveryPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: const Text('Recover Password'),
+        backgroundColor: Color(0xFF41B1F1),
+        title: const Text('Recover Password',
+          style: const TextStyle(
+            fontSize: 24,
+          ),
+        ),
       ),
       resizeToAvoidBottomInset: true,
       body: SingleChildScrollView(
@@ -63,7 +67,7 @@ class _PasswordRecoveryPageState extends State<PasswordRecoveryPage> {
                 child: const Text(
                   'Recover your Password',
                   style: TextStyle(
-                    fontSize: 40,
+                    fontSize: 30,
                     fontWeight: FontWeight.bold,
                   ),
                   textAlign: TextAlign.center,
@@ -71,11 +75,11 @@ class _PasswordRecoveryPageState extends State<PasswordRecoveryPage> {
               ),
 
 
-              const SizedBox(height: 10),
+              const SizedBox(height: 15),
 
 
               const Text(
-                'Please enter the email associated with your account. Your password will be emailed to you shortly.',
+                'Please enter the email associated with your account. A link to change your password will be sent to you shortly.',
                 style: TextStyle(
                   fontSize: 14,
                   color: Colors.black87,
@@ -100,26 +104,39 @@ class _PasswordRecoveryPageState extends State<PasswordRecoveryPage> {
                   ),
                 ),
               ),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: _sendPasswordResetEmail, // Call the method to send email
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.lightBlueAccent,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(2.5),
+              const SizedBox(height: 32),
 
-                  ),
-                  fixedSize: const Size(140, 30),
-                ),
 
-                child: const Center(
-                  child: Text(
-                    'Get Password',
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 14,
-                      fontWeight: FontWeight.normal,
+
+              Container(
+                width: 180, // Adjust as needed
+                height: 40, // Adjust as needed
+                child: ElevatedButton(
+                  onPressed: _sendPasswordResetEmail,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor:  const Color(0xFF41B1F1),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(2.5),
                     ),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: const [
+                      Icon(
+                        Icons.email,
+                        color: Colors.white,
+                        size: 16,
+                      ),
+                      SizedBox(width: 8),
+                      Text(
+                        'Get Password',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 14,
+                          fontWeight: FontWeight.normal,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),
