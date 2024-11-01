@@ -28,20 +28,40 @@ class MyLoginPage extends StatefulWidget {
   State<MyLoginPage> createState() => _MyLoginPageState();
 }
 
-// Initialize here
+// State management for MyLoginPage
 class _MyLoginPageState extends State<MyLoginPage> {
-  final TextEditingController _emailController = TextEditingController();
+  // Controllers to manage text input for username and password
+  final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance; // Instance of FirebaseAuth for authentication
 
-  String _errorMessage = '';
+  // Method to handle user sign-in
+  Future<void> _signIn() async {
+    String username = _usernameController.text.trim(); // Get username from controller
+    String password = _passwordController.text.trim(); // Get password from controller
 
   // Function to handle user login
   Future<void> _login() async {
     try {
+      // Sign in with email and password
       UserCredential userCredential = await _auth.signInWithEmailAndPassword(
-        email: _emailController.text.trim(),
-        password: _passwordController.text.trim(),
+        email: username, // Treat username as an email
+        password: password,
+      );
+      // Navigate to notifications page on successful sign-in
+      Navigator.pushNamed(context, "/Notif");
+    } on FirebaseAuthException catch (e) {
+      // Handle authentication errors and show messages
+      String message = 'An error occurred. Please try again.';
+      if (e.code == 'user-not-found') {
+        message = 'No user found for that email.';
+      } else if (e.code == 'wrong-password') {
+        message = 'Wrong password provided for that user.';
+      }
+      // Display error message in a snackbar
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(message)),
+
       );
       // On successful login, navigate to the post-home page
       Navigator.pushNamed(context, "/Post_home");
@@ -57,17 +77,24 @@ class _MyLoginPageState extends State<MyLoginPage> {
     return Scaffold(
       backgroundColor: const Color(0xFFF1F3F4),
       appBar: AppBar(
-        backgroundColor: const Color(0xFFF1F3F4),
-        //backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title),
+        backgroundColor: Color(0xFF41B1F1), // AppBar background color
+        title: Text(widget.title, // Display title
+          style: const TextStyle(
+            fontSize: 24,
+          ),
+        ),
       ),
-      resizeToAvoidBottomInset: true,
+
+      resizeToAvoidBottomInset: true, // Prevent content from being hidden by the keyboard
+
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(16.0), // Padding for the main content
+
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             children: <Widget>[
+              // Logo image at the top of the login page
               Padding(
                 padding: const EdgeInsets.only(top: 40.0),
                 child: Image.asset(
@@ -76,40 +103,51 @@ class _MyLoginPageState extends State<MyLoginPage> {
                   width: 260,
                 ),
               ),
+
+              const SizedBox(height: 16),
+
               const Text(
-                'Login',
+                'Login', // Login header
                 style: TextStyle(
                   fontSize: 30,
                   fontWeight: FontWeight.bold,
                 ),
               ),
+
               const SizedBox(height: 32),
+
+              // TextField for email input
               SizedBox(
                 height: 40,
                 width: 325,
                 child: TextField(
-                  controller: _emailController,
+                  controller: _usernameController, // Email Controller even tho it says username
                   decoration: const InputDecoration(
-                    labelText: 'Enter your Email',
+                    labelText: 'Enter your Email', // Label for email input
                     border: OutlineInputBorder(),
                     contentPadding:
                         EdgeInsets.symmetric(vertical: 10, horizontal: 10),
                   ),
-                  keyboardType:
-                      TextInputType.emailAddress, // Use email keyboard
+                  keyboardType: TextInputType.emailAddress, // Specify input type for email
                 ),
               ),
+
               const SizedBox(height: 2),
-              TextButton(
-                onPressed: () {
-                  // Navigate to username recovery page
+
+              // Link for email change page 
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const UsernameRecoveryPage()),
+                  );
                 },
                 child: const Padding(
                   padding: EdgeInsets.only(left: 33),
                   child: Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
-                      'Forgot your Email?',
+                      'Want to change your Email?', // Text for email recovery
                       style: TextStyle(
                         fontSize: 17,
                         color: Colors.blue,
@@ -118,42 +156,57 @@ class _MyLoginPageState extends State<MyLoginPage> {
                   ),
                 ),
               ),
+
               const SizedBox(height: 32),
+
+              // TextField for password input
               SizedBox(
                 height: 40,
                 width: 325,
                 child: TextField(
-                  controller: _passwordController,
-                  obscureText: true,
+                  controller: _passwordController, // Password input controller
                   decoration: const InputDecoration(
-                    labelText: 'Enter your Password',
+                    labelText: 'Enter your Password', // Label for password input
                     border: OutlineInputBorder(),
                     contentPadding:
                         EdgeInsets.symmetric(vertical: 10, horizontal: 10),
                   ),
-                  obscureText: true, // Hide password input
+                  obscureText: true, // Hide password text
                 ),
               ),
               const SizedBox(height: 2),
-              const Padding(
-                padding: EdgeInsets.only(left: 30),
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    'Forgot your Password?',
-                    style: TextStyle(
-                      fontSize: 17,
-                      color: Colors.blue,
+
+              // Link for password recovery
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const PasswordRecoveryPage()),
+                  );
+                },
+                child: const Padding(
+                  padding: EdgeInsets.only(left: 30),
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      'Forgot your Password?', // Text for password recovery
+                      style: TextStyle(
+                        fontSize: 17,
+                        color: Colors.blue,
+                      ),
                     ),
                   ),
                 ),
               ),
+
               const SizedBox(height: 40),
+
+              // Button for sign-in action
               ElevatedButton(
-                onPressed: _login,
+                onPressed: _signIn, // Call sign-in method on press
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.lightBlueAccent,
-                  backgroundColor: Colors.lightBlueAccent,
+                  backgroundColor: const Color(0xFF41B1F1),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(2.5),
                     borderRadius: BorderRadius.circular(2.5),
@@ -161,51 +214,46 @@ class _MyLoginPageState extends State<MyLoginPage> {
                   fixedSize: const Size(140, 30),
                   fixedSize: const Size(140, 30),
                 ),
-                child: const Center(
-                  child: Text(
-                    'Continue',
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 14,
-                      fontWeight: FontWeight.normal,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: const [
+                    Icon(
+                      Icons.arrow_forward, // Arrow icon on the left
+                      color: Colors.white,
+                      size: 16,
                     ),
-                    'Continue',
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 14,
-                      fontWeight: FontWeight.normal,
+                    SizedBox(width: 8), // Space between icon and text
+                    Text(
+                      'Continue', // Button text
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 14,
+                        fontWeight: FontWeight.normal,
+                      ),
                     ),
-                  ),
+                  ],
                 ),
               ),
-              if (_errorMessage.isNotEmpty)
-                Padding(
-                  padding: const EdgeInsets.only(top: 20),
-                  child: Text(
-                    _errorMessage,
-                    style: const TextStyle(
-                      color: Colors.red,
-                      fontSize: 16,
-                    ),
-                  ),
-                ),
+
               const SizedBox(height: 20),
+
+              // Sign-up prompt text
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   const Text(
-                    "Don't have an account? ",
+                    "Don't have an account? ", // Prompt for new users
                     style: TextStyle(
-                      //color: Colors.black,
+                      color: Colors.black,
                       fontSize: 16,
                     ),
                   ),
-                  TextButton(
-                    onPressed: () {
-                      Navigator.pushNamed(context, "/Sign_up");
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.pushNamed(context, "/Sign_up"); // Navigate to sign-up page
                     },
                     child: const Text(
-                      'Sign up',
+                      'Sign up', // Sign-up link text
                       style: TextStyle(
                         color: Colors.blue,
                         fontSize: 16,
