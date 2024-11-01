@@ -14,9 +14,9 @@ class GameDetailScreen extends StatefulWidget {
 }
 
 class _GameDetailScreenState extends State<GameDetailScreen> {
-
   final ApiService apiService = ApiService();
-  final FirestoreService _firestoreService = FirestoreService(); // Initialize FirestoreService
+  final FirestoreService _firestoreService =
+      FirestoreService(); // Initialize FirestoreService
   Game? selectedGame;
 
   // Called when the widget is first inserted into the widget tree

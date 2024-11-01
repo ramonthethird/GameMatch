@@ -5,8 +5,8 @@ import 'pages/game_model.dart';
 
 class ApiService {
   final FlutterSecureStorage secureStorage = const FlutterSecureStorage();
-  final String clientId = 'v5v1uyyo05m4ttc8yvd26yrwslfimc';
-  final String clientSecret = 'hu3w4pwpc344uwdp2k77xfjozbaxc5';
+  final String clientId = 'v5v1uyyo05m4ttc8yvd26yrwslfimc';  // Keep secure
+  final String clientSecret = 'hu3w4pwpc344uwdp2k77xfjozbaxc5';  // Keep secure
   final String baseUrl = 'https://api.igdb.com/v4';
 
   Future<void> storeAccessToken(String token) async {
@@ -19,15 +19,23 @@ class ApiService {
 
   Future<void> authenticate() async {
     final Uri url = Uri.parse('https://id.twitch.tv/oauth2/token');
-    final String body =
-        'client_id=$clientId&client_secret=$clientSecret&grant_type=client_credentials';
+    final Map<String, String> body = {
+      'client_id': clientId,
+      'client_secret': clientSecret,
+      'grant_type': 'client_credentials',
+    };
 
     try {
-      final response = await http.post(url, body: body);
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'}, // Ensure headers are correctly set
+        body: body,
+      );
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> tokenData = json.decode(response.body);
         await storeAccessToken(tokenData['access_token']);
+        print('Access token fetched: ${tokenData['access_token']}');
       } else {
         print('Failed to fetch token: ${response.statusCode} ${response.body}');
       }
@@ -37,17 +45,19 @@ class ApiService {
   }
 
   Future<List<Game>> fetchGames() async {
-    final String? accessToken = await retrieveAccessToken();
-
+    String? accessToken = await retrieveAccessToken();
     if (accessToken == null) {
       print('Access token is null. Please fetch a new one.');
-      await authenticate(); // Authenticate if the token is not available
-      return [];
+      await authenticate();
+      accessToken = await retrieveAccessToken();
+      if (accessToken == null) {
+        return [];
+      }
     }
 
     final Uri url = Uri.parse('$baseUrl/games');
     const String body = '''
-    fields name, summary, genres.name. cover.url;
+    fields name, summary, genres.name, cover.url;
     limit 10;
     ''';
 
@@ -69,12 +79,11 @@ class ApiService {
             .toList();
         return games;
       } else {
-        print(
-            'Failed to fetch game data: ${response.statusCode} ${response.body}');
+        print('Failed to fetch game data: ${response.statusCode} ${response.body}');
         return [];
       }
     } catch (error) {
-      print('Error: $error');
+      print('Error fetching games: $error');
       return [];
     }
   }

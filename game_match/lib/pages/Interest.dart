@@ -14,17 +14,15 @@ class _InterestsPageState extends State<InterestsPage> {
   String? dropdownValue2;
   String? dropdownValue3;
   String? dropdownValue4;
-  
-  // Loading state
-  bool _isLoading = false;
 
+  // Loading state
   bool _isLoading = false;
 
   final List<String> gameModes = [
     'Single Player',
     'Multiplayer',
     'Co-op',
-    'Online PvP'
+    'Online Pvp'
   ];
 
   final List<String> playerPerspective = [
@@ -50,8 +48,8 @@ class _InterestsPageState extends State<InterestsPage> {
 
   final firestore = FirebaseFirestore.instance;
 
-  // User ID (set dynamically)
-  late String userId;
+  // FirebaseAuth instance
+  final FirebaseAuth _auth = FirebaseAuth.instance;
 
   @override
   void initState() {
@@ -82,7 +80,7 @@ class _InterestsPageState extends State<InterestsPage> {
           'platform': dropdownValue3 ?? '',
           'price': dropdownValue4 ?? '',
         }
-      }, SetOptions(merge: true));
+      }, SetOptions(merge: true)); // Merge the interests with existing data
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -105,14 +103,17 @@ class _InterestsPageState extends State<InterestsPage> {
     }
   }
 
+  // Load user's interests from Firestore
   void _loadInterests() async {
     setState(() {
       _isLoading = true;
     });
 
     try {
-      DocumentSnapshot doc = await firestore.collection('users').doc(userId).get();
+      DocumentSnapshot doc =
+          await firestore.collection('users').doc(userId).get();
 
+      // If a user already have interests saved before, load them
       if (doc.exists && doc['interests'] != null) {
         Map<String, dynamic> interests = doc['interests'];
         setState(() {
@@ -121,7 +122,6 @@ class _InterestsPageState extends State<InterestsPage> {
           dropdownValue3 = interests['platform'];
           dropdownValue4 = interests['price'];
         });
-
       } else {
         print('No interests found for the user.');
       }
@@ -137,6 +137,7 @@ class _InterestsPageState extends State<InterestsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
       appBar: AppBar(
         title: const Text(
           'Interests',
@@ -166,7 +167,8 @@ class _InterestsPageState extends State<InterestsPage> {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const SizedBox(height: 30), // Space between title and dropdowns
+                  const SizedBox(
+                      height: 30), // Space between title and dropdowns
                   _buildDropdownCard(
                     icon: Icons.videogame_asset,
                     label: 'Game Mode',

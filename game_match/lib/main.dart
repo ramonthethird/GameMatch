@@ -22,19 +22,19 @@ import 'pages/Log_in.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+
   // Ensure dotenv is loaded before app runs
   await dotenv.load(fileName: ".env");
-  
+
   // Initialize Firebase
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  
+
   // Load the theme preference before the app starts
   final prefs = await SharedPreferences.getInstance();
   bool isDarkMode = prefs.getBool('isDarkMode') ?? false;
-  
+
   runApp(
     MultiProvider(
       providers: [
@@ -56,7 +56,8 @@ class GameMatchApp extends StatelessWidget {
       builder: (context, themeNotifier, child) {
         return MaterialApp(
           title: 'GameMatch',
-          themeMode: themeNotifier.isDarkMode ? ThemeMode.dark : ThemeMode.light,
+          themeMode:
+              themeNotifier.isDarkMode ? ThemeMode.dark : ThemeMode.light,
           theme: ThemeData(
             brightness: Brightness.light,
             fontFamily: 'SignikaNegative',
@@ -94,14 +95,14 @@ class GameMatchApp extends StatelessWidget {
                     themeNotifier.toggleTheme(isDarkMode);
                   },
                   isDarkMode: themeNotifier.isDarkMode,
-            ),
+                ),
             '/Settings': (context) => SettingsPage(),
             '/Appearance': (context) => SettingsAppearancePage(
                   isDarkMode: themeNotifier.isDarkMode,
                   onThemeChanged: (bool isDarkMode) {
                     themeNotifier.toggleTheme(isDarkMode);
                   },
-            ),
+                ),
             '/Login': (context) => const MyLoginPage(title: 'Login'),
           },
         );

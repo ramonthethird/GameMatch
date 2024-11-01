@@ -1,12 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:game_match/pages/Side_bar.dart';
-import 'package:game_match/pages/recoverusername.dart';
-import 'package:game_match/pages/recoverpassword.dart';
+import 'package:game_match/pages/Sign_up.dart';
+
+class LoginPage extends StatelessWidget {
+  const LoginPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: const MyLoginPage(title: 'Login'),
+      routes: {
+        '/Post_home': (context) => const MyLoginPage(
+            title: 'WelcomePage'), // Define the route for Post_home
+        '/Sign_up': (context) =>
+            const SignUpScreen(), // Ensure SignUpPage is imported and declared
+      },
+    );
+  }
+}
 
 class MyLoginPage extends StatefulWidget {
   const MyLoginPage({super.key, required this.title});
-
   final String title;
 
   @override
@@ -25,6 +40,8 @@ class _MyLoginPageState extends State<MyLoginPage> {
     String username = _usernameController.text.trim(); // Get username from controller
     String password = _passwordController.text.trim(); // Get password from controller
 
+  // Function to handle user login
+  Future<void> _login() async {
     try {
       // Sign in with email and password
       UserCredential userCredential = await _auth.signInWithEmailAndPassword(
@@ -44,13 +61,21 @@ class _MyLoginPageState extends State<MyLoginPage> {
       // Display error message in a snackbar
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(message)),
+
       );
+      // On successful login, navigate to the post-home page
+      Navigator.pushNamed(context, "/Post_home");
+    } catch (e) {
+      setState(() {
+        _errorMessage = e.toString();
+      });
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFF1F3F4),
       appBar: AppBar(
         backgroundColor: Color(0xFF41B1F1), // AppBar background color
         title: Text(widget.title, // Display title
@@ -100,7 +125,8 @@ class _MyLoginPageState extends State<MyLoginPage> {
                   decoration: const InputDecoration(
                     labelText: 'Enter your Email', // Label for email input
                     border: OutlineInputBorder(),
-                    contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                    contentPadding:
+                        EdgeInsets.symmetric(vertical: 10, horizontal: 10),
                   ),
                   keyboardType: TextInputType.emailAddress, // Specify input type for email
                 ),
@@ -117,7 +143,7 @@ class _MyLoginPageState extends State<MyLoginPage> {
                   );
                 },
                 child: const Padding(
-                  padding: EdgeInsets.only(left: 30),
+                  padding: EdgeInsets.only(left: 33),
                   child: Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
@@ -142,7 +168,8 @@ class _MyLoginPageState extends State<MyLoginPage> {
                   decoration: const InputDecoration(
                     labelText: 'Enter your Password', // Label for password input
                     border: OutlineInputBorder(),
-                    contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                    contentPadding:
+                        EdgeInsets.symmetric(vertical: 10, horizontal: 10),
                   ),
                   obscureText: true, // Hide password text
                 ),
@@ -182,7 +209,9 @@ class _MyLoginPageState extends State<MyLoginPage> {
                   backgroundColor: const Color(0xFF41B1F1),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(2.5),
+                    borderRadius: BorderRadius.circular(2.5),
                   ),
+                  fixedSize: const Size(140, 30),
                   fixedSize: const Size(140, 30),
                 ),
                 child: Row(
@@ -219,7 +248,6 @@ class _MyLoginPageState extends State<MyLoginPage> {
                       fontSize: 16,
                     ),
                   ),
-
                   GestureDetector(
                     onTap: () {
                       Navigator.pushNamed(context, "/Sign_up"); // Navigate to sign-up page
