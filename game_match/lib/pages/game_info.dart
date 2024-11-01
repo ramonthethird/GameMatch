@@ -7,7 +7,7 @@ import 'package:game_match/firestore_service.dart'; // Import your FirestoreServ
 class GameDetailScreen extends StatefulWidget {
   final String gameId;
 
-  const GameDetailScreen({super.key, required this.gameId});
+  const GameDetailScreen({Key? key, required this.gameId}) : super(key: key);
 
   @override
   _GameDetailScreenState createState() => _GameDetailScreenState();
@@ -19,6 +19,7 @@ class _GameDetailScreenState extends State<GameDetailScreen> {
       FirestoreService(); // Initialize FirestoreService
   Game? selectedGame;
 
+  // Called when the widget is first inserted into the widget tree
   @override
   void initState() {
     super.initState();
@@ -43,6 +44,7 @@ class _GameDetailScreenState extends State<GameDetailScreen> {
     }
   }
 
+  // Build method to construct the UI
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -103,6 +105,7 @@ class _GameDetailScreenState extends State<GameDetailScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
+                      // Game summary or fallback message if unavailable
                       Text(
                         '\$${selectedGame!.price!.toStringAsFixed(2)}',
                         style: const TextStyle(
@@ -121,12 +124,12 @@ class _GameDetailScreenState extends State<GameDetailScreen> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Platforms: ${selectedGame!.platforms.join(', ') ?? 'Unknown platforms'}',
+                    'Platforms: ${selectedGame!.platforms?.join(', ') ?? 'Unknown platforms'}',
                     style: const TextStyle(fontSize: 16),
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Release Date: ${selectedGame!.releaseDates.join(', ') ?? 'Unknown release date'}',
+                    'Release Date: ${selectedGame!.releaseDates?.join(', ') ?? 'Unknown release date'}',
                     style: const TextStyle(fontSize: 16),
                   ),
                   const SizedBox(height: 16),

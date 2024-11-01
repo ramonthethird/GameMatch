@@ -11,8 +11,10 @@ class LoginPage extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       home: const MyLoginPage(title: 'Login'),
       routes: {
-        '/Post_home': (context) => const MyLoginPage(title: 'WelcomePage'), // Define the route for Post_home
-        '/Sign_up': (context) => const SignUpScreen(), // Ensure SignUpPage is imported and declared
+        '/Post_home': (context) => const MyLoginPage(
+            title: 'WelcomePage'), // Define the route for Post_home
+        '/Sign_up': (context) =>
+            const SignUpScreen(), // Ensure SignUpPage is imported and declared
       },
     );
   }
@@ -26,6 +28,7 @@ class MyLoginPage extends StatefulWidget {
   State<MyLoginPage> createState() => _MyLoginPageState();
 }
 
+// Initialize here
 class _MyLoginPageState extends State<MyLoginPage> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
@@ -69,8 +72,8 @@ class _MyLoginPageState extends State<MyLoginPage> {
                 padding: const EdgeInsets.only(top: 40.0),
                 child: Image.asset(
                   'assets/images/gamematchlogoresize.png',
-                  height: 100,
-                  width: 100,
+                  height: 260,
+                  width: 260,
                 ),
               ),
               const Text(
@@ -92,6 +95,8 @@ class _MyLoginPageState extends State<MyLoginPage> {
                     contentPadding:
                         EdgeInsets.symmetric(vertical: 10, horizontal: 10),
                   ),
+                  keyboardType:
+                      TextInputType.emailAddress, // Use email keyboard
                 ),
               ),
               const SizedBox(height: 2),
@@ -126,6 +131,7 @@ class _MyLoginPageState extends State<MyLoginPage> {
                     contentPadding:
                         EdgeInsets.symmetric(vertical: 10, horizontal: 10),
                   ),
+                  obscureText: true, // Hide password input
                 ),
               ),
               const SizedBox(height: 2),
@@ -147,13 +153,22 @@ class _MyLoginPageState extends State<MyLoginPage> {
                 onPressed: _login,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.lightBlueAccent,
+                  backgroundColor: Colors.lightBlueAccent,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(2.5),
+                    borderRadius: BorderRadius.circular(2.5),
                   ),
+                  fixedSize: const Size(140, 30),
                   fixedSize: const Size(140, 30),
                 ),
                 child: const Center(
                   child: Text(
+                    'Continue',
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 14,
+                      fontWeight: FontWeight.normal,
+                    ),
                     'Continue',
                     style: TextStyle(
                       color: Colors.black,
@@ -181,7 +196,7 @@ class _MyLoginPageState extends State<MyLoginPage> {
                   const Text(
                     "Don't have an account? ",
                     style: TextStyle(
-                      color: Colors.black,
+                      //color: Colors.black,
                       fontSize: 16,
                     ),
                   ),

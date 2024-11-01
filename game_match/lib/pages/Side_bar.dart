@@ -77,7 +77,11 @@ class SideBar extends StatelessWidget {
           : 'Unknown';
 
       String profileImageUrl = userDoc['profileImageUrl'] ?? '';
-      return {'username': userName, 'memberSince': memberSince, 'profileImageUrl': profileImageUrl};
+      return {
+        'username': userName,
+        'memberSince': memberSince,
+        'profileImageUrl': profileImageUrl
+      };
     }
     return {'username': 'Unknown', 'memberSince': 'Unknown'};
   }
@@ -95,43 +99,48 @@ class SideBar extends StatelessWidget {
             color: const Color(0xFF74ACD5),
             width: double.infinity,
             child: Row(
-                children: [
+              children: [
                 GestureDetector(
                   onTap: () {
-                  Navigator.pushNamed(context, '/Profile');
+                    Navigator.pushNamed(context, '/Profile');
                   },
                   child: Container(
-                  width: 60,
-                  height: 60,
-                  decoration: const BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Colors.grey, // Background color for the icon
-                  ),
-                  child: FutureBuilder<Map<String, String>>(
-                    future: getUserInfo(),
-                    builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const CircularProgressIndicator();
-                    } else if (snapshot.hasError) {
-                      return const Icon(Icons.error, color: Colors.red);
-                    } else {
-                      final userInfo = snapshot.data ?? {'profileImageUrl': ''};
-                      if (userInfo['profileImageUrl'] == null || userInfo['profileImageUrl']!.isEmpty) {
-                      return const Icon(Icons.person, color: Colors.white, size: 40);
-                      } else {
-                      return Container(
-                        decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        image: DecorationImage(
-                          image: NetworkImage(userInfo['profileImageUrl']!),
-                          fit: BoxFit.cover,
-                        ),
-                        ),
-                      );
-                      }
-                    }
-                    },
-                  ),
+                    width: 60,
+                    height: 60,
+                    decoration: const BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.grey, // Background color for the icon
+                    ),
+                    child: FutureBuilder<Map<String, String>>(
+                      future: getUserInfo(),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return const CircularProgressIndicator();
+                        } else if (snapshot.hasError) {
+                          return const Icon(Icons.error, color: Colors.red);
+                        } else {
+                          final userInfo =
+                              snapshot.data ?? {'profileImageUrl': ''};
+                          if (userInfo['profileImageUrl'] == null ||
+                              userInfo['profileImageUrl']!.isEmpty) {
+                            return const Icon(Icons.person,
+                                color: Colors.white, size: 40);
+                          } else {
+                            return Container(
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                image: DecorationImage(
+                                  image: NetworkImage(
+                                      userInfo['profileImageUrl']!),
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                            );
+                          }
+                        }
+                      },
+                    ),
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -160,7 +169,7 @@ class SideBar extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                    snapshot.data?['username'] ?? 'Unknown',
+                                  snapshot.data?['username'] ?? 'Unknown',
                                   style: TextStyle(
                                     fontSize: 18,
                                     color: isDarkMode
@@ -219,8 +228,7 @@ class SideBar extends StatelessWidget {
                 buildMenuButton(context, Icons.interests, "Wishlist", () {
                   Navigator.pushNamed(context, '/Wishlist');
                 }),
-                buildMenuButton(
-                    context, Icons.reviews, "My Reviews", () {
+                buildMenuButton(context, Icons.reviews, "My Reviews", () {
                   Navigator.pushNamed(context, '/Reviews');
                 }),
                 buildMenuButton(context, Icons.settings, "Settings", () {
