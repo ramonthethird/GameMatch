@@ -86,9 +86,13 @@ class _AddReviewsPageState extends State<AddReviewsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Create New Review'),
+        title: Text('Create New Review',
+        style: TextStyle(
+              color: Colors.black, 
+              fontSize: 24,
+            ),),
         centerTitle: true,
-        backgroundColor: Colors.white,
+        //backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: Colors.black),
@@ -180,7 +184,7 @@ class _AddReviewsPageState extends State<AddReviewsPage> {
                   _addReview(titleController.text, bodyController.text, rating); // Call the function to submit the review
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue,
+                  backgroundColor: Color(0xFF41B1F1),
                   padding: EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
@@ -195,31 +199,31 @@ class _AddReviewsPageState extends State<AddReviewsPage> {
             SizedBox(height: 20),
 
             // Navigate to Submitted Reviews Button
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => SubmittedReviewsPage()), // Navigate to the SubmittedReviewsPage
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.grey,
-                  padding: EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-                child: Text(
-                  'Submitted Reviews',
-                  style: TextStyle(color: Colors.white, fontSize: 16),
-                ),
-              ),
-            ),
+            // SizedBox(
+            //   width: double.infinity,
+            //   child: ElevatedButton(
+            //     onPressed: () {
+            //       Navigator.push(
+            //         context,
+            //         MaterialPageRoute(builder: (context) => SubmittedReviewsPage()), // Navigate to the SubmittedReviewsPage
+            //       );
+            //     },
+            //     style: ElevatedButton.styleFrom(
+            //       backgroundColor: Color(0xFF41B1F1),
+            //       padding: EdgeInsets.symmetric(vertical: 16),
+            //       shape: RoundedRectangleBorder(
+            //         borderRadius: BorderRadius.circular(10),
+            //       ),
+            //     ),
+            //     child: Text(
+            //       'Submitted Reviews',
+            //       style: TextStyle(color: Colors.white, fontSize: 16),
+            //     ),
+            //   ),
+            // ),
 
             // Guidelines Text
-            SizedBox(height: 20),
+            //SizedBox(height: 20),
             Text(
               'Please ensure your review follows our community guidelines.',
               style: TextStyle(color: Colors.grey, fontSize: 14),

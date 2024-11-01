@@ -5,192 +5,220 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'billing_info.dart';
 import 'Sign_up.dart';
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(); // Initialize Firebase
-  runApp(const GameMatchApp());
-}
+import 'Side_bar.dart';
+import 'package:game_match/theme_notifier.dart';
+import 'package:provider/provider.dart';
 
-class GameMatchApp extends StatelessWidget {
-  const GameMatchApp({super.key});
+// void main() async {
+//   WidgetsFlutterBinding.ensureInitialized();
+//   await Firebase.initializeApp(); // Initialize Firebase
+//   runApp(const GameMatchApp());
+// }
 
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      initialRoute: '/',
-      routes: {
-        '/': (context) => const SignUpScreen(),
-        '/Subscription': (context) => const SubscriptionManagementScreen(),
-        '/billing_info': (context) => const BillingInfoPage(),
-      },
-    );
-  }
-}
+// class GameMatchApp extends StatelessWidget {
+//   const GameMatchApp({super.key});
 
-// SignUpScreen StatefulWidget that handles user registration
-class SignUpScreen extends StatefulWidget {
-  const SignUpScreen({super.key});
+//   @override
+//   Widget build(BuildContext context) {
+//     return MaterialApp(
+//       debugShowCheckedModeBanner: false,
+//       initialRoute: '/',
+//       routes: {
+//         '/': (context) => const SignUpScreen(),
+//         '/Subscription': (context) => SubscriptionManagementScreen(),
+//         '/billing_info': (context) => const PremiumSubscriptionPage(),
+//       },
+//     );
+//   }
+// }
 
-  @override
-  _SignUpScreenState createState() => _SignUpScreenState();
-}
+// // SignUpScreen StatefulWidget that handles user registration
+// class SignUpScreen extends StatefulWidget {
+//   const SignUpScreen({super.key});
 
-// State class for SignUpScreen that contains the form and logic
-class _SignUpScreenState extends State<SignUpScreen> {
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  final TextEditingController emailController = TextEditingController();
-  final TextEditingController usernameController = TextEditingController();
-  final TextEditingController passwordController = TextEditingController();
-  final TextEditingController confirmPasswordController = TextEditingController();
+//   @override
+//   _SignUpScreenState createState() => _SignUpScreenState();
+// }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Create an Account', style: TextStyle(color: Colors.black)),
-        backgroundColor: Colors.white,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-      ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: <Widget>[
-                Image.asset(
-                  'assets/images/gamematchlogoresize.png',
-                  height: 100,
-                ),
-                const SizedBox(height: 20),
-                TextFormField(
-                  controller: emailController,
-                  decoration: const InputDecoration(
-                    labelText: 'Email',
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-                const SizedBox(height: 20),
-                TextFormField(
-                  controller: usernameController,
-                  decoration: const InputDecoration(
-                    labelText: 'Username',
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-                const SizedBox(height: 20),
-                TextFormField(
-                  controller: passwordController,
-                  obscureText: true,
-                  decoration: const InputDecoration(
-                    labelText: 'Password',
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-                const SizedBox(height: 20),
-                TextFormField(
-                  controller: confirmPasswordController,
-                  obscureText: true,
-                  decoration: const InputDecoration(
-                    labelText: 'Confirm Password',
-                    border: OutlineInputBorder(),
-                  ),
-                  validator: (value) {
-                    if (value != passwordController.text) {
-                      return 'Passwords do not match';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 40),
-                ElevatedButton(
-                  onPressed: _trySubmit,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
-                  ),
-                  child: const Text('Sign Up'),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
+// // State class for SignUpScreen that contains the form and logic
+// class _SignUpScreenState extends State<SignUpScreen> {
+//   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+//   final TextEditingController emailController = TextEditingController();
+//   final TextEditingController usernameController = TextEditingController();
+//   final TextEditingController passwordController = TextEditingController();
+//   final TextEditingController confirmPasswordController = TextEditingController();
 
-  // Function to handle form submission
-  Future<void> _trySubmit() async {
-    if (_formKey.currentState!.validate()) {
-      _formKey.currentState!.save();
-      try {
-        UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
-          email: emailController.text,
-          password: passwordController.text,
-        );
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: AppBar(
+//         title: const Text('Create an Account', style: TextStyle(color: Colors.black)),
+//         backgroundColor: Colors.white,
+//         elevation: 0,
+//         leading: IconButton(
+//           icon: const Icon(Icons.arrow_back, color: Colors.black),
+//           onPressed: () {
+//             Navigator.pop(context);
+//           },
+//         ),
+//       ),
+//       body: SingleChildScrollView(
+//         child: Padding(
+//           padding: const EdgeInsets.all(20),
+//           child: Form(
+//             key: _formKey,
+//             child: Column(
+//               crossAxisAlignment: CrossAxisAlignment.stretch,
+//               children: <Widget>[
+//                 Image.asset(
+//                   'assets/images/gamematchlogoresize.png',
+//                   height: 100,
+//                 ),
+//                 const SizedBox(height: 20),
+//                 TextFormField(
+//                   controller: emailController,
+//                   decoration: const InputDecoration(
+//                     labelText: 'Email',
+//                     border: OutlineInputBorder(),
+//                   ),
+//                 ),
+//                 const SizedBox(height: 20),
+//                 TextFormField(
+//                   controller: usernameController,
+//                   decoration: const InputDecoration(
+//                     labelText: 'Username',
+//                     border: OutlineInputBorder(),
+//                   ),
+//                 ),
+//                 const SizedBox(height: 20),
+//                 TextFormField(
+//                   controller: passwordController,
+//                   obscureText: true,
+//                   decoration: const InputDecoration(
+//                     labelText: 'Password',
+//                     border: OutlineInputBorder(),
+//                   ),
+//                 ),
+//                 const SizedBox(height: 20),
+//                 TextFormField(
+//                   controller: confirmPasswordController,
+//                   obscureText: true,
+//                   decoration: const InputDecoration(
+//                     labelText: 'Confirm Password',
+//                     border: OutlineInputBorder(),
+//                   ),
+//                   validator: (value) {
+//                     if (value != passwordController.text) {
+//                       return 'Passwords do not match';
+//                     }
+//                     return null;
+//                   },
+//                 ),
+//                 const SizedBox(height: 40),
+//                 ElevatedButton(
+//                   onPressed: _trySubmit,
+//                   style: ElevatedButton.styleFrom(
+//                     backgroundColor: Colors.blue,
+//                   ),
+//                   child: const Text('Sign Up'),
+//                 ),
+//               ],
+//             ),
+//           ),
+//         ),
+//       ),
+//     );
+//   }
 
-        await FirebaseFirestore.instance.collection('users').doc(userCredential.user!.uid).set({
-          'username': usernameController.text,
-          'email': emailController.text,
-          'creationDate': FieldValue.serverTimestamp(),
-        });
+//   // Function to handle form submission
+//   Future<void> _trySubmit() async {
+//     if (_formKey.currentState!.validate()) {
+//       _formKey.currentState!.save();
+//       try {
+//         UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+//           email: emailController.text,
+//           password: passwordController.text,
+//         );
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Successfully signed up! Welcome, ${usernameController.text}!'),
-            backgroundColor: Colors.green,
-          ),
-        );
+//         await FirebaseFirestore.instance.collection('users').doc(userCredential.user!.uid).set({
+//           'username': usernameController.text,
+//           'email': emailController.text,
+//           'creationDate': FieldValue.serverTimestamp(),
+//         });
 
-        // Navigate to SubscriptionManagementScreen
-        Navigator.pushNamed(context, '/Subscription');
-      } on FirebaseAuthException catch (e) {
-        var errorMessage = 'An error occurred, please check your credentials!';
-        if (e.code == 'weak-password') {
-          errorMessage = 'The password provided is too weak. Must have at least 8 characters';
-        } else if (e.code == 'email-already-in-use') {
-          errorMessage = 'The account already exists for that email.';
-        }
+//         ScaffoldMessenger.of(context).showSnackBar(
+//           SnackBar(
+//             content: Text('Successfully signed up! Welcome, ${usernameController.text}!'),
+//             backgroundColor: Colors.green,
+//           ),
+//         );
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(errorMessage),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
-    }
-  }
+//         // Navigate to SubscriptionManagementScreen
+//         Navigator.pushNamed(context, '/Subscription');
+//       } on FirebaseAuthException catch (e) {
+//         var errorMessage = 'An error occurred, please check your credentials!';
+//         if (e.code == 'weak-password') {
+//           errorMessage = 'The password provided is too weak. Must have at least 8 characters';
+//         } else if (e.code == 'email-already-in-use') {
+//           errorMessage = 'The account already exists for that email.';
+//         }
 
-  @override
-  void dispose() {
-    emailController.dispose();
-    usernameController.dispose();
-    passwordController.dispose();
-    confirmPasswordController.dispose();
-    super.dispose();
-  }
-}
+//         ScaffoldMessenger.of(context).showSnackBar(
+//           SnackBar(
+//             content: Text(errorMessage),
+//             backgroundColor: Colors.red,
+//           ),
+//         );
+//       }
+//     }
+//   }
+
+//   @override
+//   void dispose() {
+//     emailController.dispose();
+//     usernameController.dispose();
+//     passwordController.dispose();
+//     confirmPasswordController.dispose();
+//     super.dispose();
+//   }
+// }
 
 // SubscriptionManagementScreen implementation
 class SubscriptionManagementScreen extends StatelessWidget {
-  const SubscriptionManagementScreen({super.key});
+  SubscriptionManagementScreen({super.key});
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   Widget build(BuildContext context) {
+    final themeNotifier = Provider.of<ThemeNotifier>(context);
     return Scaffold(
+      key: _scaffoldKey, // Key for the scaffold
       appBar: AppBar(
-        title: const Text('Subscription Management', style: TextStyle(color: Colors.black)),
-        backgroundColor: Colors.white,
+        centerTitle: true,
+        title: const Text(
+          'Subscription Management',
+          style: TextStyle(
+            color: Colors.black,
+            fontSize: 24,
+          ),
+        ),
+        //backgroundColor: Colors.white,
         elevation: 1,
-        iconTheme: const IconThemeData(color: Colors.black),
+        leading: IconButton(
+          icon: const Icon(Icons.menu, color: Colors.black), // Sidebar Icon
+          onPressed: () {
+            _scaffoldKey.currentState?.openDrawer();
+          },
+        ),
+      ),
+      drawer: Drawer(
+        child: SideBar(
+          onThemeChanged: (isDarkMode) {
+            // Handle theme change here
+            themeNotifier.toggleTheme(isDarkMode);
+          },
+          isDarkMode: themeNotifier.isDarkMode,
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -249,7 +277,7 @@ class SubscriptionManagementScreen extends StatelessWidget {
                 subtitle: const Text('\$5'),
                 trailing: ElevatedButton(
                   onPressed: () {
-Navigator.pushNamed(context, '/billing_info');
+Navigator.pushNamed(context, '/Billing_info');
 
                   },
                   child: const Text('Upgrade'),

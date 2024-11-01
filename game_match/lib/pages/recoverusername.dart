@@ -76,11 +76,20 @@ class _UsernameRecoveryPageState extends State<UsernameRecoveryPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Color(0xFF41B1F1), // AppBar background color consistency with other AppBars
-        title: const Text('Change Email', 
+        //backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        title: const Text(
+          'Recover Username',
           style: TextStyle(
+            color: Colors.black,
             fontSize: 24,
           ),
+        ),
+        centerTitle: true,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () {
+            Navigator.pop(context); // Navigate back to the previous screen
+          },
         ),
       ),
       resizeToAvoidBottomInset: true, // prevents keyboard conflicting with other elements on screen
@@ -93,14 +102,24 @@ class _UsernameRecoveryPageState extends State<UsernameRecoveryPage> {
               // Logo image at the top of the email change page
               Padding(
                 padding: const EdgeInsets.only(top: 40.0),
-                child: Image.asset(
-                  'assets/images/gamematchlogoresize.png',
-                  height: 260,
-                  width: 260,
+                child: ColorFiltered(
+                  colorFilter: Theme.of(context).brightness == Brightness.dark
+                      ? const ColorFilter.mode(
+                          Colors.white, // Makes the logo white in dark mode
+                          BlendMode.srcATop,
+                        )
+                      : const ColorFilter.mode(
+                          Colors.transparent, // No change in light mode
+                          BlendMode.srcOver,
+                        ),
+                  child: Image.asset(
+                    'assets/images/gamematchlogoresize.png',
+                    height: 260,
+                    width: 260,
+                  ),
                 ),
-              ),
-              
-              
+              ),  
+
               const SizedBox(height: 16),
               
               
@@ -123,8 +142,8 @@ class _UsernameRecoveryPageState extends State<UsernameRecoveryPage> {
               const Text(
                 'Please enter your current password and the new email you would like to use for your account.', // Instruction text
                 style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.black87,
+                  fontSize: 14, // Smaller font size for the subtitle
+                  //color: Colors.black87, // Lighter color for the subtitle
                 ),
                 textAlign: TextAlign.center,
               ),

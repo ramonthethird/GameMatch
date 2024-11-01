@@ -35,11 +35,20 @@ class _PasswordRecoveryPageState extends State<PasswordRecoveryPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Color(0xFF41B1F1),
-        title: const Text('Recover Password',
-          style: const TextStyle(
+        //backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        title: const Text(
+          'Recover Password',
+          style: TextStyle(
+            color: Colors.black,
             fontSize: 24,
           ),
+        ),
+        centerTitle: true,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () {
+            Navigator.pop(context); // Navigate back to the previous screen
+          },
         ),
       ),
       resizeToAvoidBottomInset: true,
@@ -51,12 +60,23 @@ class _PasswordRecoveryPageState extends State<PasswordRecoveryPage> {
             children: <Widget>[
               Padding(
                 padding: const EdgeInsets.only(top: 40.0),
-                child: Image.asset(
-                  'assets/images/gamematchlogoresize.png',
-                  height: 260,
-                  width: 260,
+                child: ColorFiltered(
+                  colorFilter: Theme.of(context).brightness == Brightness.dark
+                      ? const ColorFilter.mode(
+                          Colors.white, // Makes the logo white in dark mode
+                          BlendMode.srcATop,
+                        )
+                      : const ColorFilter.mode(
+                          Colors.transparent, // No change in light mode
+                          BlendMode.srcOver,
+                        ),
+                  child: Image.asset(
+                    'assets/images/gamematchlogoresize.png',
+                    height: 260,
+                    width: 260,
+                  ),
                 ),
-              ),
+              ),  
 
 
               const SizedBox(height: 16),
@@ -82,7 +102,7 @@ class _PasswordRecoveryPageState extends State<PasswordRecoveryPage> {
                 'Please enter the email associated with your account. A link to change your password will be sent to you shortly.',
                 style: TextStyle(
                   fontSize: 14,
-                  color: Colors.black87,
+                  //color: Colors.black87,
                 ),
                 textAlign: TextAlign.center,
               ),

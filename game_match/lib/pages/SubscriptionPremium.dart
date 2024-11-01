@@ -1,16 +1,47 @@
-// SubscriptionPremium.dart
 import 'package:flutter/material.dart';
+import 'Side_bar.dart';
+import 'package:game_match/theme_notifier.dart';
+import 'package:provider/provider.dart';
 
-class PremiumSubscriptionPage extends StatelessWidget {
+class PremiumSubscriptionPage extends StatefulWidget {
   const PremiumSubscriptionPage({super.key});
 
   @override
+  _PremiumSubscriptionPageState createState() => _PremiumSubscriptionPageState();
+}
+
+class _PremiumSubscriptionPageState extends State<PremiumSubscriptionPage> {
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>(); // Key for the scaffold
+
+  @override
   Widget build(BuildContext context) {
+    final themeNotifier = Provider.of<ThemeNotifier>(context);
     return Scaffold(
+      key: _scaffoldKey,
       appBar: AppBar(
-        title: const Text('Manage Subscription'),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
+        leading: IconButton(
+          icon: const Icon(Icons.menu, color: Colors.black),
+          onPressed: () {
+            _scaffoldKey.currentState?.openDrawer();
+          },
+        ),
+        title: const Text(
+          'Manage Subscription',
+          style: TextStyle(
+            color: Colors.black,
+            fontSize: 24,
+          ),
+        ),
+        centerTitle: true,
+      ),
+      drawer: Drawer(
+        child: SideBar(
+          onThemeChanged: (isDarkMode) {
+            // Handle theme change here
+            themeNotifier.toggleTheme(isDarkMode);
+          },
+          isDarkMode: themeNotifier.isDarkMode,
+        ),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
@@ -18,7 +49,7 @@ class PremiumSubscriptionPage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Image.asset(
-              'assets/images/premium_banner.png', // Update the path with your image
+              'assets/images/premium-sub.png', // Update the path with your image
               height: 200,
             ),
             const SizedBox(height: 20),
@@ -40,7 +71,7 @@ class PremiumSubscriptionPage extends StatelessWidget {
               title: const Text('Update billing information'),
               trailing: ElevatedButton(
                 onPressed: () {
-                  Navigator.pushNamed(context, '/Billing');
+                  Navigator.pushNamed(context, '/Billing_info');
                 },
                 child: const Text('Open'),
               ),
@@ -87,13 +118,13 @@ class PremiumSubscriptionPage extends StatelessWidget {
             const SizedBox(height: 20),
             TextButton(
               onPressed: () {
-                // Navigate to terms and conditions or privacy policy
+                Navigator.pushNamed(context, "/Terms");
               },
               child: const Text('Terms and Conditions'),
             ),
             TextButton(
               onPressed: () {
-                // Navigate to terms and conditions or privacy policy
+                Navigator.pushNamed(context, "/Privacy");
               },
               child: const Text('Privacy Policy'),
             ),

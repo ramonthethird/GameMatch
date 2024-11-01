@@ -45,11 +45,11 @@ class _MyLoginPageState extends State<MyLoginPage> {
     try {
       // Sign in with email and password
       UserCredential userCredential = await _auth.signInWithEmailAndPassword(
-        email: username, // Treat username as an email
+        email: username, // Ensure the username is an email address
         password: password,
       );
-      // Navigate to notifications page on successful sign-in
-      Navigator.pushNamed(context, "/Notif");
+      // If the sign-in is successful, navigate to the SideBar
+      Navigator.pushNamed(context, "/Post_home");
     } on FirebaseAuthException catch (e) {
       // Handle authentication errors and show messages
       String message = 'An error occurred. Please try again.';
@@ -77,11 +77,20 @@ class _MyLoginPageState extends State<MyLoginPage> {
     return Scaffold(
       backgroundColor: const Color(0xFFF1F3F4),
       appBar: AppBar(
-        backgroundColor: Color(0xFF41B1F1), // AppBar background color
-        title: Text(widget.title, // Display title
-          style: const TextStyle(
+        //backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        title: const Text(
+          'Login',
+          style: TextStyle(
+            color: Colors.black,
             fontSize: 24,
           ),
+        ),
+        centerTitle: true,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () {
+            Navigator.pop(context); // Navigate back to the previous screen
+          },
         ),
       ),
 
@@ -97,15 +106,23 @@ class _MyLoginPageState extends State<MyLoginPage> {
               // Logo image at the top of the login page
               Padding(
                 padding: const EdgeInsets.only(top: 40.0),
-                child: Image.asset(
-                  'assets/images/gamematchlogoresize.png',
-                  height: 260,
-                  width: 260,
+                child: ColorFiltered(
+                  colorFilter: Theme.of(context).brightness == Brightness.dark
+                      ? const ColorFilter.mode(
+                          Colors.white, // Makes the logo white in dark mode
+                          BlendMode.srcATop,
+                        )
+                      : const ColorFilter.mode(
+                          Colors.transparent, // No change in light mode
+                          BlendMode.srcOver,
+                        ),
+                  child: Image.asset(
+                    'assets/images/gamematchlogoresize.png',
+                    height: 260,
+                    width: 260,
+                  ),
                 ),
-              ),
-
-              const SizedBox(height: 16),
-
+              ),  
               const Text(
                 'Login', // Login header
                 style: TextStyle(
@@ -244,7 +261,6 @@ class _MyLoginPageState extends State<MyLoginPage> {
                   const Text(
                     "Don't have an account? ", // Prompt for new users
                     style: TextStyle(
-                      color: Colors.black,
                       fontSize: 16,
                     ),
                   ),

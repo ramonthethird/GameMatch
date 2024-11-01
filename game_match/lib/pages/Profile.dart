@@ -1,6 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'Side_bar.dart';
+import 'package:game_match/theme_notifier.dart';
+import 'package:provider/provider.dart';
+
 
 class Profile extends StatefulWidget {
   const Profile({super.key});
@@ -10,6 +14,7 @@ class Profile extends StatefulWidget {
 }
 
 class _ProfileState extends State<Profile> {
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   String? _profileImageUrl;
   String _username = "User";
   String _bio = "This is the bio.";
@@ -44,10 +49,34 @@ class _ProfileState extends State<Profile> {
 
   @override
   Widget build(BuildContext context) {
+    final themeNotifier = Provider.of<ThemeNotifier>(context);
     return Scaffold(
+      key: _scaffoldKey,
       appBar: AppBar(
-        title: const Text('Profile'),
-        backgroundColor: const Color(0xFF74ACD5),
+        centerTitle: true,
+        title: Text(
+          'Profile',
+          style: TextStyle(
+            color: Colors.black,
+            fontSize: 24,
+          ),
+        ),
+        //backgroundColor: const Color(0xFF74ACD5),
+        leading: IconButton(
+          icon: const Icon(Icons.menu, color: Colors.black),
+          onPressed: () {
+            _scaffoldKey.currentState?.openDrawer();
+          },
+        ),
+      ),
+      drawer: Drawer(
+        child: SideBar(
+          onThemeChanged: (isDarkMode) {
+            // Handle theme change here
+            themeNotifier.toggleTheme(isDarkMode);
+          },
+          isDarkMode: themeNotifier.isDarkMode,
+        ),
       ),
       body: SingleChildScrollView(
         child: Column(
