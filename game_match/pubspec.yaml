@@ -41,12 +41,17 @@ dependencies:
   flutter_dotenv: ^5.0.2
   shared_preferences: ^2.3.2
   firebase_auth: 5.3.1
+  firebase_storage: ^12.3.4
   cached_network_image: ^3.2.1
   flutter_card_swiper: ^2.0.4
   card_swiper: ^3.0.1
   intl: ^0.17.0
   font_awesome_flutter: ^10.3.0
   provider: ^6.0.5
+  image_picker: ^1.1.2
+  permission_handler: ^10.2.0
+  device_info_plus: ^9.0.2
+  json_annotation: ^4.0.1
 
   # this is to authenticate the API for IGDB
   http: ^0.13.5
@@ -85,6 +90,10 @@ flutter:
     - .env
     - assets/images/profile.png  # An image asset can refer to one or more resolution-specific "variants", see
     - assets/images/gamematchlogoresize.png
+    - assets/images/nba-logo.png
+    #- assets/images/crunchy-demonslayer.png
+    #- assets/images/JP-Morgan-Chase-Emblem.png
+    - assets/images/premium-sub.png
   # https://flutter.dev/to/resolution-aware-images
 
   # For details regarding adding assets from package dependencies, see

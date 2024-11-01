@@ -26,11 +26,11 @@ class _MyLoginPageState extends State<MyLoginPage> {
 
     try {
       UserCredential userCredential = await _auth.signInWithEmailAndPassword(
-        email: username,  // Make sure the username is an email address bc firebase doesn't allow direct usern input
+        email: username, // Ensure the username is an email address
         password: password,
       );
       // If the sign-in is successful, navigate to the SideBar
-      Navigator.pushNamed(context, "/Side_bar");
+      Navigator.pushNamed(context, "/Post_home");
     } on FirebaseAuthException catch (e) {
       // Handle authentication errors
       String message = 'An error occurred. Please try again.';
@@ -50,8 +50,21 @@ class _MyLoginPageState extends State<MyLoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title),
+        //backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        title: const Text(
+          'Login',
+          style: TextStyle(
+            color: Colors.black,
+            fontSize: 24,
+          ),
+        ),
+        centerTitle: true,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () {
+            Navigator.pop(context); // Navigate back to the previous screen
+          },
+        ),
       ),
       resizeToAvoidBottomInset: true,
       body: SingleChildScrollView(
@@ -62,12 +75,23 @@ class _MyLoginPageState extends State<MyLoginPage> {
             children: <Widget>[
               Padding(
                 padding: const EdgeInsets.only(top: 40.0),
-                child: Image.asset(
-                  'assets/images/gamematchlogoresize.png',
-                  height: 260,
-                  width: 260,
+                child: ColorFiltered(
+                  colorFilter: Theme.of(context).brightness == Brightness.dark
+                      ? const ColorFilter.mode(
+                          Colors.white, // Makes the logo white in dark mode
+                          BlendMode.srcATop,
+                        )
+                      : const ColorFilter.mode(
+                          Colors.transparent, // No change in light mode
+                          BlendMode.srcOver,
+                        ),
+                  child: Image.asset(
+                    'assets/images/gamematchlogoresize.png',
+                    height: 260,
+                    width: 260,
+                  ),
                 ),
-              ),
+              ),  
               const Text(
                 'Login',
                 style: TextStyle(
@@ -173,15 +197,12 @@ class _MyLoginPageState extends State<MyLoginPage> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  
                   const Text(
                     "Don't have an account? ",
                     style: TextStyle(
-                      //color: Colors.black,
                       fontSize: 16,
                     ),
                   ),
-                  
                   GestureDetector(
                     onTap: () {
                       Navigator.pushNamed(context, "/Sign_up");

@@ -18,8 +18,6 @@ class _InterestsPageState extends State<InterestsPage> {
   // Loading state
   bool _isLoading = false;
 
-  bool _isLoading = false;
-
   final List<String> gameModes = [
     'Single Player',
     'Multiplayer',
@@ -143,11 +141,11 @@ class _InterestsPageState extends State<InterestsPage> {
           style: TextStyle(color: Colors.black, fontSize: 24),
         ),
         centerTitle: true,
-        backgroundColor: const Color(0xFF74ACD5),
+        backgroundColor: Color(0xFF41B1F1),
         leading: IconButton(
-          icon: const Icon(Icons.menu, color: Colors.black),
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () {
-            Navigator.pushNamed(context, "/Side_bar");
+            Navigator.pushNamed(context, "/Preference_&_Interest");
           },
         ),
       ),
@@ -272,7 +270,7 @@ class _InterestsPageState extends State<InterestsPage> {
     return ElevatedButton(
       onPressed: _saveInterests,
       style: ElevatedButton.styleFrom(
-        backgroundColor: const Color(0xFF74ACD5),
+        backgroundColor: const Color(0xFF41B1F1),
         padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
         textStyle: const TextStyle(fontSize: 18),
         shape: RoundedRectangleBorder(

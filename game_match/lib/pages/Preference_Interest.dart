@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:game_match/pages/Side_bar.dart';
+import 'package:game_match/theme_notifier.dart';
+import 'package:provider/provider.dart';
 
-class PreferenceInterestPage extends StatelessWidget {
+class PreferenceInterestPage extends StatefulWidget {
   final bool isDarkMode; // Accept current theme mode
   final ValueChanged<bool> onThemeChanged; // Theme change callback
 
@@ -12,8 +14,16 @@ class PreferenceInterestPage extends StatelessWidget {
   });
 
   @override
+  _PreferenceInterestPageState createState() => _PreferenceInterestPageState();
+}
+
+class _PreferenceInterestPageState extends State<PreferenceInterestPage> {
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  @override
   Widget build(BuildContext context) {
+    final themeNotifier = Provider.of<ThemeNotifier>(context);
     return Scaffold(
+      key: _scaffoldKey, // Key for the scaffold
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(60.0),
         child: AppBar(
@@ -25,14 +35,23 @@ class PreferenceInterestPage extends StatelessWidget {
             ),
           ),
           centerTitle: true,
-          backgroundColor: const Color(0xFF74ACD5),
+          backgroundColor: const Color(0xFF41B1F1),
           elevation: 0,
           leading: IconButton(
-            icon: const Icon(Icons.menu, color: Colors.black),
-            onPressed: () {
-              Navigator.pop(context, "/SideBar"); // Open/Return to sidebar
-            },
-          ),
+          icon: const Icon(Icons.menu, color: Colors.black), // Sidebar Icon
+          onPressed: () {
+            _scaffoldKey.currentState?.openDrawer();
+          },
+        ),
+        ),
+      ),
+      drawer: Drawer(
+        child: SideBar(
+          onThemeChanged: (isDarkMode) {
+            // Handle theme change here
+            themeNotifier.toggleTheme(isDarkMode);
+          },
+          isDarkMode: themeNotifier.isDarkMode,
         ),
       ),
       body: Stack(
@@ -58,8 +77,9 @@ class PreferenceInterestPage extends StatelessWidget {
                     icon: Icons.tune,
                     onPressed: () {
                       // Add navigation here
+                      Navigator.pushNamed(context, '/preference_page');
                     },
-                    isDarkMode: isDarkMode, // Pass dark mode status
+                    isDarkMode: widget.isDarkMode, // Pass dark mode status
                   ),
                   const SizedBox(height: 15),
 
@@ -71,7 +91,7 @@ class PreferenceInterestPage extends StatelessWidget {
                     onPressed: () {
                       Navigator.pushNamed(context, '/Interest'); // Navigate to Interest page
                     },
-                    isDarkMode: isDarkMode, // Pass dark mode status
+                    isDarkMode: widget.isDarkMode, // Pass dark mode status
                   ),
                 ],
               ),
@@ -90,7 +110,8 @@ class CustomButton extends StatelessWidget {
   final VoidCallback onPressed;
   final bool isDarkMode;
 
-  const CustomButton({super.key, 
+  const CustomButton({
+    super.key, 
     required this.title,
     required this.subtitle,
     required this.icon,
@@ -116,7 +137,6 @@ class CustomButton extends StatelessWidget {
       child: ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
-          // Change colors depending on theme
           backgroundColor: isDarkMode ? const Color.fromARGB(255, 50, 50, 50) : Colors.white,
           foregroundColor: isDarkMode ? Colors.white : Colors.black,
           padding: const EdgeInsets.all(25),
@@ -142,7 +162,6 @@ class CustomButton extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      //color: isDarkMode ? Colors.white : Colors.black, // Adapt text color
                     ),
                   ),
                   const SizedBox(height: 5),
@@ -150,7 +169,6 @@ class CustomButton extends StatelessWidget {
                     subtitle,
                     style: TextStyle(
                       fontSize: 14,
-                      //color: isDarkMode ? Colors.grey[300] : Colors.black54, // Adapt subtitle color
                     ),
                   ),
                 ],

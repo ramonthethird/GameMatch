@@ -15,8 +15,21 @@ class _UsernameRecoveryPageState extends State<UsernameRecoveryPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: const Text('Recover Username'),
+        //backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        title: const Text(
+          'Recover Username',
+          style: TextStyle(
+            color: Colors.black,
+            fontSize: 24,
+          ),
+        ),
+        centerTitle: true,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () {
+            Navigator.pop(context); // Navigate back to the previous screen
+          },
+        ),
       ),
       resizeToAvoidBottomInset: true, // Add same function for keyboard pop up error
 
@@ -31,12 +44,23 @@ class _UsernameRecoveryPageState extends State<UsernameRecoveryPage> {
 
               Padding(
                 padding: const EdgeInsets.only(top: 40.0),
-                child: Image.asset(
-                  'images/gamematchlogoresize.png', // Same image as the login page
-                  height: 260,
-                  width: 260,
+                child: ColorFiltered(
+                  colorFilter: Theme.of(context).brightness == Brightness.dark
+                      ? const ColorFilter.mode(
+                          Colors.white, // Makes the logo white in dark mode
+                          BlendMode.srcATop,
+                        )
+                      : const ColorFilter.mode(
+                          Colors.transparent, // No change in light mode
+                          BlendMode.srcOver,
+                        ),
+                  child: Image.asset(
+                    'assets/images/gamematchlogoresize.png',
+                    height: 260,
+                    width: 260,
+                  ),
                 ),
-              ),
+              ),  
 
               const SizedBox(height: 16),
 
@@ -59,7 +83,7 @@ class _UsernameRecoveryPageState extends State<UsernameRecoveryPage> {
                 'Please enter the email associated with your account. Your password will be emailed to you shortly.',
                 style: TextStyle(
                   fontSize: 14, // Smaller font size for the subtitle
-                  color: Colors.black87, // Lighter color for the subtitle
+                  //color: Colors.black87, // Lighter color for the subtitle
                 ),
                 textAlign: TextAlign.center, // Center align the subtitle
               ),
