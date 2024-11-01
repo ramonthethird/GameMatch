@@ -9,6 +9,8 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -22,6 +24,8 @@ class MyApp extends StatelessWidget {
 }
 
 class GameListScreen extends StatefulWidget {
+  const GameListScreen({super.key});
+
   @override
   _GameListScreenState createState() => _GameListScreenState();
 }
@@ -57,13 +61,13 @@ class _GameListScreenState extends State<GameListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Community'),
+        title: const Text('Community'),
         leading: IconButton(
-          icon: Icon(Icons.menu),
+          icon: const Icon(Icons.menu),
           onPressed: () {
             // Handle menu press
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('')),
+              const SnackBar(content: Text('')),
             );
           },
         ),
@@ -76,7 +80,7 @@ class _GameListScreenState extends State<GameListScreen> {
             Padding(
               padding: const EdgeInsets.all(10.0),
               child: TextField(
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   labelText: 'Search...',
                   border: OutlineInputBorder(),
                   prefixIcon: Icon(Icons.search),
@@ -88,19 +92,19 @@ class _GameListScreenState extends State<GameListScreen> {
             ),
 
             // Trending games title
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10.0),
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 10.0),
               child: Text(
                 'Trending Games',
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
             ),
 
-            SizedBox(height: 5),
+            const SizedBox(height: 5),
 
 
             isLoading
-                ? Center(child: CircularProgressIndicator())
+                ? const Center(child: CircularProgressIndicator())
                 : SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Row(
@@ -141,7 +145,7 @@ class _GameListScreenState extends State<GameListScreen> {
                                   width: 150,
                                   height: 150,
                                   color: Colors.grey[400],
-                                  child: Icon(Icons.videogame_asset, size: 50),
+                                  child: const Icon(Icons.videogame_asset, size: 50),
                                 ),
                               ),
                               // Game Name in the bottom part
@@ -153,7 +157,7 @@ class _GameListScreenState extends State<GameListScreen> {
                                   alignment: Alignment.center,
                                   child: Text(
                                     game.name,
-                                    style: TextStyle(
+                                    style: const TextStyle(
                                       color: Colors.white,
                                       fontWeight: FontWeight.bold,
                                     ),
@@ -171,8 +175,8 @@ class _GameListScreenState extends State<GameListScreen> {
             ),
 
             // Recent Threads Section
-            Padding(
-              padding: const EdgeInsets.all(10.0),
+            const Padding(
+              padding: EdgeInsets.all(10.0),
               child: Text(
                 'Recent Threads',
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
@@ -196,7 +200,7 @@ class _GameListScreenState extends State<GameListScreen> {
       padding: const EdgeInsets.all(10.0),
       child: Container(
         width: double.infinity,
-        padding: EdgeInsets.all(10.0),
+        padding: const EdgeInsets.all(10.0),
         decoration: BoxDecoration(
           color: Colors.grey[300],
           borderRadius: BorderRadius.circular(12),
@@ -204,7 +208,7 @@ class _GameListScreenState extends State<GameListScreen> {
         ),
         child: Text(
           threadName,
-          style: TextStyle(fontSize: 16),
+          style: const TextStyle(fontSize: 16),
         ),
       ),
     );

@@ -2,7 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'SubscriptionPremium.dart'; // Update the import with your actual file path
+// Update the import with your actual file path
 
 class SubscriptionCheckScreen extends StatefulWidget {
   const SubscriptionCheckScreen({super.key});

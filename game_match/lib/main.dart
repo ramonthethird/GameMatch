@@ -79,7 +79,7 @@ class GameMatchApp extends StatelessWidget {
             brightness: Brightness.light,
             fontFamily: 'SignikaNegative',
             primarySwatch: Colors.blue,
-            scaffoldBackgroundColor: Color(0xFFF1F3F4),
+            scaffoldBackgroundColor: const Color(0xFFF1F3F4),
             appBarTheme: const AppBarTheme(
               backgroundColor: Color(0xFF41B1F1),
               foregroundColor: Colors.black,
@@ -95,7 +95,7 @@ class GameMatchApp extends StatelessWidget {
               foregroundColor: Colors.white,
             ),
           ),
-          home: HomePage(title: 'Home'),
+          home: const HomePage(title: 'Home'),
           // home: SwipePage(),
           routes: {
             '/Sign_up': (context) => const SignUpScreen(),
@@ -129,14 +129,14 @@ class GameMatchApp extends StatelessWidget {
                 const WelcomePage(username: 'defaultUsername'),
             '/swiping_games': (context) => const SwipePage(),
             '/Reviews': (context) => SubmittedReviewsPage(),
-            '/Subscription': (context) => SubscriptionManagementScreen(),
+            '/Subscription': (context) => const SubscriptionManagementScreen(),
             '/Billing_info': (context) => BillingInfoPage(),
             '/New_Releases': (context) =>
                 const NewReleasesGames(), // Route to TopRatedGames widget
             //'/game_info': (context) => const GameListScreen(),
             '/preference_page': (context) =>  GenrePreferencePage(), // Route to PreferencePage widget
-            '/Terms': (context) => SettingsTermsPage(),
-            '/Privacy': (context) => SettingsPrivacyPage(),
+            '/Terms': (context) => const SettingsTermsPage(),
+            '/Privacy': (context) => const SettingsPrivacyPage(),
             '/Wishlist': (context) => WishlistPage(),
             '/community_trends': (context) => GameListScreen(),
           },

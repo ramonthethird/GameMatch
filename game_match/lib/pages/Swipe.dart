@@ -108,7 +108,7 @@ class _SwipePageState extends State<SwipePage> with TickerProviderStateMixin {
       if (ModalRoute.of(context)?.isCurrent ?? false) {
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => CustomAdPage()),
+          MaterialPageRoute(builder: (context) => const CustomAdPage()),
         ).then((_) {
           if (mounted) {
             setState(() {

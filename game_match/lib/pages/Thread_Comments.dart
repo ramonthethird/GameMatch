@@ -14,7 +14,7 @@ class ThreadDetailPage extends StatefulWidget {
   final int shares;
 
   const ThreadDetailPage({
-    Key? key,
+    super.key,
     required this.threadId,
     required this.threadContent,
     required this.threadUserName,
@@ -24,7 +24,7 @@ class ThreadDetailPage extends StatefulWidget {
     required this.likes,
     required this.comments,
     required this.shares,
-  }) : super(key: key);
+  });
 
   @override
   _ThreadDetailPageState createState() => _ThreadDetailPageState();
@@ -53,7 +53,7 @@ class _ThreadDetailPageState extends State<ThreadDetailPage> {
 
       // Retrieve comments and user info concurrently
       final fetchedComments = await Future.wait(querySnapshot.docs.map((doc) async {
-        Map<String, dynamic> commentData = doc.data() as Map<String, dynamic>;
+        Map<String, dynamic> commentData = doc.data();
 
         // Get user data based on userId
         if (commentData['userId'] != null) {
@@ -64,7 +64,7 @@ class _ThreadDetailPageState extends State<ThreadDetailPage> {
           if (userSnapshot.exists) {
             Map<String, dynamic> userData = userSnapshot.data() as Map<String, dynamic>;
             commentData['userName'] = userData['username'] ?? 'Anonymous';
-            commentData['userAvatarUrl'] = userData['avatarUrl'] ?? null;
+            commentData['userAvatarUrl'] = userData['avatarUrl'];
           } else {
             commentData['userName'] = 'Anonymous';
           }
@@ -90,7 +90,7 @@ class _ThreadDetailPageState extends State<ThreadDetailPage> {
     final User? user = _auth.currentUser;
     if (user == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('You need to be logged in to comment.')),
+        const SnackBar(content: Text('You need to be logged in to comment.')),
       );
       return;
     }
@@ -129,7 +129,7 @@ class _ThreadDetailPageState extends State<ThreadDetailPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Thread Details'),
+        title: const Text('Thread Details'),
       ),
       body: Column(
         children: [
@@ -155,20 +155,20 @@ class _ThreadDetailPageState extends State<ThreadDetailPage> {
                                   as ImageProvider,
                           radius: 20,
                         ),
-                        SizedBox(width: 8),
+                        const SizedBox(width: 8),
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
                               widget.threadUserName,
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 16,
                               ),
                             ),
                             Text(
                               _formatTimestamp(widget.timestamp),
-                              style: TextStyle(
+                              style: const TextStyle(
                                 color: Colors.grey,
                                 fontSize: 12,
                               ),
@@ -180,7 +180,7 @@ class _ThreadDetailPageState extends State<ThreadDetailPage> {
                     const SizedBox(height: 12),
                     Text(
                       widget.threadContent,
-                      style: TextStyle(fontSize: 16),
+                      style: const TextStyle(fontSize: 16),
                     ),
                     const SizedBox(height: 12),
                     if (widget.threadImageUrl != null)
@@ -197,14 +197,14 @@ class _ThreadDetailPageState extends State<ThreadDetailPage> {
                               return Container(
                                 height: 150,
                                 color: Colors.grey[300],
-                                child: Center(
+                                child: const Center(
                                     child: Icon(Icons.image_not_supported)),
                               );
                             },
                           ),
                         ),
                       ),
-                    SizedBox(height: 16),
+                    const SizedBox(height: 16),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -221,10 +221,10 @@ class _ThreadDetailPageState extends State<ThreadDetailPage> {
               ),
             ),
           ),
-          Divider(),
+          const Divider(),
           Expanded(
             child: isLoading
-                ? Center(child: CircularProgressIndicator())
+                ? const Center(child: CircularProgressIndicator())
                 : ListView.builder(
                     itemCount: comments.length,
                     itemBuilder: (context, index) {
@@ -257,7 +257,7 @@ class _ThreadDetailPageState extends State<ThreadDetailPage> {
                                       ? _formatTimestamp(
                                           comment['timestamp'])
                                       : 'No timestamp available',
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                       fontSize: 12, color: Colors.grey),
                                 ),
                               ],
@@ -268,7 +268,7 @@ class _ThreadDetailPageState extends State<ThreadDetailPage> {
                     },
                   ),
           ),
-          Divider(),
+          const Divider(),
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Row(
@@ -276,14 +276,14 @@ class _ThreadDetailPageState extends State<ThreadDetailPage> {
                 Expanded(
                   child: TextField(
                     controller: _commentController,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       hintText: 'Add a comment...',
                       border: OutlineInputBorder(),
                     ),
                   ),
                 ),
                 IconButton(
-                  icon: Icon(Icons.send),
+                  icon: const Icon(Icons.send),
                   onPressed: () {
                     _addComment(_commentController.text.trim());
                   },
@@ -300,10 +300,10 @@ class _ThreadDetailPageState extends State<ThreadDetailPage> {
     return Row(
       children: [
         Icon(icon, color: color, size: 20),
-        SizedBox(width: 4),
+        const SizedBox(width: 4),
         Text(
           count.toString(),
-          style: TextStyle(fontSize: 14, color: Colors.black87),
+          style: const TextStyle(fontSize: 14, color: Colors.black87),
         ),
       ],
     );

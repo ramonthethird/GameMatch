@@ -8,6 +8,8 @@ import 'package:game_match/pages/Settings_Privacy.dart';
 import 'Side_bar.dart';
 
 class SettingsPage extends StatefulWidget {
+  const SettingsPage({super.key});
+
   @override
   _SettingsPageState createState() => _SettingsPageState();
 }
@@ -139,13 +141,13 @@ class _SettingsPageState extends State<SettingsPage> {
               buildSettingsOption(
                 context,
                 'Terms of Service',
-                SettingsTermsPage(),
+                const SettingsTermsPage(),
                 Icons.description,
               ),
               buildSettingsOption(
                 context,
                 'Privacy Policy',
-                SettingsPrivacyPage(),
+                const SettingsPrivacyPage(),
                 Icons.privacy_tip,
               ),
               const SizedBox(height: 200),

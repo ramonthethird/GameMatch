@@ -25,7 +25,7 @@ import 'game_model.dart';
 // }
 
 class ShoppingCartProvider with ChangeNotifier {
-  List<Product> _cart = [];
+  final List<Product> _cart = [];
 
   List<Product> get cart => _cart;
 
@@ -50,6 +50,8 @@ class Product {
 }
 
 class WishlistPage extends StatefulWidget {
+  const WishlistPage({super.key});
+
   @override
   _WishlistPageState createState() => _WishlistPageState();
 }
@@ -135,19 +137,19 @@ class _WishlistPageState extends State<WishlistPage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Remove Game'),
+          title: const Text('Remove Game'),
           content: Text('Would you like to remove ${product.name} from the wishlist?'),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: Text('Cancel'),
+              child: const Text('Cancel'),
             ),
             TextButton(
               onPressed: () {
                 _removeProduct(product);
                 Navigator.of(context).pop();
               },
-              child: Text('Remove'),
+              child: const Text('Remove'),
             ),
           ],
         );
@@ -175,7 +177,7 @@ class _WishlistPageState extends State<WishlistPage> {
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: Text('Close'),
+              child: const Text('Close'),
             ),
           ],
         );
@@ -190,7 +192,7 @@ class _WishlistPageState extends State<WishlistPage> {
         padding: const EdgeInsets.symmetric(vertical: 8.0),
         child: Text(
           label,
-          style: TextStyle(
+          style: const TextStyle(
             fontSize: 18,
             color: Colors.blue,
             decoration: TextDecoration.underline,
@@ -240,18 +242,18 @@ class _WishlistPageState extends State<WishlistPage> {
     final cartProvider = Provider.of<ShoppingCartProvider>(context);
     return Scaffold(
       appBar: AppBar(
-        title: Text('Wishlist'),
+        title: const Text('Wishlist'),
         leading: IconButton(
-          icon: Icon(Icons.menu), // Three horizontal lines (hamburger menu icon)
+          icon: const Icon(Icons.menu), // Three horizontal lines (hamburger menu icon)
           onPressed: () {
             // Handle menu press
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('')),
+              const SnackBar(content: Text('')),
             );
           },
         ),
       ),
-      backgroundColor: Color(0xffF1F3F4),
+      backgroundColor: const Color(0xffF1F3F4),
       body: Column(
         children: [
           // Search bar
@@ -261,7 +263,7 @@ class _WishlistPageState extends State<WishlistPage> {
               onChanged: _searchProducts,
               decoration: InputDecoration(
                 hintText: 'Search...',
-                prefixIcon: Icon(Icons.search),
+                prefixIcon: const Icon(Icons.search),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),
@@ -289,26 +291,26 @@ class _WishlistPageState extends State<WishlistPage> {
                   onChanged: (value) {
                     _sortProducts(value!);
                   },
-                  items: [
+                  items: const [
                     DropdownMenuItem(
-                      child: Text('Sort by Custom'),
                       value: 'Sort by Custom',
+                      child: Text('Sort by Custom'),
                     ),
                     DropdownMenuItem(
-                      child: Text('Price: Low to High'),
                       value: 'Price: Low to High',
+                      child: Text('Price: Low to High'),
                     ),
                     DropdownMenuItem(
-                      child: Text('Price: High to Low'),
                       value: 'Price: High to Low',
+                      child: Text('Price: High to Low'),
                     ),
                     DropdownMenuItem(
-                      child: Text('Name: A - Z'),
                       value: 'Name: A - Z',
+                      child: Text('Name: A - Z'),
                     ),
                     DropdownMenuItem(
-                      child: Text('Name: Z - A'),
                       value: 'Name: Z - A',
+                      child: Text('Name: Z - A'),
                     ),
                   ],
                 ),
@@ -336,7 +338,7 @@ class _WishlistPageState extends State<WishlistPage> {
                           color: Colors.grey.withOpacity(0.2),
                           spreadRadius: 1,
                           blurRadius: 5,
-                          offset: Offset(0, 3),
+                          offset: const Offset(0, 3),
                         ),
                       ],
                     ),
@@ -361,15 +363,15 @@ class _WishlistPageState extends State<WishlistPage> {
                                     future: ApiService().fetchGameDetailsTwo(product.name),
                                     builder: (context, snapshot) {
                                       if (snapshot.connectionState == ConnectionState.waiting) {
-                                        return CircularProgressIndicator();
+                                        return const CircularProgressIndicator();
                                       } else if (snapshot.hasError || snapshot.data == null) {
-                                        return Text('Error fetching game details');
+                                        return const Text('Error fetching game details');
                                       } else {
                                         final game = snapshot.data!;
                                         return Column(
                                           crossAxisAlignment: CrossAxisAlignment.start,
                                           children: [
-                                            Text(game.name, style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                                            Text(game.name, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
                                             Text('Platforms: ${game.platforms.join(', ')}'),
                                             Text('Price: \$${product.price.toStringAsFixed(2)}'),
                                           ],
@@ -378,37 +380,37 @@ class _WishlistPageState extends State<WishlistPage> {
                                     },
                                   ),
 
-                                  SizedBox(width: 16),
+                                  const SizedBox(width: 16),
 
                                   Expanded(
                                     child: FutureBuilder<Game?>(
                                       future: ApiService().fetchGameDetailsTwo(product.name),
                                       builder: (context, snapshot) {
                                         if (snapshot.connectionState == ConnectionState.waiting) {
-                                          return CircularProgressIndicator();
+                                          return const CircularProgressIndicator();
                                         } else if (snapshot.hasError || snapshot.data == null) {
                                           return Column(
                                             crossAxisAlignment: CrossAxisAlignment.start,
                                             children: [
                                               Text(
                                                 product.name,
-                                                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                                                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                                               ),
-                                              SizedBox(height: 8),
+                                              const SizedBox(height: 8),
                                               Text('Platforms: ${product.platforms}'),
-                                              SizedBox(height: 8),
+                                              const SizedBox(height: 8),
 
                                               FutureBuilder<String>(
                                                 future: apiService.fetchGamePrice(product.name),
                                                 builder: (context, snapshot) {
                                                   if (snapshot.connectionState == ConnectionState.waiting) {
-                                                    return Text('Loading price...');
+                                                    return const Text('Loading price...');
                                                   } else if (snapshot.hasError) {
-                                                    return Text('Error fetching price');
+                                                    return const Text('Error fetching price');
                                                   } else {
                                                     return Text(
                                                       'Price: ${snapshot.data}',
-                                                      style: TextStyle(fontSize: 16, color: Colors.blue),
+                                                      style: const TextStyle(fontSize: 16, color: Colors.blue),
                                                     );
                                                   }
                                                 },
@@ -428,14 +430,14 @@ class _WishlistPageState extends State<WishlistPage> {
                                                 height: 150,
                                                 fit: BoxFit.cover, // Ensures the image fills the box without distortion
                                               ),
-                                              SizedBox(width: 16), // Spacing between image and text
+                                              const SizedBox(width: 16), // Spacing between image and text
 
                                               // Product details
                                               Expanded(
                                                 child: Column(
                                                   crossAxisAlignment: CrossAxisAlignment.start,
                                                   children: [
-                                                    Text(game.name, style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                                                    Text(game.name, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
                                                     Text('Platforms: ${game.platforms.join(', ')}'),
                                                     Text('Price: \$${product.price.toStringAsFixed(2)}'),
                                                   ],
@@ -449,7 +451,7 @@ class _WishlistPageState extends State<WishlistPage> {
                                   ),
                                 ],
                               ),
-                              SizedBox(height: 45),
+                              const SizedBox(height: 45),
                             ],
                           ),
                         ),
@@ -461,16 +463,16 @@ class _WishlistPageState extends State<WishlistPage> {
                             children: [
                               ElevatedButton(
                                 onPressed: () => _showLinkDialog(context, product),
-                                child: Text('Buy Now'),
+                                child: const Text('Buy Now'),
                               ),
                               IconButton(
-                                icon: Icon(Icons.more_horiz),
+                                icon: const Icon(Icons.more_horiz),
                                 onPressed: () => _showRemoveDialog(context, product),
                               ),
                             ],
                           ),
                         ),
-                        SizedBox(height: 45),
+                        const SizedBox(height: 45),
                       ],
                     ),
                   ),
@@ -486,6 +488,8 @@ class _WishlistPageState extends State<WishlistPage> {
 
 
 class FilterPage extends StatefulWidget {
+  const FilterPage({super.key});
+
   @override
   _FilterPageState createState() => _FilterPageState();
 }
@@ -529,12 +533,12 @@ class _FilterPageState extends State<FilterPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('All Filters')),
+      appBar: AppBar(title: const Text('All Filters')),
       body: Column(
         children: [
           ListTile(
-            title: Text('Price'),
-            trailing: Icon(Icons.arrow_forward_ios),
+            title: const Text('Price'),
+            trailing: const Icon(Icons.arrow_forward_ios),
             onTap: () {
               Navigator.push(
                 context,
@@ -558,8 +562,8 @@ class _FilterPageState extends State<FilterPage> {
             },
           ),
           ListTile(
-            title: Text('Platform'),
-            trailing: Icon(Icons.arrow_forward_ios),
+            title: const Text('Platform'),
+            trailing: const Icon(Icons.arrow_forward_ios),
             onTap: () {
               Navigator.push(
                 context,
@@ -582,12 +586,12 @@ class _FilterPageState extends State<FilterPage> {
               );
             },
           ),
-          Spacer(),
+          const Spacer(),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              ElevatedButton(onPressed: clearAllFilters, child: Text('Clear')),
-              ElevatedButton(onPressed: seeResults, child: Text('See Results')),
+              ElevatedButton(onPressed: clearAllFilters, child: const Text('Clear')),
+              ElevatedButton(onPressed: seeResults, child: const Text('See Results')),
             ],
           )
         ],
@@ -602,7 +606,7 @@ class ChoosePricePage extends StatefulWidget {
   final bool isFree, isBetween0And20, isBetween20And50, isBetween50And85;
   final Function(bool, bool, bool, bool) onSelectionChanged;
 
-  ChoosePricePage({
+  const ChoosePricePage({super.key, 
     required this.isFree,
     required this.isBetween0And20,
     required this.isBetween20And50,
@@ -629,11 +633,11 @@ class _ChoosePricePageState extends State<ChoosePricePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Choose Price')),
+      appBar: AppBar(title: const Text('Choose Price')),
       body: Column(
         children: [
           CheckboxListTile(
-            title: Text('Free'),
+            title: const Text('Free'),
             value: isFree,
             onChanged: (value) {
               setState(() => isFree = value ?? false);
@@ -641,7 +645,7 @@ class _ChoosePricePageState extends State<ChoosePricePage> {
             },
           ),
           CheckboxListTile(
-            title: Text('\$0 - \$20'),
+            title: const Text('\$0 - \$20'),
             value: isBetween0And20,
             onChanged: (value) {
               setState(() => isBetween0And20 = value ?? false);
@@ -649,7 +653,7 @@ class _ChoosePricePageState extends State<ChoosePricePage> {
             },
           ),
           CheckboxListTile(
-            title: Text('\$20 - \$50'),
+            title: const Text('\$20 - \$50'),
             value: isBetween20And50,
             onChanged: (value) {
               setState(() => isBetween20And50 = value ?? false);
@@ -657,7 +661,7 @@ class _ChoosePricePageState extends State<ChoosePricePage> {
             },
           ),
           CheckboxListTile(
-            title: Text('\$50 - \$85'),
+            title: const Text('\$50 - \$85'),
             value: isBetween50And85,
             onChanged: (value) {
               setState(() => isBetween50And85 = value ?? false);
@@ -676,7 +680,7 @@ class ChoosePlatformPage extends StatefulWidget {
   final bool isPC, isPS4, isXboxOne, isSwitch;
   final Function(bool, bool, bool, bool) onSelectionChanged;
 
-  ChoosePlatformPage({
+  const ChoosePlatformPage({super.key, 
     required this.isPC,
     required this.isPS4,
     required this.isXboxOne,
@@ -703,11 +707,11 @@ class _ChoosePlatformPageState extends State<ChoosePlatformPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Choose Platform')),
+      appBar: AppBar(title: const Text('Choose Platform')),
       body: Column(
         children: [
           CheckboxListTile(
-            title: Text('PC'),
+            title: const Text('PC'),
             value: isPC,
             onChanged: (value) {
               setState(() => isPC = value ?? false);
@@ -715,7 +719,7 @@ class _ChoosePlatformPageState extends State<ChoosePlatformPage> {
             },
           ),
           CheckboxListTile(
-            title: Text('Playstation 4'),
+            title: const Text('Playstation 4'),
             value: isPS4,
             onChanged: (value) {
               setState(() => isPS4 = value ?? false);
@@ -723,7 +727,7 @@ class _ChoosePlatformPageState extends State<ChoosePlatformPage> {
             },
           ),
           CheckboxListTile(
-            title: Text('Xbox One'),
+            title: const Text('Xbox One'),
             value: isXboxOne,
             onChanged: (value) {
               setState(() => isXboxOne = value ?? false);
@@ -731,7 +735,7 @@ class _ChoosePlatformPageState extends State<ChoosePlatformPage> {
             },
           ),
           CheckboxListTile(
-            title: Text('Nintendo Switch'),
+            title: const Text('Nintendo Switch'),
             value: isSwitch,
             onChanged: (value) {
               setState(() => isSwitch = value ?? false);
@@ -751,7 +755,7 @@ class ChooseGenresPage extends StatefulWidget {
   final bool isNonFiction;
   final Function(bool, bool) onSelectionChanged;
 
-  ChooseGenresPage({
+  const ChooseGenresPage({super.key, 
     required this.isFiction,
     required this.isNonFiction,
     required this.onSelectionChanged,
@@ -776,12 +780,12 @@ class _ChooseGenresPageState extends State<ChooseGenresPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Choose Genres'),
+        title: const Text('Choose Genres'),
       ),
       body: Column(
         children: [
           CheckboxListTile(
-            title: Text('Fiction'),
+            title: const Text('Fiction'),
             value: isFiction,
             onChanged: (value) {
               setState(() {
@@ -790,7 +794,7 @@ class _ChooseGenresPageState extends State<ChooseGenresPage> {
             },
           ),
           CheckboxListTile(
-            title: Text('Non-Fiction'),
+            title: const Text('Non-Fiction'),
             value: isNonFiction,
             onChanged: (value) {
               setState(() {
@@ -805,7 +809,7 @@ class _ChooseGenresPageState extends State<ChooseGenresPage> {
           widget.onSelectionChanged(isFiction, isNonFiction);
           Navigator.pop(context);
         },
-        child: Icon(Icons.check),
+        child: const Icon(Icons.check),
       ),
     );
   }

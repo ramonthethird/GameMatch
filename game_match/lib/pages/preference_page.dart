@@ -20,12 +20,12 @@ class MoreGenresPage extends StatelessWidget {
   final List<String> selectedGenres;
   final Function(String) onGenresUnselected;
 
-  MoreGenresPage({required this.selectedGenres, required this.onGenresUnselected});
+  const MoreGenresPage({super.key, required this.selectedGenres, required this.onGenresUnselected});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('View All Selected Genres')),
+      appBar: AppBar(title: const Text('View All Selected Genres')),
       body: ListView.builder(
         itemCount: selectedGenres.length,
         itemBuilder: (context, index) {
@@ -33,11 +33,11 @@ class MoreGenresPage extends StatelessWidget {
           return ListTile(
             title: Text(genre),
             trailing: IconButton(
-              icon: Icon(Icons.remove_circle),
+              icon: const Icon(Icons.remove_circle),
               onPressed: () {
                 onGenresUnselected(genre);
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Removing Genre')),
+                  const SnackBar(content: Text('Removing Genre')),
                 );
               },
             ),
@@ -82,6 +82,8 @@ class FirestoreService {
 
 // Main screen for the preference page
 class GenrePreferencePage extends StatefulWidget {
+  const GenrePreferencePage({super.key});
+
   @override
   _GenrePreferencePageState createState() => _GenrePreferencePageState();
 }
@@ -98,7 +100,7 @@ class _GenrePreferencePageState extends State<GenrePreferencePage> {
   FirestoreService firestoreService = FirestoreService();
   String? userId;
   TextEditingController searchController = TextEditingController();
-  ApiService _apiService = ApiService();
+  final ApiService _apiService = ApiService();
 
   @override
   void initState() {
@@ -139,7 +141,7 @@ class _GenrePreferencePageState extends State<GenrePreferencePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Genre Preference Page'),
+        title: const Text('Genre Preference Page'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () {
@@ -153,7 +155,7 @@ class _GenrePreferencePageState extends State<GenrePreferencePage> {
             padding: const EdgeInsets.all(10.0),
             child: TextField(
               controller: searchController,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 labelText: 'Search Video Game Genre',
                 border: OutlineInputBorder(),
                 prefixIcon: Icon(Icons.search),
@@ -171,15 +173,15 @@ class _GenrePreferencePageState extends State<GenrePreferencePage> {
               },
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.all(10.0),
+          const Padding(
+            padding: EdgeInsets.all(10.0),
             child: Text('Scroll to view more genres. \nSearch for genres not displayed on the screen'),
           ),
           Expanded(
             child: GridView.builder(
               padding: const EdgeInsets.all(10.0),
               itemCount: genres.length,
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2, 
                 childAspectRatio: 3, 
                 crossAxisSpacing: 10, 
@@ -193,7 +195,7 @@ class _GenrePreferencePageState extends State<GenrePreferencePage> {
                     onPressed: () => updateGenreSelection(genre),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: selectedGenres.contains(genre) ? Colors.blue : Colors.white60,
-                      minimumSize: Size(100, 40),
+                      minimumSize: const Size(100, 40),
                     ),
                     child: Text(genre),
                   ),
@@ -201,7 +203,7 @@ class _GenrePreferencePageState extends State<GenrePreferencePage> {
               },
             ),
           ),
-          Divider(
+          const Divider(
             thickness: 2,
             color: Colors.grey,
           ),
@@ -222,10 +224,10 @@ class _GenrePreferencePageState extends State<GenrePreferencePage> {
                       ),
                     );
                   },
-                  child: Text('View More'),
                   style: ElevatedButton.styleFrom(
-                    minimumSize: Size(150, 40),
+                    minimumSize: const Size(150, 40),
                   ),
+                  child: Text('View More'),
                 ),
                 ElevatedButton(
                   onPressed: () {
@@ -234,10 +236,10 @@ class _GenrePreferencePageState extends State<GenrePreferencePage> {
                     });
                     firestoreService.saveGenresToFirestore(userId!, selectedGenres);
                   },
-                  child: Text('Reset'),
                   style: ElevatedButton.styleFrom(
-                    minimumSize: Size(150, 40),
+                    minimumSize: const Size(150, 40),
                   ),
+                  child: Text('Reset'),
                 ),
               ],
             ),
@@ -253,7 +255,7 @@ class SearchGenrePage extends StatefulWidget {
   final String searchQuery;
   final Function(String) onGenreSelected;
 
-  SearchGenrePage({required this.searchQuery, required this.onGenreSelected});
+  const SearchGenrePage({super.key, required this.searchQuery, required this.onGenreSelected});
 
   @override
   _SearchGenrePageState createState() => _SearchGenrePageState();
@@ -286,12 +288,12 @@ class _SearchGenrePageState extends State<SearchGenrePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Search Genres')),
+      appBar: AppBar(title: const Text('Search Genres')),
       body: Center(
         child: Column(
           children: [
             if (_errorMsg.isNotEmpty)
-              Text(_errorMsg, style: TextStyle(color: Colors.red))
+              Text(_errorMsg, style: const TextStyle(color: Colors.red))
             else
               Text(_searchResult),
             if (_searchResult.contains('Genre found'))
@@ -300,7 +302,7 @@ class _SearchGenrePageState extends State<SearchGenrePage> {
                   widget.onGenreSelected(widget.searchQuery);
                   Navigator.pop(context);
                 },
-                icon: Icon(Icons.add),
+                icon: const Icon(Icons.add),
                 label: Text(widget.searchQuery),
               )
           ],

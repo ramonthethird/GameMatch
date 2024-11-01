@@ -10,7 +10,7 @@ import 'package:device_info_plus/device_info_plus.dart';
 class AddThreadsPage extends StatefulWidget {
   final String gameId;
 
-  const AddThreadsPage({Key? key, required this.gameId}) : super(key: key);
+  const AddThreadsPage({super.key, required this.gameId});
 
   @override
   _AddThreadsPageState createState() => _AddThreadsPageState();
@@ -43,7 +43,7 @@ class _AddThreadsPageState extends State<AddThreadsPage> {
             const SizedBox(height: 32),
             _buildPostButton(),
             const SizedBox(height: 16),
-            Text(
+            const Text(
               'Please ensure your thread follows our community guidelines.',
               style: TextStyle(color: Colors.grey, fontSize: 12),
             ),
@@ -58,7 +58,7 @@ class _AddThreadsPageState extends State<AddThreadsPage> {
       padding: const EdgeInsets.only(bottom: 8.0),
       child: Text(
         title,
-        style: TextStyle(
+        style: const TextStyle(
           fontSize: 16,
           fontWeight: FontWeight.bold,
         ),
@@ -75,7 +75,7 @@ class _AddThreadsPageState extends State<AddThreadsPage> {
           maxLength: 300,
           decoration: InputDecoration(
             hintText: 'Describe your thread in detail...',
-            border: OutlineInputBorder(),
+            border: const OutlineInputBorder(),
             filled: true,
             fillColor: Colors.grey[200],
           ),
@@ -103,12 +103,12 @@ class _AddThreadsPageState extends State<AddThreadsPage> {
                   child: GestureDetector(
                     onTap: _deletePhoto,
                     child: Container(
-                      padding: EdgeInsets.all(2),
-                      decoration: BoxDecoration(
+                      padding: const EdgeInsets.all(2),
+                      decoration: const BoxDecoration(
                         color: Colors.white,
                         shape: BoxShape.circle,
                       ),
-                      child: Icon(
+                      child: const Icon(
                         Icons.close,
                         size: 18,
                         color: Colors.red,
@@ -171,7 +171,7 @@ class _AddThreadsPageState extends State<AddThreadsPage> {
       _selectedPhoto = null;
     });
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Photo removed.')),
+      const SnackBar(content: Text('Photo removed.')),
     );
   }
 
@@ -192,7 +192,7 @@ class _AddThreadsPageState extends State<AddThreadsPage> {
   Future<void> _postThread() async {
     if (_descriptionController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Please fill out the description.')),
+        const SnackBar(content: Text('Please fill out the description.')),
       );
       return;
     }
@@ -201,7 +201,7 @@ class _AddThreadsPageState extends State<AddThreadsPage> {
       final User? user = FirebaseAuth.instance.currentUser;
       if (user == null) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('You need to be logged in to post a thread.')),
+          const SnackBar(content: Text('You need to be logged in to post a thread.')),
         );
         return;
       }
@@ -225,7 +225,7 @@ class _AddThreadsPageState extends State<AddThreadsPage> {
       });
 
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Thread posted successfully.')),
+        const SnackBar(content: Text('Thread posted successfully.')),
       );
       Navigator.of(context).pop();
     } catch (e) {

@@ -9,7 +9,7 @@ class GameDescriptionPage extends StatefulWidget {
   final Game game;
 
 
-  GameDescriptionPage({
+  const GameDescriptionPage({super.key, 
     required this.game
   });
 
@@ -43,7 +43,7 @@ class _GameDescriptionPageState extends State<GameDescriptionPage> {
         title: Text(widget.game.name),
       ),
       body: isLoading
-          ? Center(child: CircularProgressIndicator())
+          ? const Center(child: CircularProgressIndicator())
           : Padding(
         padding: const EdgeInsets.all(16.0),
         child: SingleChildScrollView(
@@ -53,47 +53,47 @@ class _GameDescriptionPageState extends State<GameDescriptionPage> {
               // Display cover image
               widget.game.coverUrl != null
                   ? Image.network(widget.game.coverUrl!, fit: BoxFit.cover)
-                  : Icon(Icons.videogame_asset, size: 150),
-              SizedBox(height: 16),
+                  : const Icon(Icons.videogame_asset, size: 150),
+              const SizedBox(height: 16),
 
               // Game title
               Text(
                 widget.game.name,
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
 
               // Game genres
               if (gameDetails?['genres'] != null)
                 Text(
                   'Genres: ${gameDetails!['genres'].map((genre) => genre['name']).join(', ')}',
-                  style: TextStyle(fontSize: 16),
+                  style: const TextStyle(fontSize: 16),
                 ),
-              SizedBox(height: 8),
+              const SizedBox(height: 8),
 
               // Game themes
               if (gameDetails?['themes'] != null)
                 Text(
                   'Themes: ${gameDetails!['themes'].map((theme) => theme['name']).join(', ')}',
-                  style: TextStyle(fontSize: 16),
+                  style: const TextStyle(fontSize: 16),
                 ),
-              SizedBox(height: 8),
+              const SizedBox(height: 8),
 
               // Game modes
               if (gameDetails?['game_modes'] != null)
                 Text(
                   'Game Modes: ${gameDetails!['game_modes'].map((mode) => mode['name']).join(', ')}',
-                  style: TextStyle(fontSize: 16),
+                  style: const TextStyle(fontSize: 16),
                 ),
-              SizedBox(height: 8),
+              const SizedBox(height: 8),
 
               // Platforms
               if (gameDetails?['platforms'] != null)
                 Text(
                   'Platforms: ${gameDetails!['platforms'].map((platform) => platform['name']).join(', ')}',
-                  style: TextStyle(fontSize: 16),
+                  style: const TextStyle(fontSize: 16),
                 ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
 
               // Screenshots
               // if (gameDetails?['screenshots'] != null)

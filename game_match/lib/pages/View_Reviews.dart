@@ -9,7 +9,7 @@ import 'Add_Reviews.dart';
 class ViewReviewsPage extends StatefulWidget {
   final String gameId; // Accept the gameId as a parameter
 
-  const ViewReviewsPage({Key? key, required this.gameId}) : super(key: key);
+  const ViewReviewsPage({super.key, required this.gameId});
 
   @override
   _ViewReviewsPageState createState() => _ViewReviewsPageState();
@@ -170,14 +170,14 @@ class _ViewReviewsPageState extends State<ViewReviewsPage> {
     context: context,
     builder: (context) {
       return AlertDialog(
-        title: Text('Edit Review'),
-        content: Container(
+        title: const Text('Edit Review'),
+        content: SizedBox(
           width: 500,
           height: 450,
           child: StatefulBuilder(
             builder: (context, setState) {
               void updateRating(double localX) {
-                final double starWidth = 32.0;
+                const double starWidth = 32.0;
                 final double totalWidth = starWidth * 5;
                 if (localX < 0) localX = 0;
                 if (localX > totalWidth) localX = totalWidth;
@@ -191,33 +191,33 @@ class _ViewReviewsPageState extends State<ViewReviewsPage> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Review Title', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                  SizedBox(height: 8),
+                  const Text('Review Title', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 8),
                   TextField(
                     controller: titleController,
                     decoration: InputDecoration(
                       hintText: 'Enter review title...',
                       filled: true,
                       fillColor: Colors.grey[200],
-                      border: OutlineInputBorder(),
+                      border: const OutlineInputBorder(),
                     ),
                   ),
-                  SizedBox(height: 10),
-                  Text('Review Body', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                  SizedBox(height: 8),
+                  const SizedBox(height: 10),
+                  const Text('Review Body', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 8),
                   TextField(
                     controller: bodyController,
                     decoration: InputDecoration(
                       hintText: 'Write your review here...',
                       filled: true,
                       fillColor: Colors.grey[200],
-                      border: OutlineInputBorder(),
+                      border: const OutlineInputBorder(),
                     ),
                     maxLines: 8,
                     maxLength: 300,
                   ),
-                  SizedBox(height: 10),
-                  Text('Rating:', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 10),
+                  const Text('Rating:', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                   GestureDetector(
                     onPanUpdate: (details) {
                       updateRating(details.localPosition.dx);
@@ -248,7 +248,7 @@ class _ViewReviewsPageState extends State<ViewReviewsPage> {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: Text('Cancel'),
+            child: const Text('Cancel'),
           ),
           TextButton(
             onPressed: () async {
@@ -263,7 +263,7 @@ class _ViewReviewsPageState extends State<ViewReviewsPage> {
                 _fetchReviews();
 
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
+                  const SnackBar(
                     content: Text('Review updated successfully!'),
                     backgroundColor: Colors.green,
                     duration: Duration(seconds: 2),
@@ -274,12 +274,12 @@ class _ViewReviewsPageState extends State<ViewReviewsPage> {
                   SnackBar(
                     content: Text('Failed to update review: $e'),
                     backgroundColor: Colors.red,
-                    duration: Duration(seconds: 2),
+                    duration: const Duration(seconds: 2),
                   ),
                 );
               }
             },
-            child: Text('Save'),
+            child: const Text('Save'),
           ),
         ],
       );
@@ -293,7 +293,7 @@ Future<void> _deleteReview(String reviewId) async {
     _fetchReviews(); // Refresh the reviews list after deletion
 
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
+      const SnackBar(
         content: Text('Review deleted successfully!'),
         backgroundColor: Colors.green,
         duration: Duration(seconds: 2),
@@ -304,7 +304,7 @@ Future<void> _deleteReview(String reviewId) async {
       SnackBar(
         content: Text('Failed to delete review: $e'),
         backgroundColor: Colors.red,
-        duration: Duration(seconds: 2),
+        duration: const Duration(seconds: 2),
       ),
     );
   }
@@ -437,9 +437,9 @@ Future<void> _deleteReview(String reviewId) async {
           children: [
             Text(
               averageRating.toStringAsFixed(1), // Display the average rating
-              style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+              style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
             ),
-            SizedBox(width: 8),
+            const SizedBox(width: 8),
             Row(
               children: List.generate(
                 5,
@@ -456,10 +456,10 @@ Future<void> _deleteReview(String reviewId) async {
             ),
           ],
         ),
-        SizedBox(height: 4),
+        const SizedBox(height: 4),
         Text(
           '$totalReviews Reviews', // Display total number of reviews
-          style: TextStyle(color: Colors.grey),
+          style: const TextStyle(color: Colors.grey),
         ),
       ],
     );
@@ -468,8 +468,9 @@ Future<void> _deleteReview(String reviewId) async {
   // Widget to build the rating breakdown
   Widget _buildRatingBreakdown() {
     int totalRatings = ratingCounts.values.reduce((a, b) => a + b);
-    if (totalRatings == 0)
-      return SizedBox(); // If no ratings, return empty widget
+    if (totalRatings == 0) {
+      return const SizedBox(); // If no ratings, return empty widget
+    }
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -481,20 +482,20 @@ Future<void> _deleteReview(String reviewId) async {
             children: [
               Text(
                 '$starValue',
-                style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
               ),
-              SizedBox(width: 8),
+              const SizedBox(width: 8),
               Expanded(
                 child: LinearProgressIndicator(
                   value: percentage / 100,
                   backgroundColor: Colors.grey[300],
-                  valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
+                  valueColor: const AlwaysStoppedAnimation<Color>(Colors.blue),
                 ),
               ),
-              SizedBox(width: 8),
+              const SizedBox(width: 8),
               Text(
                 '${percentage.toStringAsFixed(0)}%',
-                style: TextStyle(fontSize: 14),
+                style: const TextStyle(fontSize: 14),
               ),
             ],
           );
@@ -506,12 +507,12 @@ Future<void> _deleteReview(String reviewId) async {
     // Widget to build the list of reviews
   Widget _buildReviewList() {
     if (reviews.isEmpty) {
-      return Center(
+      return const Center(
         child: Text('No reviews yet!'), // Show message if no reviews
       );
     }
     return ListView.builder(
-      physics: NeverScrollableScrollPhysics(),
+      physics: const NeverScrollableScrollPhysics(),
       shrinkWrap: true,
       itemCount: reviews.length,
       itemBuilder: (context, index) {
@@ -546,14 +547,14 @@ Future<void> _deleteReview(String reviewId) async {
                         ? Icon(Icons.person, color: Colors.grey[600])
                         : null,
                   ),
-                  SizedBox(width: 8),
+                  const SizedBox(width: 8),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
                           username, // Display username
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 16,
                           ),
@@ -566,22 +567,22 @@ Future<void> _deleteReview(String reviewId) async {
                                 (starIndex) {
                                   double starValue = starIndex + 1;
                                   if (rating >= starValue) {
-                                    return Icon(Icons.star,
+                                    return const Icon(Icons.star,
                                         color: Colors.yellow, size: 16);
                                   } else if (rating >= starValue - 0.5) {
-                                    return Icon(Icons.star_half,
+                                    return const Icon(Icons.star_half,
                                         color: Colors.yellow, size: 16);
                                   } else {
-                                    return Icon(Icons.star_border,
+                                    return const Icon(Icons.star_border,
                                         color: Colors.yellow, size: 16);
                                   }
                                 },
                               ),
                             ),
-                            SizedBox(width: 8),
+                            const SizedBox(width: 8),
                             Text(
                               date, // Display formatted date
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontSize: 12,
                                 color: Colors.grey,
                               ),
@@ -601,22 +602,22 @@ Future<void> _deleteReview(String reviewId) async {
                           showDialog(
                             context: context,
                             builder: (context) => AlertDialog(
-                              title: Text('Delete Review'),
-                              content: Text(
+                              title: const Text('Delete Review'),
+                              content: const Text(
                                   'Are you sure you want to delete this review?'),
                               actions: [
                                 TextButton(
                                   onPressed: () {
                                     Navigator.of(context).pop();
                                   },
-                                  child: Text('No'),
+                                  child: const Text('No'),
                                 ),
                                 TextButton(
                                   onPressed: () {
                                     _deleteReview(docId);
                                     Navigator.of(context).pop();
                                   },
-                                  child: Text('Yes'),
+                                  child: const Text('Yes'),
                                 ),
                               ],
                             ),
@@ -624,11 +625,11 @@ Future<void> _deleteReview(String reviewId) async {
                         }
                       },
                       itemBuilder: (BuildContext context) => [
-                        PopupMenuItem<String>(
+                        const PopupMenuItem<String>(
                           value: 'Edit',
                           child: Text('Edit'),
                         ),
-                        PopupMenuItem<String>(
+                        const PopupMenuItem<String>(
                           value: 'Delete',
                           child: Text('Delete'),
                         ),
@@ -636,21 +637,21 @@ Future<void> _deleteReview(String reviewId) async {
                     ),
                 ],
               ),
-              SizedBox(height: 8),
+              const SizedBox(height: 8),
               if (review['title'] != null && review['title'].isNotEmpty)
                 Text(
                   review['title'], // Display review title if available
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-              SizedBox(height: 4),
+              const SizedBox(height: 4),
               Text(
                 review['body'] ?? '', // Display review body
-                style: TextStyle(fontSize: 14),
+                style: const TextStyle(fontSize: 14),
               ),
-              SizedBox(height: 8),
+              const SizedBox(height: 8),
               Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
@@ -665,7 +666,7 @@ Future<void> _deleteReview(String reviewId) async {
                     onPressed: () => _toggleLikeOrDislike(docId, 'like', index),
                   ),
                   Text('${review['likes'] ?? 0}'), // Display like count
-                  SizedBox(width: 16),
+                  const SizedBox(width: 16),
                   IconButton(
                     icon: Icon(
                       Icons.heart_broken,
@@ -692,7 +693,7 @@ Future<void> _deleteReview(String reviewId) async {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('View Reviews',
+        title: const Text('View Reviews',
           style: TextStyle(
               color: Colors.black, 
               fontSize: 24,
@@ -702,7 +703,7 @@ Future<void> _deleteReview(String reviewId) async {
         //backgroundColor: Colors.white,
       ),
       body: isLoading
-          ? Center(
+          ? const Center(
               child:
                   CircularProgressIndicator()) // Show loading indicator if loading
           : SingleChildScrollView(
@@ -730,7 +731,7 @@ Future<void> _deleteReview(String reviewId) async {
                               color: Colors.grey[300],
                               borderRadius: BorderRadius.circular(10),
                             ),
-                            child: Center(
+                            child: const Center(
                               child: Icon(
                                 Icons.image_not_supported,
                                 size: 50,
@@ -738,25 +739,25 @@ Future<void> _deleteReview(String reviewId) async {
                               ),
                             ),
                           ),
-                    SizedBox(height: 16),
+                    const SizedBox(height: 16),
                     if (gameTitle != null)
                       Text(
                         gameTitle!,
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
                         ),
                         textAlign: TextAlign.center,
                       ),
-                    SizedBox(height: 16),
+                    const SizedBox(height: 16),
                     _buildAverageRating(), // Display average rating
-                    SizedBox(height: 16),
+                    const SizedBox(height: 16),
                     _buildRatingBreakdown(), // Display rating breakdown
-                    SizedBox(height: 16),
+                    const SizedBox(height: 16),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
+                        const Text(
                           'Game Reviews',
                           style: TextStyle(
                               fontSize: 24, fontWeight: FontWeight.bold),
@@ -764,7 +765,7 @@ Future<void> _deleteReview(String reviewId) async {
                         _buildSortDropdown(), // Display sorting options
                       ],
                     ),
-                    SizedBox(height: 12),
+                    const SizedBox(height: 12),
                     _buildReviewList(), // Display list of reviews
                   ],
                 ),
@@ -786,13 +787,13 @@ Future<void> _deleteReview(String reviewId) async {
               });
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: Color(0xFF41B1F1),
-              padding: EdgeInsets.symmetric(vertical: 16.0),
+              backgroundColor: const Color(0xFF41B1F1),
+              padding: const EdgeInsets.symmetric(vertical: 16.0),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(10),
               ),
             ),
-            child: Text(
+            child: const Text(
               'Add Review',
               style: TextStyle(color: Colors.white, fontSize: 16),
             ),

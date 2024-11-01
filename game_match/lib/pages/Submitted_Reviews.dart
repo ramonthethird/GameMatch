@@ -9,6 +9,8 @@ import 'package:game_match/theme_notifier.dart';
 import 'package:provider/provider.dart';
 
 class SubmittedReviewsPage extends StatefulWidget {
+  const SubmittedReviewsPage({super.key});
+
   @override
   _SubmittedReviewsPageState createState() => _SubmittedReviewsPageState();
 }
@@ -103,14 +105,14 @@ class _SubmittedReviewsPageState extends State<SubmittedReviewsPage> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text('Edit Review'),
-          content: Container(
+          title: const Text('Edit Review'),
+          content: SizedBox(
             width: 500,
             height: 450,
             child: StatefulBuilder(
               builder: (context, setState) {
                 void updateRating(double localX) {
-                  final double starWidth = 32.0;
+                  const double starWidth = 32.0;
 
                   if (localX < 0) localX = 0;
                   if (localX > starWidth * 5) localX = starWidth * 5;
@@ -126,41 +128,41 @@ class _SubmittedReviewsPageState extends State<SubmittedReviewsPage> {
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
+                    const Text(
                       'Review Title',
                       style:
                           TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                     ),
-                    SizedBox(height: 8),
+                    const SizedBox(height: 8),
                     TextField(
                       controller: titleController,
                       decoration: InputDecoration(
                         hintText: 'Enter review title...',
                         filled: true,
                         fillColor: Colors.grey[200],
-                        border: OutlineInputBorder(),
+                        border: const OutlineInputBorder(),
                       ),
                     ),
-                    SizedBox(height: 10),
-                    Text(
+                    const SizedBox(height: 10),
+                    const Text(
                       'Review Body',
                       style:
                           TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                     ),
-                    SizedBox(height: 8),
+                    const SizedBox(height: 8),
                     TextField(
                       controller: bodyController,
                       decoration: InputDecoration(
                         hintText: 'Write your review here...',
                         filled: true,
                         fillColor: Colors.grey[200],
-                        border: OutlineInputBorder(),
+                        border: const OutlineInputBorder(),
                       ),
                       maxLines: 8,
                       maxLength: 300,
                     ),
-                    SizedBox(height: 10),
-                    Text(
+                    const SizedBox(height: 10),
+                    const Text(
                       'Rating:',
                       style:
                           TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
@@ -198,7 +200,7 @@ class _SubmittedReviewsPageState extends State<SubmittedReviewsPage> {
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: Text('Cancel'),
+              child: const Text('Cancel'),
             ),
             TextButton(
               onPressed: () async {
@@ -213,7 +215,7 @@ class _SubmittedReviewsPageState extends State<SubmittedReviewsPage> {
                   _fetchUserReviews();
 
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
+                    const SnackBar(
                       content: Text('Review updated successfully!'),
                       backgroundColor: Colors.green,
                       duration: Duration(seconds: 2),
@@ -224,12 +226,12 @@ class _SubmittedReviewsPageState extends State<SubmittedReviewsPage> {
                     SnackBar(
                       content: Text('Failed to update review: $e'),
                       backgroundColor: Colors.red,
-                      duration: Duration(seconds: 2),
+                      duration: const Duration(seconds: 2),
                     ),
                   );
                 }
               },
-              child: Text('Save'),
+              child: const Text('Save'),
             ),
           ],
         );
@@ -239,7 +241,7 @@ class _SubmittedReviewsPageState extends State<SubmittedReviewsPage> {
 
   Widget _buildReviewList() {
     if (userReviews.isEmpty) {
-      return Center(
+      return const Center(
         child: Text('You have not submitted any reviews yet!'),
       );
     }
@@ -262,7 +264,7 @@ class _SubmittedReviewsPageState extends State<SubmittedReviewsPage> {
             borderRadius: BorderRadius.circular(10),
             border: Border.all(color: Colors.grey.shade300, width: 1),
           ),
-          margin: EdgeInsets.symmetric(vertical: 8),
+          margin: const EdgeInsets.symmetric(vertical: 8),
           child: Padding(
             padding: const EdgeInsets.all(16.0),
             child: Row(
@@ -280,7 +282,7 @@ class _SubmittedReviewsPageState extends State<SubmittedReviewsPage> {
                         width: 48,
                         height: 48,
                         color: Colors.grey,
-                        child: Icon(
+                        child: const Icon(
                           Icons.image_not_supported,
                           color: Colors.white,
                         ),
@@ -288,7 +290,7 @@ class _SubmittedReviewsPageState extends State<SubmittedReviewsPage> {
                     },
                   ),
                 ),
-                SizedBox(width: 16),
+                const SizedBox(width: 16),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -298,7 +300,7 @@ class _SubmittedReviewsPageState extends State<SubmittedReviewsPage> {
                           Expanded(
                             child: Text(
                               gameTitle,
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 20,
                               ),
@@ -312,22 +314,22 @@ class _SubmittedReviewsPageState extends State<SubmittedReviewsPage> {
                                 showDialog(
                                   context: context,
                                   builder: (context) => AlertDialog(
-                                    title: Text('Delete Review'),
-                                    content: Text(
+                                    title: const Text('Delete Review'),
+                                    content: const Text(
                                         'Are you sure you want to delete this review?'),
                                     actions: [
                                       TextButton(
                                         onPressed: () {
                                           Navigator.of(context).pop();
                                         },
-                                        child: Text('No'),
+                                        child: const Text('No'),
                                       ),
                                       TextButton(
                                         onPressed: () {
                                           _deleteReview(reviewId);
                                           Navigator.of(context).pop();
                                         },
-                                        child: Text('Yes'),
+                                        child: const Text('Yes'),
                                       ),
                                     ],
                                   ),
@@ -335,11 +337,11 @@ class _SubmittedReviewsPageState extends State<SubmittedReviewsPage> {
                               }
                             },
                             itemBuilder: (BuildContext context) => [
-                              PopupMenuItem<String>(
+                              const PopupMenuItem<String>(
                                 value: 'Edit',
                                 child: Text('Edit'),
                               ),
-                              PopupMenuItem<String>(
+                              const PopupMenuItem<String>(
                                 value: 'Delete',
                                 child: Text('Delete'),
                               ),
@@ -347,7 +349,7 @@ class _SubmittedReviewsPageState extends State<SubmittedReviewsPage> {
                           ),
                         ],
                       ),
-                      SizedBox(height: 4),
+                      const SizedBox(height: 4),
                       Row(
                         children: [
                           Row(
@@ -356,54 +358,54 @@ class _SubmittedReviewsPageState extends State<SubmittedReviewsPage> {
                               (starIndex) {
                                 double starValue = starIndex + 1;
                                 if (rating >= starValue) {
-                                  return Icon(Icons.star,
+                                  return const Icon(Icons.star,
                                       color: Colors.yellow, size: 16);
                                 } else if (rating >= starValue - 0.5) {
-                                  return Icon(Icons.star_half,
+                                  return const Icon(Icons.star_half,
                                       color: Colors.yellow, size: 16);
                                 } else {
-                                  return Icon(Icons.star_border,
+                                  return const Icon(Icons.star_border,
                                       color: Colors.yellow, size: 16);
                                 }
                               },
                             ),
                           ),
-                          SizedBox(width: 8),
+                          const SizedBox(width: 8),
                           Text(
                             formattedDate,
-                            style: TextStyle(color: Colors.grey, fontSize: 12),
+                            style: const TextStyle(color: Colors.grey, fontSize: 12),
                           ),
                         ],
                       ),
-                      SizedBox(height: 8),
+                      const SizedBox(height: 8),
                       Text(
                         review['title'] ?? '',
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      SizedBox(height: 4),
+                      const SizedBox(height: 4),
                       Text(
                         review['body'] ?? '',
-                        style: TextStyle(fontSize: 14),
+                        style: const TextStyle(fontSize: 14),
                       ),
-                      SizedBox(height: 8),
+                      const SizedBox(height: 8),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
                           Row(
                             children: [
-                              Icon(Icons.favorite, color: Colors.red, size: 24),
-                              SizedBox(width: 4),
+                              const Icon(Icons.favorite, color: Colors.red, size: 24),
+                              const SizedBox(width: 4),
                               Text('${review['likes'] ?? 0}',
-                                  style: TextStyle(fontSize: 12)),
-                              SizedBox(width: 16),
-                              Icon(Icons.heart_broken,
+                                  style: const TextStyle(fontSize: 12)),
+                              const SizedBox(width: 16),
+                              const Icon(Icons.heart_broken,
                                   color: Colors.blue, size: 24),
-                              SizedBox(width: 4),
+                              const SizedBox(width: 4),
                               Text('${review['dislikes'] ?? 0}',
-                                  style: TextStyle(fontSize: 12)),
+                                  style: const TextStyle(fontSize: 12)),
                             ],
                           ),
                         ],
@@ -425,7 +427,7 @@ class _SubmittedReviewsPageState extends State<SubmittedReviewsPage> {
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
-        title: Text(
+        title: const Text(
           'My Reviews',
           style: TextStyle(
             color: Colors.black,
@@ -455,11 +457,11 @@ class _SubmittedReviewsPageState extends State<SubmittedReviewsPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
+            const Text(
               'My Reviews',
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             Expanded(child: _buildReviewList()),
           ],
         ),

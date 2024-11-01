@@ -5,7 +5,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 
 class NotificationsPage extends StatefulWidget {
-  NotificationsPage({Key? key}) : super(key: key);
+  const NotificationsPage({super.key});
 
   @override
   _NotificationsPageState createState() => _NotificationsPageState();
@@ -79,10 +79,10 @@ class _NotificationsPageState extends State<NotificationsPage> {
                     borderRadius: BorderRadius.circular(2.5),
                   ),
                 ),
-                child: Row(
+                child: const Row(
                   mainAxisSize: MainAxisSize.min, // Use minimum size for row
                   mainAxisAlignment: MainAxisAlignment.center, // Center align button contents
-                  children: const [
+                  children: [
 
                     Icon(
                       Icons.clear,
@@ -156,7 +156,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
 
     // Add a subscription warning notification just for testing since subscription can't be shown yet
     loadedNotifications.add(
-      WarningNotificationCard(
+      const WarningNotificationCard(
         message: "Warning: Your subscription ends in two weeks.",
       ),
     );
@@ -196,12 +196,12 @@ class NotificationCard extends StatelessWidget {
   final String dealUrl;
 
   const NotificationCard({
-    Key? key,
+    super.key,
     required this.gameTitle,
     required this.discount,
     required this.thumbnailUrl,
     required this.dealUrl,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -241,7 +241,7 @@ class NotificationCard extends StatelessWidget {
 class WarningNotificationCard extends StatelessWidget {
   final String message; // Warning message
 
-  const WarningNotificationCard({Key? key, required this.message}) : super(key: key);
+  const WarningNotificationCard({super.key, required this.message});
 
   @override
   Widget build(BuildContext context) {

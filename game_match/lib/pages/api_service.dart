@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -74,61 +73,6 @@ class ApiService {
     where platforms = (6);
     limit 100;
     ''';
-
-    try {
-      final response = await http.post(
-        url,
-        headers: {
-          'Client-ID': clientId,
-          'Authorization': 'Bearer $accessToken',
-          'Content-Type': 'application/json',
-        },
-        body: body,
-      );
-
-      if (response.statusCode == 200) {
-        final List<dynamic> gameDataJson = json.decode(response.body);
-        return gameDataJson
-            .map((json) => Game.fromJson(json as Map<String, dynamic>))
-            .where((game) {
-          if (game.coverUrl == null || game.coverUrl!.isEmpty) return false;
-          if (game.screenshotUrls == null || game.screenshotUrls!.isEmpty) return false;
-          if (game.summary == null || game.summary!.isEmpty) return false;
-          if (game.releaseDates == null || game.releaseDates.isEmpty) return false;
-
-          DateTime? releaseDate = _parseReleaseDate(game.releaseDates.first);
-          return releaseDate != null && releaseDate.year >= 2020;
-        }).toList();
-      } else if (response.statusCode == 401) {
-        await authenticate();
-        return fetchGames();
-      } else {
-        print('Failed to fetch game data: ${response.statusCode} ${response.body}');
-        return [];
-      }
-    } catch (error) {
-      print('Error: $error');
-      return [];
-    }
-  }
-
-  Future<List<Game>> fetchNewReleases() async {
-    String? accessToken = await retrieveAccessToken();
-    if (accessToken == null) {
-      print('Access token is null. Please fetch a new one.');
-      await authenticate();
-      accessToken = await retrieveAccessToken();
-      if (accessToken == null) {
-        return [];
-      }
-    }
-
-    final Uri url = Uri.parse('$baseUrl/games');
-    const String body = '''
-      fields name, summary, genres.name, cover.url, first_release_date, websites.url;
-      sort first_release_date desc; 
-      limit 10;
-    '''; // Query to get the newest games, sorted by release date
 
     try {
       final response = await http.post(

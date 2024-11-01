@@ -7,7 +7,7 @@ import 'Thread_Comments.dart';
 
 class ThreadsPage extends StatefulWidget {
   final String gameId;
-  const ThreadsPage({Key? key, required this.gameId}) : super(key: key);
+  const ThreadsPage({super.key, required this.gameId});
 
   @override
   _ThreadsPageState createState() => _ThreadsPageState();
@@ -36,7 +36,7 @@ class _ThreadsPageState extends State<ThreadsPage> {
         isLoading = false;
       });
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('You need to be logged in to view threads.')),
+        const SnackBar(content: Text('You need to be logged in to view threads.')),
       );
     }
   }
@@ -91,7 +91,7 @@ class _ThreadsPageState extends State<ThreadsPage> {
       }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('You must be logged in to post a thread.')),
+        const SnackBar(content: Text('You must be logged in to post a thread.')),
       );
     }
   }
@@ -112,9 +112,9 @@ class _ThreadsPageState extends State<ThreadsPage> {
           _buildFilterTabs(),
           Expanded(
             child: isLoading
-                ? Center(child: CircularProgressIndicator())
+                ? const Center(child: CircularProgressIndicator())
                 : threads.isEmpty
-                    ? Center(
+                    ? const Center(
                         child: Text(
                           'No Threads',
                           style: TextStyle(fontSize: 18, color: Colors.grey),
@@ -123,7 +123,7 @@ class _ThreadsPageState extends State<ThreadsPage> {
                     : RefreshIndicator(
                         onRefresh: _fetchThreads,
                         child: ListView.builder(
-                          padding: EdgeInsets.all(16.0),
+                          padding: const EdgeInsets.all(16.0),
                           itemCount: threads.length,
                           itemBuilder: (context, index) {
                             final thread = threads[index];
@@ -137,7 +137,7 @@ class _ThreadsPageState extends State<ThreadsPage> {
       floatingActionButton: _currentUser != null
           ? FloatingActionButton(
               onPressed: () => _navigateToAddThreadPage(),
-              child: Icon(Icons.add),
+              child: const Icon(Icons.add),
             )
           : null,
     );
@@ -182,7 +182,7 @@ class _ThreadsPageState extends State<ThreadsPage> {
           ),
           if (filter == label)
             Container(
-              margin: EdgeInsets.only(top: 4),
+              margin: const EdgeInsets.only(top: 4),
               height: 2,
               width: 40,
               color: Colors.blue,
@@ -197,10 +197,10 @@ class _ThreadsPageState extends State<ThreadsPage> {
 
     return Card(
       elevation: 2,
-      margin: EdgeInsets.symmetric(vertical: 8.0),
+      margin: const EdgeInsets.symmetric(vertical: 8.0),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       child: Padding(
-        padding: EdgeInsets.all(12.0),
+        padding: const EdgeInsets.all(12.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -213,28 +213,28 @@ class _ThreadsPageState extends State<ThreadsPage> {
                   ),
                   radius: 20,
                 ),
-                SizedBox(width: 8),
+                const SizedBox(width: 8),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       thread['userName'] ?? 'Anonymous',
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 16,
                       ),
                     ),
-                    SizedBox(height: 4),
+                    const SizedBox(height: 4),
                     Text(
                       _formatTimestamp(thread['timestamp']),
-                      style: TextStyle(
+                      style: const TextStyle(
                         color: Colors.grey,
                         fontSize: 12,
                       ),
                     ),
                   ],
                 ),
-                Spacer(),
+                const Spacer(),
                 if (thread['userId'] == _currentUser?.uid)
                   PopupMenuButton<String>(
                     onSelected: (value) {
@@ -245,11 +245,11 @@ class _ThreadsPageState extends State<ThreadsPage> {
                       }
                     },
                     itemBuilder: (BuildContext context) => [
-                      PopupMenuItem(
+                      const PopupMenuItem(
                         value: 'edit',
                         child: Text('Edit'),
                       ),
-                      PopupMenuItem(
+                      const PopupMenuItem(
                         value: 'delete',
                         child: Text('Delete'),
                       ),
@@ -257,12 +257,12 @@ class _ThreadsPageState extends State<ThreadsPage> {
                   ),
               ],
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             Text(
               thread['content'] ?? '',
-              style: TextStyle(fontSize: 14, color: Colors.black87),
+              style: const TextStyle(fontSize: 14, color: Colors.black87),
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             if (thread['imageUrl'] != null)
               GestureDetector(
                 onTap: () => _showImageDialog(thread['imageUrl']),
@@ -277,13 +277,13 @@ class _ThreadsPageState extends State<ThreadsPage> {
                       return Container(
                         height: 200,
                         color: Colors.grey[300],
-                        child: Center(child: Icon(Icons.image_not_supported)),
+                        child: const Center(child: Icon(Icons.image_not_supported)),
                       );
                     },
                   ),
                 ),
               ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -340,19 +340,19 @@ class _ThreadsPageState extends State<ThreadsPage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Confirm Delete'),
-          content: Text('Are you sure you want to delete this thread?'),
+          title: const Text('Confirm Delete'),
+          content: const Text('Are you sure you want to delete this thread?'),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: Text('Cancel'),
+              child: const Text('Cancel'),
             ),
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
                 _deleteThread(threadId);
               },
-              child: Text('Delete', style: TextStyle(color: Colors.red)),
+              child: const Text('Delete', style: TextStyle(color: Colors.red)),
             ),
           ],
         );
@@ -365,12 +365,12 @@ class _ThreadsPageState extends State<ThreadsPage> {
       await _firestoreService.deleteThread(threadId);
       _fetchThreads();
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Thread deleted successfully.')),
+        const SnackBar(content: Text('Thread deleted successfully.')),
       );
     } catch (e) {
       print('Error deleting thread: $e');
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error deleting thread.')),
+        const SnackBar(content: Text('Error deleting thread.')),
       );
     }
   }
@@ -412,10 +412,10 @@ class _ThreadsPageState extends State<ThreadsPage> {
       child: Row(
         children: [
           Icon(icon, color: color, size: 20),
-          SizedBox(width: 4),
+          const SizedBox(width: 4),
           Text(
             count.toString(),
-            style: TextStyle(fontSize: 14, color: Colors.black87),
+            style: const TextStyle(fontSize: 14, color: Colors.black87),
           ),
         ],
       ),
