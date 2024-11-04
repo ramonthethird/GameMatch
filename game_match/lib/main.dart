@@ -22,6 +22,7 @@ import 'theme_notifier.dart';
 // Import all your pages
 import 'pages/Preference_Interest.dart';
 import 'pages/game_info.dart';
+import 'pages/game_news.dart';
 import 'pages/Profile.dart';
 import 'pages/Side_bar.dart';
 import 'pages/Interest.dart';
@@ -138,6 +139,8 @@ class GameMatchApp extends StatelessWidget {
             '/Privacy': (context) => SettingsPrivacyPage(),
             '/Wishlist': (context) => WishlistPage(),
             '/community_trends': (context) => GameListScreen(),
+            '/Game_news': (context) => GamingNewsPage(),
+
           },
         );
       },
