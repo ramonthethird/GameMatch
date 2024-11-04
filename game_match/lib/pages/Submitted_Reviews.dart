@@ -4,6 +4,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'api_service.dart';
 import 'game_model.dart';
 import 'package:intl/intl.dart';
+import 'Side_bar.dart';
+import 'package:game_match/theme_notifier.dart';
+import 'package:provider/provider.dart';
 
 class SubmittedReviewsPage extends StatefulWidget {
   @override
@@ -11,28 +14,24 @@ class SubmittedReviewsPage extends StatefulWidget {
 }
 
 class _SubmittedReviewsPageState extends State<SubmittedReviewsPage> {
-  final FirebaseFirestore firestore =
-      FirebaseFirestore.instance; // Firestore instance to access the database
-  final FirebaseAuth auth =
-      FirebaseAuth.instance; // Firebase Authentication instance for user access
-  final ApiService apiService =
-      ApiService(); // Instance of ApiService to fetch game details
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  final FirebaseFirestore firestore = FirebaseFirestore.instance;
+  final FirebaseAuth auth = FirebaseAuth.instance;
+  final ApiService apiService = ApiService();
 
-  List<Map<String, dynamic>> userReviews = []; // List to hold user reviews
-  Map<String, String> gameImages = {}; // Map to hold game images
-  Map<String, String> gameTitles = {}; // Map to hold game titles
+  List<Map<String, dynamic>> userReviews = [];
+  Map<String, String> gameImages = {};
+  Map<String, String> gameTitles = {};
 
   @override
   void initState() {
     super.initState();
-    _fetchUserReviews(); // Fetch user reviews when the page is initialized
+    _fetchUserReviews();
   }
 
-  // Fetch user reviews from Firestore
   Future<void> _fetchUserReviews() async {
-    User? user = auth.currentUser; // Get the currently authenticated user
+    User? user = auth.currentUser;
     if (user != null) {
-      // Fetch reviews where the user ID matches the current user's ID
       QuerySnapshot querySnapshot = await firestore
           .collection('reviews')
           .where('userId', isEqualTo: user.uid)
@@ -56,12 +55,11 @@ class _SubmittedReviewsPageState extends State<SubmittedReviewsPage> {
       }
 
       setState(() {
-        userReviews = fetchedReviews; // Update the state with fetched reviews
+        userReviews = fetchedReviews;
       });
     }
   }
 
-  // Fetch game details from the API based on gameId
   Future<void> _fetchGameDetails(String gameId) async {
     try {
       List<Game> fetchedGames = await apiService.fetchGames();
@@ -81,22 +79,19 @@ class _SubmittedReviewsPageState extends State<SubmittedReviewsPage> {
       );
 
       setState(() {
-        gameImages[gameId] = matchedGame.coverUrl ?? ''; // Store the cover URL
-        gameTitles[gameId] = matchedGame.name; // Store the game name
+        gameImages[gameId] = matchedGame.coverUrl ?? '';
+        gameTitles[gameId] = matchedGame.name;
       });
     } catch (e) {
-      print(
-          'Error fetching game details: $e'); // Log an error if fetching fails
+      print('Error fetching game details: $e');
     }
   }
 
-  // Delete a review from Firestore
   Future<void> _deleteReview(String reviewId) async {
     await firestore.collection('reviews').doc(reviewId).delete();
-    _fetchUserReviews(); // Refresh the review list after deletion
+    _fetchUserReviews();
   }
 
-  // Edit a review with a dialog box
   Future<void> _editReview(
       String reviewId, Map<String, dynamic> currentReview) async {
     TextEditingController titleController =
@@ -116,19 +111,15 @@ class _SubmittedReviewsPageState extends State<SubmittedReviewsPage> {
             child: StatefulBuilder(
               builder: (context, setState) {
                 void updateRating(double localX) {
-                  final double starWidth = 32.0; // Width of each star
-                  final double totalWidth =
-                      starWidth * 5; // Total width of all stars
+                  final double starWidth = 32.0;
 
-                  // Limit localX within the star area
                   if (localX < 0) localX = 0;
-                  if (localX > totalWidth) localX = totalWidth;
+                  if (localX > starWidth * 5) localX = starWidth * 5;
 
                   double newRating = (localX / starWidth);
 
                   setState(() {
-                    currentRating = (newRating * 2).round() /
-                        2; // Update the rating to the nearest 0.5
+                    currentRating = (newRating * 2).round() / 2;
                   });
                 }
 
@@ -145,7 +136,6 @@ class _SubmittedReviewsPageState extends State<SubmittedReviewsPage> {
                     TextField(
                       controller: titleController,
                       decoration: InputDecoration(
-                        //labelText: 'Review Title',
                         hintText: 'Enter review title...',
                         filled: true,
                         fillColor: Colors.grey[200],
@@ -162,7 +152,6 @@ class _SubmittedReviewsPageState extends State<SubmittedReviewsPage> {
                     TextField(
                       controller: bodyController,
                       decoration: InputDecoration(
-                        //labelText: 'Review Body',
                         hintText: 'Write your review here...',
                         filled: true,
                         fillColor: Colors.grey[200],
@@ -179,12 +168,10 @@ class _SubmittedReviewsPageState extends State<SubmittedReviewsPage> {
                     ),
                     GestureDetector(
                       onPanUpdate: (details) {
-                        updateRating(
-                            details.localPosition.dx); // Update rating on drag
+                        updateRating(details.localPosition.dx);
                       },
                       onTapDown: (details) {
-                        updateRating(
-                            details.localPosition.dx); // Update rating on tap
+                        updateRating(details.localPosition.dx);
                       },
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.start,
@@ -210,7 +197,7 @@ class _SubmittedReviewsPageState extends State<SubmittedReviewsPage> {
           actions: [
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop(); // Close the dialog
+                Navigator.of(context).pop();
               },
               child: Text('Cancel'),
             ),
@@ -224,8 +211,8 @@ class _SubmittedReviewsPageState extends State<SubmittedReviewsPage> {
                     'rating': currentRating,
                   });
 
-                  Navigator.of(context).pop(); // Close the dialog
-                  _fetchUserReviews(); // Refresh the review list
+                  Navigator.of(context).pop();
+                  _fetchUserReviews();
 
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
@@ -310,12 +297,59 @@ class _SubmittedReviewsPageState extends State<SubmittedReviewsPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        gameTitle,
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 20,
-                        ),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              gameTitle,
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 20,
+                              ),
+                            ),
+                          ),
+                          PopupMenuButton<String>(
+                            onSelected: (value) {
+                              if (value == 'Edit') {
+                                _editReview(reviewId, review);
+                              } else if (value == 'Delete') {
+                                showDialog(
+                                  context: context,
+                                  builder: (context) => AlertDialog(
+                                    title: Text('Delete Review'),
+                                    content: Text(
+                                        'Are you sure you want to delete this review?'),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                        },
+                                        child: Text('No'),
+                                      ),
+                                      TextButton(
+                                        onPressed: () {
+                                          _deleteReview(reviewId);
+                                          Navigator.of(context).pop();
+                                        },
+                                        child: Text('Yes'),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              }
+                            },
+                            itemBuilder: (BuildContext context) => [
+                              PopupMenuItem<String>(
+                                value: 'Edit',
+                                child: Text('Edit'),
+                              ),
+                              PopupMenuItem<String>(
+                                value: 'Delete',
+                                child: Text('Delete'),
+                              ),
+                            ],
+                          ),
+                        ],
                       ),
                       SizedBox(height: 4),
                       Row(
@@ -377,44 +411,6 @@ class _SubmittedReviewsPageState extends State<SubmittedReviewsPage> {
                                   style: TextStyle(fontSize: 12)),
                             ],
                           ),
-                          Spacer(),
-                          IconButton(
-                            icon:
-                                Icon(Icons.edit, size: 18, color: Colors.grey),
-                            onPressed: () {
-                              _editReview(reviewId, review); // Edit the review
-                            },
-                          ),
-                          IconButton(
-                            icon: Icon(Icons.delete,
-                                size: 18, color: Colors.grey),
-                            onPressed: () {
-                              showDialog(
-                                context: context,
-                                builder: (context) => AlertDialog(
-                                  title: Text('Delete Review'),
-                                  content: Text(
-                                      'Are you sure you want to delete this review?'),
-                                  actions: [
-                                    TextButton(
-                                      onPressed: () {
-                                        Navigator.of(context).pop();
-                                      },
-                                      child: Text('No'),
-                                    ),
-                                    TextButton(
-                                      onPressed: () {
-                                        _deleteReview(
-                                            reviewId); // Delete the review
-                                        Navigator.of(context).pop();
-                                      },
-                                      child: Text('Yes'),
-                                    ),
-                                  ],
-                                ),
-                              );
-                            },
-                          ),
                         ],
                       ),
                     ],
@@ -430,17 +426,33 @@ class _SubmittedReviewsPageState extends State<SubmittedReviewsPage> {
 
   @override
   Widget build(BuildContext context) {
+    final themeNotifier = Provider.of<ThemeNotifier>(context);
     return Scaffold(
+      key: _scaffoldKey,
       appBar: AppBar(
-        title: Text('My Reviews'),
+        title: Text(
+          'My Reviews',
+          style: TextStyle(
+            color: Colors.black,
+            fontSize: 24,
+          ),
+        ),
         centerTitle: true,
-        backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.black),
+          icon: const Icon(Icons.menu, color: Colors.black),
           onPressed: () {
-            Navigator.pop(context);
+            _scaffoldKey.currentState?.openDrawer();
           },
+        ),
+      ),
+      drawer: Drawer(
+        child: SideBar(
+          onThemeChanged: (isDarkMode) {
+            // Handle theme change here
+            themeNotifier.toggleTheme(isDarkMode);
+          },
+          isDarkMode: themeNotifier.isDarkMode,
         ),
       ),
       body: Padding(
@@ -453,8 +465,7 @@ class _SubmittedReviewsPageState extends State<SubmittedReviewsPage> {
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 10),
-            Expanded(
-                child: _buildReviewList()), // Build the review list dynamically
+            Expanded(child: _buildReviewList()),
           ],
         ),
       ),

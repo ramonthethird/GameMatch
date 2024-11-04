@@ -109,8 +109,7 @@ class _InterestsPageState extends State<InterestsPage> {
     });
 
     try {
-      DocumentSnapshot doc =
-          await firestore.collection('users').doc(userId).get();
+      DocumentSnapshot doc = await firestore.collection('users').doc(userId).get();
 
       if (doc.exists && doc['interests'] != null) {
         Map<String, dynamic> interests = doc['interests'];
@@ -120,6 +119,7 @@ class _InterestsPageState extends State<InterestsPage> {
           dropdownValue3 = interests['platform'];
           dropdownValue4 = interests['price'];
         });
+
       } else {
         print('No interests found for the user.');
       }
@@ -141,11 +141,11 @@ class _InterestsPageState extends State<InterestsPage> {
           style: TextStyle(color: Colors.black, fontSize: 24),
         ),
         centerTitle: true,
-        backgroundColor: const Color(0xFF74ACD5),
+        backgroundColor: Color(0xFF41B1F1),
         leading: IconButton(
-          icon: const Icon(Icons.menu, color: Colors.black),
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () {
-            Navigator.pushNamed(context, "/Side_bar");
+            Navigator.pushNamed(context, "/Preference_&_Interest");
           },
         ),
       ),
@@ -164,8 +164,7 @@ class _InterestsPageState extends State<InterestsPage> {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const SizedBox(
-                      height: 30), // Space between title and dropdowns
+                  const SizedBox(height: 30), // Space between title and dropdowns
                   _buildDropdownCard(
                     icon: Icons.videogame_asset,
                     label: 'Game Mode',
@@ -271,7 +270,7 @@ class _InterestsPageState extends State<InterestsPage> {
     return ElevatedButton(
       onPressed: _saveInterests,
       style: ElevatedButton.styleFrom(
-        backgroundColor: const Color(0xFF74ACD5),
+        backgroundColor: const Color(0xFF41B1F1),
         padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
         textStyle: const TextStyle(fontSize: 18),
         shape: RoundedRectangleBorder(

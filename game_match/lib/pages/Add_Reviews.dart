@@ -13,11 +13,9 @@ class AddReviewsPage extends StatefulWidget {
 }
 
 class _AddReviewsPageState extends State<AddReviewsPage> {
-  final FirebaseFirestore firestore =
-      FirebaseFirestore.instance; // Firestore instance for database access
-  final FirebaseAuth auth =
-      FirebaseAuth.instance; // Firebase Authentication instance
-
+  final FirebaseFirestore firestore = FirebaseFirestore.instance; // Firestore instance for database access
+  final FirebaseAuth auth = FirebaseAuth.instance; // Firebase Authentication instance
+  
   // Text controllers for review title and body input
   final TextEditingController titleController = TextEditingController();
   final TextEditingController bodyController = TextEditingController();
@@ -88,9 +86,13 @@ class _AddReviewsPageState extends State<AddReviewsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Create New Review'),
+        title: Text('Create New Review',
+        style: TextStyle(
+              color: Colors.black, 
+              fontSize: 24,
+            ),),
         centerTitle: true,
-        backgroundColor: Colors.white,
+        //backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: Colors.black),
@@ -154,12 +156,10 @@ class _AddReviewsPageState extends State<AddReviewsPage> {
             SizedBox(height: 8),
             GestureDetector(
               onPanUpdate: (details) {
-                _updateRating(
-                    details.localPosition.dx); // Update rating based on drag
+                _updateRating(details.localPosition.dx); // Update rating based on drag
               },
               onTapDown: (details) {
-                _updateRating(
-                    details.localPosition.dx); // Update rating based on tap
+                _updateRating(details.localPosition.dx); // Update rating based on tap
               },
               child: Row(
                 children: List.generate(5, (index) {
@@ -167,10 +167,7 @@ class _AddReviewsPageState extends State<AddReviewsPage> {
                   return Icon(
                     rating >= starValue
                         ? Icons.star
-                        : (rating >= starValue - 0.5
-                            ? Icons.star_half
-                            : Icons
-                                .star_border), // Display full, half, or empty star
+                        : (rating >= starValue - 0.5 ? Icons.star_half : Icons.star_border), // Display full, half, or empty star
                     size: 32,
                     color: Colors.yellow,
                   );
@@ -184,11 +181,10 @@ class _AddReviewsPageState extends State<AddReviewsPage> {
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: () {
-                  _addReview(titleController.text, bodyController.text,
-                      rating); // Call the function to submit the review
+                  _addReview(titleController.text, bodyController.text, rating); // Call the function to submit the review
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue,
+                  backgroundColor: Color(0xFF41B1F1),
                   padding: EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
@@ -203,33 +199,31 @@ class _AddReviewsPageState extends State<AddReviewsPage> {
             SizedBox(height: 20),
 
             // Navigate to Submitted Reviews Button
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) =>
-                            SubmittedReviewsPage()), // Navigate to the SubmittedReviewsPage
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.grey,
-                  padding: EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-                child: Text(
-                  'Submitted Reviews',
-                  style: TextStyle(color: Colors.white, fontSize: 16),
-                ),
-              ),
-            ),
+            // SizedBox(
+            //   width: double.infinity,
+            //   child: ElevatedButton(
+            //     onPressed: () {
+            //       Navigator.push(
+            //         context,
+            //         MaterialPageRoute(builder: (context) => SubmittedReviewsPage()), // Navigate to the SubmittedReviewsPage
+            //       );
+            //     },
+            //     style: ElevatedButton.styleFrom(
+            //       backgroundColor: Color(0xFF41B1F1),
+            //       padding: EdgeInsets.symmetric(vertical: 16),
+            //       shape: RoundedRectangleBorder(
+            //         borderRadius: BorderRadius.circular(10),
+            //       ),
+            //     ),
+            //     child: Text(
+            //       'Submitted Reviews',
+            //       style: TextStyle(color: Colors.white, fontSize: 16),
+            //     ),
+            //   ),
+            // ),
 
             // Guidelines Text
-            SizedBox(height: 20),
+            //SizedBox(height: 20),
             Text(
               'Please ensure your review follows our community guidelines.',
               style: TextStyle(color: Colors.grey, fontSize: 14),
@@ -243,8 +237,7 @@ class _AddReviewsPageState extends State<AddReviewsPage> {
 
   @override
   void dispose() {
-    titleController
-        .dispose(); // Dispose of the text controllers to free up resources
+    titleController.dispose(); // Dispose of the text controllers to free up resources
     bodyController.dispose();
     super.dispose();
   }

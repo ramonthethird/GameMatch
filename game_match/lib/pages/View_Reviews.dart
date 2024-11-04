@@ -24,6 +24,7 @@ class _ViewReviewsPageState extends State<ViewReviewsPage> {
   User? currentUser; // Current logged-in user
   bool isLoading = true;
   double averageRating = 0.0; // Average rating of the reviews
+  String? profilePictureUrl;
   String? gameImageUrl; // Game image URL
   String? gameTitle; // Game title
   int totalReviews = 0; // Total number of reviews
@@ -99,10 +100,11 @@ class _ViewReviewsPageState extends State<ViewReviewsPage> {
         DocumentSnapshot userDoc =
             await firestore.collection('users').doc(userId).get();
         String username = 'Unknown User';
+        String? profilePictureUrl;
         if (userDoc.exists) {
-          Map<String, dynamic>? userData =
-              userDoc.data() as Map<String, dynamic>?;
+          Map<String, dynamic>? userData = userDoc.data() as Map<String, dynamic>?;
           username = userData?['username'] ?? 'Unknown User';
+          profilePictureUrl = userData?['profileImageUrl'] ?? ''; // Fetch profile image
         }
 
         Timestamp? timestamp = reviewData['timestamp'];
@@ -127,10 +129,12 @@ class _ViewReviewsPageState extends State<ViewReviewsPage> {
         fetchedReviews.add({
           'review': reviewData,
           'username': username,
+          'profileImageUrl': profilePictureUrl, // Add profile image URL
           'date': formattedDate,
           'rating': rating,
           'docId': doc.id,
         });
+
 
         totalRating += rating;
         reviewCount++;
@@ -155,6 +159,155 @@ class _ViewReviewsPageState extends State<ViewReviewsPage> {
       });
     }
   }
+
+  Future<void> _editReview(String reviewId, Map<String, dynamic> currentReview) async {
+  TextEditingController titleController = TextEditingController(text: currentReview['title']);
+  TextEditingController bodyController = TextEditingController(text: currentReview['body']);
+  double currentRating = currentReview['rating']?.toDouble() ?? 0.0;
+
+  showDialog(
+    context: context,
+    builder: (context) {
+      return AlertDialog(
+        title: Text('Edit Review'),
+        content: Container(
+          width: 500,
+          height: 450,
+          child: StatefulBuilder(
+            builder: (context, setState) {
+              void updateRating(double localX) {
+                final double starWidth = 32.0;
+                final double totalWidth = starWidth * 5;
+                if (localX < 0) localX = 0;
+                if (localX > totalWidth) localX = totalWidth;
+                double newRating = (localX / starWidth);
+                setState(() {
+                  currentRating = (newRating * 2).round() / 2;
+                });
+              }
+
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Review Title', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                  SizedBox(height: 8),
+                  TextField(
+                    controller: titleController,
+                    decoration: InputDecoration(
+                      hintText: 'Enter review title...',
+                      filled: true,
+                      fillColor: Colors.grey[200],
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  SizedBox(height: 10),
+                  Text('Review Body', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                  SizedBox(height: 8),
+                  TextField(
+                    controller: bodyController,
+                    decoration: InputDecoration(
+                      hintText: 'Write your review here...',
+                      filled: true,
+                      fillColor: Colors.grey[200],
+                      border: OutlineInputBorder(),
+                    ),
+                    maxLines: 8,
+                    maxLength: 300,
+                  ),
+                  SizedBox(height: 10),
+                  Text('Rating:', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                  GestureDetector(
+                    onPanUpdate: (details) {
+                      updateRating(details.localPosition.dx);
+                    },
+                    onTapDown: (details) {
+                      updateRating(details.localPosition.dx);
+                    },
+                    child: Row(
+                      children: List.generate(5, (index) {
+                        double starValue = index + 1;
+                        return Icon(
+                          currentRating >= starValue
+                              ? Icons.star
+                              : (currentRating >= starValue - 0.5
+                                  ? Icons.star_half
+                                  : Icons.star_border),
+                          color: Colors.yellow,
+                          size: 32,
+                        );
+                      }),
+                    ),
+                  ),
+                ],
+              );
+            },
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () async {
+              try {
+                await firestore.collection('reviews').doc(reviewId).update({
+                  'title': titleController.text,
+                  'body': bodyController.text,
+                  'rating': currentRating,
+                });
+
+                Navigator.of(context).pop();
+                _fetchReviews();
+
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Review updated successfully!'),
+                    backgroundColor: Colors.green,
+                    duration: Duration(seconds: 2),
+                  ),
+                );
+              } catch (e) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Failed to update review: $e'),
+                    backgroundColor: Colors.red,
+                    duration: Duration(seconds: 2),
+                  ),
+                );
+              }
+            },
+            child: Text('Save'),
+          ),
+        ],
+      );
+    },
+  );
+}
+
+Future<void> _deleteReview(String reviewId) async {
+  try {
+    await firestore.collection('reviews').doc(reviewId).delete();
+    _fetchReviews(); // Refresh the reviews list after deletion
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Review deleted successfully!'),
+        backgroundColor: Colors.green,
+        duration: Duration(seconds: 2),
+      ),
+    );
+  } catch (e) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Failed to delete review: $e'),
+        backgroundColor: Colors.red,
+        duration: Duration(seconds: 2),
+      ),
+    );
+  }
+}
 
   // Function to toggle like or dislike for a review
   Future<void> _toggleLikeOrDislike(
@@ -347,8 +500,7 @@ class _ViewReviewsPageState extends State<ViewReviewsPage> {
       ],
     );
   }
-
-  // Widget to build the list of reviews
+    // Widget to build the list of reviews
   Widget _buildReviewList() {
     if (reviews.isEmpty) {
       return Center(
@@ -362,9 +514,11 @@ class _ViewReviewsPageState extends State<ViewReviewsPage> {
       itemBuilder: (context, index) {
         final review = reviews[index]['review'];
         final username = reviews[index]['username'];
+        final profilePictureUrl = reviews[index]['profileImageUrl'];
         final date = reviews[index]['date'];
         final double rating = reviews[index]['rating'];
         final docId = reviews[index]['docId'];
+        final String userId = review['userId'];
 
         return Container(
           margin: const EdgeInsets.symmetric(vertical: 8.0),
@@ -382,54 +536,101 @@ class _ViewReviewsPageState extends State<ViewReviewsPage> {
                   CircleAvatar(
                     backgroundColor: Colors.grey[300],
                     radius: 20,
-                    child: Icon(
-                      Icons.person,
-                      color: Colors.grey[600],
-                    ),
+                    backgroundImage: profilePictureUrl != null && profilePictureUrl!.isNotEmpty
+                        ? NetworkImage(profilePictureUrl!)
+                        : null,
+                    child: profilePictureUrl == null || profilePictureUrl!.isEmpty
+                        ? Icon(Icons.person, color: Colors.grey[600])
+                        : null,
                   ),
                   SizedBox(width: 8),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        username, // Display username
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          username, // Display username
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
                         ),
-                      ),
-                      Row(
-                        children: [
-                          Row(
-                            children: List.generate(
-                              5,
-                              (starIndex) {
-                                double starValue = starIndex + 1;
-                                if (rating >= starValue) {
-                                  return Icon(Icons.star,
-                                      color: Colors.yellow, size: 16);
-                                } else if (rating >= starValue - 0.5) {
-                                  return Icon(Icons.star_half,
-                                      color: Colors.yellow, size: 16);
-                                } else {
-                                  return Icon(Icons.star_border,
-                                      color: Colors.yellow, size: 16);
-                                }
-                              },
+                        Row(
+                          children: [
+                            Row(
+                              children: List.generate(
+                                5,
+                                (starIndex) {
+                                  double starValue = starIndex + 1;
+                                  if (rating >= starValue) {
+                                    return Icon(Icons.star,
+                                        color: Colors.yellow, size: 16);
+                                  } else if (rating >= starValue - 0.5) {
+                                    return Icon(Icons.star_half,
+                                        color: Colors.yellow, size: 16);
+                                  } else {
+                                    return Icon(Icons.star_border,
+                                        color: Colors.yellow, size: 16);
+                                  }
+                                },
+                              ),
                             ),
-                          ),
-                          SizedBox(width: 8),
-                          Text(
-                            date, // Display formatted date
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.grey,
+                            SizedBox(width: 8),
+                            Text(
+                              date, // Display formatted date
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.grey,
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
-                    ],
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
+                  // Show PopupMenuButton if current user is the review author
+                  if (userId == currentUser?.uid)
+                    PopupMenuButton<String>(
+                      onSelected: (value) {
+                        if (value == 'Edit') {
+                          _editReview(docId, review);
+                        } else if (value == 'Delete') {
+                          showDialog(
+                            context: context,
+                            builder: (context) => AlertDialog(
+                              title: Text('Delete Review'),
+                              content: Text(
+                                  'Are you sure you want to delete this review?'),
+                              actions: [
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                  child: Text('No'),
+                                ),
+                                TextButton(
+                                  onPressed: () {
+                                    _deleteReview(docId);
+                                    Navigator.of(context).pop();
+                                  },
+                                  child: Text('Yes'),
+                                ),
+                              ],
+                            ),
+                          );
+                        }
+                      },
+                      itemBuilder: (BuildContext context) => [
+                        PopupMenuItem<String>(
+                          value: 'Edit',
+                          child: Text('Edit'),
+                        ),
+                        PopupMenuItem<String>(
+                          value: 'Delete',
+                          child: Text('Delete'),
+                        ),
+                      ],
+                    ),
                 ],
               ),
               SizedBox(height: 8),
@@ -483,13 +684,19 @@ class _ViewReviewsPageState extends State<ViewReviewsPage> {
     );
   }
 
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('View Reviews'),
+        title: Text('View Reviews',
+          style: TextStyle(
+              color: Colors.black, 
+              fontSize: 24,
+            ),
+          ),
         centerTitle: true,
-        backgroundColor: Colors.white,
+        //backgroundColor: Colors.white,
       ),
       body: isLoading
           ? Center(
@@ -576,7 +783,7 @@ class _ViewReviewsPageState extends State<ViewReviewsPage> {
               });
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.blue,
+              backgroundColor: Color(0xFF41B1F1),
               padding: EdgeInsets.symmetric(vertical: 16.0),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(10),

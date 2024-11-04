@@ -19,8 +19,6 @@
 // * */
 
 // class PreferencePage extends StatelessWidget {
-//   const PreferencePage({super.key});
-
 //   @override
 //   Widget build(BuildContext context) {
 //     return MaterialApp(
@@ -30,8 +28,6 @@
 // }
 
 // class GenrePreferencePage extends StatefulWidget {
-//   const GenrePreferencePage({super.key});
-
 //   @override
 //   _GenrePreferencePageState createState() => _GenrePreferencePageState();
 // }
@@ -60,14 +56,14 @@
 //   @override
 //   Widget build(BuildContext context) {
 //     return Scaffold(
-//       appBar: AppBar(title: const Text('Genre Preference Page')),
+//       appBar: AppBar(title: Text('Genre Preference Page')),
 //       body: Column(
 //         children: [
 //           Padding(
 //             padding: const EdgeInsets.all(8.0),
 //             child: TextField(
 //               controller: searchController,
-//               decoration: const InputDecoration(
+//               decoration: InputDecoration(
 //                 labelText: 'Search Video Game Genre',
 //                 border: OutlineInputBorder(),
 //                 prefixIcon: Icon(Icons.search),
@@ -85,15 +81,15 @@
 //               },
 //             ),
 //           ),
-//           const Padding(
-//               padding: EdgeInsets.all(8.0),
+//           Padding(
+//               padding: const EdgeInsets.all(8.0),
 //               child: Text('Scroll to view more genres. \nSearch for genres not displayed on the screen.',)
 //           ),
 //           Expanded(
 //             child: GridView.builder(
 //               padding: const EdgeInsets.all(10.0),
 //               itemCount: genres.length,
-//               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+//               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
 //                 crossAxisCount: 2,
 //                 childAspectRatio: 3,
 //                 crossAxisSpacing: 10,
@@ -109,7 +105,7 @@
 //                       backgroundColor: selectedGenres.contains(genre)
 //                           ? Colors.blue
 //                           : Colors.white60,
-//                       minimumSize: const Size(100, 40),
+//                       minimumSize: Size(100, 40),
 //                     ),
 //                     child: Text(genre),
 //                   ),
@@ -117,7 +113,7 @@
 //               },
 //             ),
 //           ),
-//           const Divider(
+//           Divider(
 //             thickness: 2,
 //             color: Colors.grey,
 //           ),
@@ -137,11 +133,11 @@
 //                         ),
 //                       ),
 //                     );
-//                   },
-//                   style: ElevatedButton.styleFrom(
-//                     minimumSize: const Size(150, 40),
-//                   ), 
+//                   }, 
 //                   child: Text('More'),
+//                   style: ElevatedButton.styleFrom(
+//                     minimumSize: Size(150, 40),
+//                   ),
 //                 ),
 //                 ElevatedButton(
 //                   onPressed: () {
@@ -149,10 +145,10 @@
 //                       selectedGenres.clear();
 //                     });
 //                   },
-//                   style: ElevatedButton.styleFrom(
-//                     minimumSize: const Size(150, 40),
-//                   ),
 //                   child: Text('Reset'),
+//                   style: ElevatedButton.styleFrom(
+//                     minimumSize: Size(150, 40),
+//                   ),
 //                 ),
 //               ],
 //             ),
@@ -168,12 +164,12 @@
 //   final String searchQuery;
 //   final Function(String) onGenreSelected;
 
-//   const SearchGenrePage({super.key, required this.searchQuery, required this.onGenreSelected});
+//   SearchGenrePage({required this.searchQuery, required this.onGenreSelected});
 
 //   @override
 //   Widget build(BuildContext context) {
 //     return Scaffold(
-//       appBar: AppBar(title: const Text('Search Genres')),
+//       appBar: AppBar(title: Text('Search Genres')),
 //       body: Center(
 //         child: Column(
 //           children: [
@@ -183,7 +179,7 @@
 //                 onGenreSelected(searchQuery);
 //                 Navigator.pop(context);
 //               },
-//               icon: const Icon(Icons.add),
+//               icon: Icon(Icons.add),
 //               label: Text(searchQuery),
 //             )
 //           ],
@@ -199,12 +195,12 @@
 //   final List<String> selectedGenres;
 //   final Function(String) onGenresUnselected;
 
-//   const MoreGenresPage({super.key, required this.selectedGenres, required this.onGenresUnselected});
+//   MoreGenresPage({required this.selectedGenres, required this.onGenresUnselected});
 
 //   @override
 //   Widget build(BuildContext context) {
 //     return Scaffold(
-//       appBar: AppBar(title: const Text('View All Selected Genres')),
+//       appBar: AppBar(title: Text('View All Selected Genres')),
 //       body: ListView.builder(
 //         itemCount: selectedGenres.length,
 //         itemBuilder: (context, index) {
@@ -212,11 +208,11 @@
 //           return ListTile(
 //             title: Text(genre),
 //             trailing: IconButton(
-//               icon: const Icon(Icons.remove_circle),
+//               icon: Icon(Icons.remove_circle),
 //               onPressed: () {
 //                 onGenresUnselected(genre);
 //                 ScaffoldMessenger.of(context).showSnackBar(
-//                     const SnackBar(content: Text('Removing Genre'))
+//                     SnackBar(content: Text('Removing Genre'))
 //                 );
 //               },
 //             ),
