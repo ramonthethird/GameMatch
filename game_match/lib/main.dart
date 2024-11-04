@@ -6,6 +6,7 @@ import 'firebase_options.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
 import 'theme_notifier.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 // Import all your pages
 import 'pages/Preference_Interest.dart';
@@ -30,6 +31,9 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
+  // Initialize Google Mobile Ads SDK before app starts
+  await MobileAds.instance.initialize();
 
   // Load the theme preference before the app starts
   final prefs = await SharedPreferences.getInstance();

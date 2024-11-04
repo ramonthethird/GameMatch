@@ -46,10 +46,9 @@ dependencies:
   font_awesome_flutter: ^10.4.0
   card_swiper: ^3.0.1
   flutter_card_swiper: ^2.0.4
-  card_swiper: ^3.0.1
-  intl: ^0.17.0
-  font_awesome_flutter: ^10.3.0
   provider: ^6.0.5
+  google_fonts: ^3.0.1
+  google_mobile_ads: ^2.3.0
 
 
   # this is to authenticate the API for IGDB
@@ -89,9 +88,6 @@ flutter:
     - .env
     - assets/images/profile.png  # An image asset can refer to one or more resolution-specific "variants", see
     - assets/images/gamematchlogoresize.png
-    - assets/images/nba-logos.png
-    - assets/images/jp_morgan.png
-    - assets/images/crunchyroll_ad.png
   # https://flutter.dev/to/resolution-aware-images
 
   # For details regarding adding assets from package dependencies, see
