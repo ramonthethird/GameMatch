@@ -83,6 +83,23 @@ class SideBar extends StatelessWidget {
     return {'username': 'Unknown', 'memberSince': 'Unknown'};
   }
 
+  Future<void> navigateToSubscription(BuildContext context) async {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      DocumentSnapshot userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .get();
+
+      String subscriptionStatus = userDoc['subscription'] ?? 'free';
+      if (subscriptionStatus == 'free') {
+        Navigator.pushNamed(context, '/Subscription'); // Free subscription page
+      } else if (subscriptionStatus == 'paid') {
+        Navigator.pushNamed(context, '/SubscriptionPremium'); // Paid subscription page
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Drawer(
@@ -215,7 +232,7 @@ class SideBar extends StatelessWidget {
                 }),
                 buildMenuButton(context, Icons.subscriptions, "Subscription",
                     () {
-                  Navigator.pushNamed(context, '/Subscription');
+                  navigateToSubscription(context); // Check subscription status
                 }),
                 buildMenuButton(context, Icons.interests, "Wishlist", () {
                   Navigator.pushNamed(context, '/Wishlist');
