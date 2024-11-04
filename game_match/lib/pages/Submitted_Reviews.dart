@@ -43,6 +43,7 @@ class _SubmittedReviewsPageState extends State<SubmittedReviewsPage> {
         Map<String, dynamic> reviewData = doc.data() as Map<String, dynamic>;
         String gameId = reviewData['gameId'] ?? 'unknown';
 
+        // Fetch game details if they haven't been loaded already
         if (gameId != 'unknown' && !gameImages.containsKey(gameId)) {
           _fetchGameDetails(gameId);
         }
@@ -203,6 +204,7 @@ class _SubmittedReviewsPageState extends State<SubmittedReviewsPage> {
             TextButton(
               onPressed: () async {
                 try {
+                  // Update the review in Firestore
                   await firestore.collection('reviews').doc(reviewId).update({
                     'title': titleController.text,
                     'body': bodyController.text,
@@ -237,6 +239,7 @@ class _SubmittedReviewsPageState extends State<SubmittedReviewsPage> {
     );
   }
 
+  // Build the list of reviews for the user
   Widget _buildReviewList() {
     if (userReviews.isEmpty) {
       return Center(
@@ -268,6 +271,7 @@ class _SubmittedReviewsPageState extends State<SubmittedReviewsPage> {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // Display game image
                 ClipRRect(
                   borderRadius: BorderRadius.circular(8),
                   child: Image.network(
@@ -350,6 +354,7 @@ class _SubmittedReviewsPageState extends State<SubmittedReviewsPage> {
                       SizedBox(height: 4),
                       Row(
                         children: [
+                          // Display the star rating
                           Row(
                             children: List.generate(
                               5,

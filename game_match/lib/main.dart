@@ -18,6 +18,7 @@ import 'firebase_options.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
 import 'theme_notifier.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 // Import all your pages
 import 'pages/Preference_Interest.dart';
@@ -49,6 +50,9 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   
+   // Initialize Google Mobile Ads SDK before app starts
+  await MobileAds.instance.initialize();
+  
   // Load the theme preference before the app starts
   final prefs = await SharedPreferences.getInstance();
   bool isDarkMode = prefs.getBool('isDarkMode') ?? false;
@@ -67,7 +71,7 @@ void main() async {
 
 class GameMatchApp extends StatelessWidget {
   const GameMatchApp({super.key});
-
+  
   @override
   Widget build(BuildContext context) {
     return Consumer<ThemeNotifier>(
@@ -140,7 +144,6 @@ class GameMatchApp extends StatelessWidget {
             '/Wishlist': (context) => WishlistPage(),
             '/community_trends': (context) => GameListScreen(),
             '/Game_news': (context) => GamingNewsPage(),
-
           },
         );
       },

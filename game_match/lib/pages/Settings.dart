@@ -211,6 +211,11 @@ class _SettingsPageState extends State<SettingsPage> {
           fontWeight: FontWeight.bold,
           color: themeNotifier.isDarkMode ? Colors.white : Colors.black,
         ),
+        value: value,
+        inactiveThumbColor: Colors.grey[400],
+        inactiveTrackColor: Colors.grey[600],
+        activeColor: const Color(0xFF74ACD5),
+        onChanged: onChanged,
       ),
     );
   }

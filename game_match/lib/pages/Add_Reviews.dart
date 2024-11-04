@@ -15,7 +15,7 @@ class AddReviewsPage extends StatefulWidget {
 class _AddReviewsPageState extends State<AddReviewsPage> {
   final FirebaseFirestore firestore = FirebaseFirestore.instance; // Firestore instance for database access
   final FirebaseAuth auth = FirebaseAuth.instance; // Firebase Authentication instance
-
+  
   // Text controllers for review title and body input
   final TextEditingController titleController = TextEditingController();
   final TextEditingController bodyController = TextEditingController();

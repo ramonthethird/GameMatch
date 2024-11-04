@@ -9,8 +9,8 @@ import 'genre_model.dart';
 class ApiService {
   // Secure storage for sensitive info
   final FlutterSecureStorage secureStorage = const FlutterSecureStorage();
-  final String clientId = dotenv.env['CLIENT_ID'] ?? 'v5v1uyyo05m4ttc8yvd26yrwslfimc';
-  final String clientSecret = dotenv.env['CLIENT_SECRET'] ?? 'hu3w4pwpc344uwdp2k77xfjozbaxc5';
+  final String clientId = dotenv.env['CLIENT_ID'] ?? '';
+  final String clientSecret = dotenv.env['CLIENT_SECRET'] ?? '';
   final String baseUrl = 'https://api.igdb.com/v4';
   final String cheapSharkBaseUrl = 'https://www.cheapshark.com/api/1.0';
 
@@ -47,6 +47,7 @@ class ApiService {
         await storeAccessToken(tokenData['access_token']);
       } else {
         print('Failed to fetch token: ${response.statusCode} ${response.body}');
+        throw Exception('Failed to authenticate with Twitch API');
       }
     } catch (error) {
       print('Error fetching token: $error');
@@ -131,7 +132,7 @@ class ApiService {
         },
         body: body,
       );
-
+      
       if (response.statusCode == 200) {
         final List<dynamic> gameDataJson = json.decode(response.body);
         return gameDataJson.map((json) => Game.fromJson(json as Map<String, dynamic>)).toList();

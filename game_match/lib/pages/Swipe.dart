@@ -5,6 +5,8 @@ import 'game_model.dart';
 import 'package:game_match/firestore_service.dart';
 import 'dart:async';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'ad_helper.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'Side_bar.dart';
 
 class SwipePage extends StatefulWidget {
@@ -19,6 +21,7 @@ class _SwipePageState extends State<SwipePage> with TickerProviderStateMixin {
   final ApiService apiService = ApiService();
   final FirestoreService _firestoreService = FirestoreService();
   StreamSubscription? _firestoreSubscription;
+   InterstitialAd? _interstitialAd;
   List<Game> games = [];
   List<Game> swipedGames = [];
   Game? selectedGame;
@@ -27,7 +30,6 @@ class _SwipePageState extends State<SwipePage> with TickerProviderStateMixin {
   double _opacity = 1.0;
   final int _currentIndex = 0;
   int _swipeCount = 0; // track the number of swipes
-  final int _swipeThreshold = 3; // number of swipes to trigger an ad
 
   AnimationController? _heartAnimationController;
   AnimationController? _heartbrokenAnimationController;
@@ -98,26 +100,9 @@ class _SwipePageState extends State<SwipePage> with TickerProviderStateMixin {
       parent: _instructionAnimationController!,
       curve: Curves.easeInOut,
     ));
-  }
 
-  void _showCustomAd() {
-    if (!mounted) return;
-
-    // Push the ad page on top of the current page without replacing it
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (ModalRoute.of(context)?.isCurrent ?? false) {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => CustomAdPage()),
-        ).then((_) {
-          if (mounted) {
-            setState(() {
-              _swipeCount = 0; // Reset swipe count after ad
-            });
-          }
-        });
-      }
-    });
+    // load the first ad
+    _loadInterstitialAd();
   }
 
   Future<void> _fetchGames() async {
@@ -171,6 +156,32 @@ class _SwipePageState extends State<SwipePage> with TickerProviderStateMixin {
     }
   }
 
+  // Load an interstitial ad
+  void _loadInterstitialAd() {
+    InterstitialAd.load(
+      adUnitId: AdHelper.interstitialAdUnitId,
+      request: const AdRequest(),
+      adLoadCallback: InterstitialAdLoadCallback(
+        onAdLoaded: (InterstitialAd ad) {
+          _interstitialAd = ad;
+        },
+        onAdFailedToLoad: (LoadAdError error) {
+          print('Failed to load interstitial ad');
+          _interstitialAd = null;
+        },
+      ),
+    );
+  }
+
+  // Display the interstitial ad
+  void _showInterstitialAd() {
+    if (_interstitialAd != null) {
+      _interstitialAd!.show();
+      _interstitialAd = null; // Reset the ad
+      _loadInterstitialAd(); // Load a new ad for the next time
+    }
+  }
+
   void _fadeOutInstruction() {
     if (_showSwipeInstruction) {
       _instructionFadeController!.forward().then((_) {
@@ -197,6 +208,7 @@ class _SwipePageState extends State<SwipePage> with TickerProviderStateMixin {
 
   @override
   void dispose() {
+    _interstitialAd?.dispose();
     _instructionFadeController?.dispose();
     _instructionAnimationController?.dispose();
     _heartAnimationController?.dispose();
@@ -332,12 +344,11 @@ class _SwipePageState extends State<SwipePage> with TickerProviderStateMixin {
         _rotationAngle = 0.0;
         _opacity = 1.0;
 
-        // increment swipe count and check it custom ad should be shown
         _swipeCount++;
-        if (_swipeCount >= _swipeThreshold) {
-          if (ModalRoute.of(context)?.isCurrent ?? false) {
-            _showCustomAd();
-          }
+        // Show ad after threshold met
+        if (_swipeCount >= 3) {
+          _showInterstitialAd();
+          _swipeCount = 0;
         }
       });
     }

@@ -36,6 +36,7 @@ class _GameDetailScreenState extends State<GameDetailScreen> {
       }
     } catch (e) {
       print('Error fetching game details: $e');
+      // Show a snackbar or handle the error appropriately
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Game not found or failed to load')),
       );
@@ -155,7 +156,6 @@ class _GameDetailScreenState extends State<GameDetailScreen> {
                     style: const TextStyle(fontSize: 16),
                   ),
                   const SizedBox(height: 16),
-
                   // Container for Price and Developer
                   Container(
                     padding: const EdgeInsets.all(12),
