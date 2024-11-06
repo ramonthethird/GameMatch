@@ -2,28 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:game_match/pages/Log_in.dart';
 
-// void main() async {
-//   WidgetsFlutterBinding.ensureInitialized();
-//   await Firebase.initializeApp(); // Initialize Firebase
-//   runApp(const SignUp());
-// }
-
-// Main SignUp widget that sets up the MaterialApp
-// class SignUp extends StatelessWidget {
-//   const SignUp({super.key});
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return const MaterialApp(
-//       debugShowCheckedModeBanner: false,
-//       home: SignUpScreen(),
-//     );
-//   }
-// }
-
-// SignUpScreen StatefulWidget that handles user registration
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
 
@@ -31,9 +10,8 @@ class SignUpScreen extends StatefulWidget {
   _SignUpScreenState createState() => _SignUpScreenState();
 }
 
-// State class for SignUpScreen that contains the form and logic
 class _SignUpScreenState extends State<SignUpScreen> {
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>(); // Key to track form state
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
@@ -45,13 +23,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
       appBar: AppBar(
         title: const Text('Create an Account', style: TextStyle(color: Colors.black, fontSize: 24,)),
         centerTitle: true,
-        //backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
-            onPressed: () {
-              Navigator.pop(context);
-          }, 
+          onPressed: () {
+            Navigator.pop(context);
+          },
         ),
       ),
       body: SingleChildScrollView(
@@ -63,24 +40,24 @@ class _SignUpScreenState extends State<SignUpScreen> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
                 Padding(
-                padding: const EdgeInsets.only(top: 40.0),
-                child: ColorFiltered(
-                  colorFilter: Theme.of(context).brightness == Brightness.dark
-                      ? const ColorFilter.mode(
-                          Colors.white, // Makes the logo white in dark mode
-                          BlendMode.srcATop,
-                        )
-                      : const ColorFilter.mode(
-                          Colors.transparent, // No change in light mode
-                          BlendMode.srcOver,
-                        ),
-                  child: Image.asset(
-                    'assets/images/gamematchlogoresize.png',
-                    height: 260,
-                    width: 260,
+                  padding: const EdgeInsets.only(top: 40.0),
+                  child: ColorFiltered(
+                    colorFilter: Theme.of(context).brightness == Brightness.dark
+                        ? const ColorFilter.mode(
+                            Colors.white,
+                            BlendMode.srcATop,
+                          )
+                        : const ColorFilter.mode(
+                            Colors.transparent,
+                            BlendMode.srcOver,
+                          ),
+                    child: Image.asset(
+                      'assets/images/gamematchlogoresize.png',
+                      height: 260,
+                      width: 260,
+                    ),
                   ),
                 ),
-              ),  
                 const SizedBox(height: 20),
                 TextFormField(
                   controller: emailController,
@@ -100,7 +77,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 const SizedBox(height: 20),
                 TextFormField(
                   controller: passwordController,
-                  obscureText: true, // Hide the text for password fields
+                  obscureText: true,
                   decoration: const InputDecoration(
                     labelText: 'Password',
                     border: OutlineInputBorder(),
@@ -114,7 +91,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     labelText: 'Confirm Password',
                     border: OutlineInputBorder(),
                   ),
-                  validator: (value) { // Validator to ensure passwords match
+                  validator: (value) {
                     if (value != passwordController.text) {
                       return 'Passwords do not match';
                     }
@@ -122,16 +99,19 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   },
                 ),
                 const SizedBox(height: 40),
-                ElevatedButton(
-                  onPressed: (){
-                    _trySubmit();
-                    Navigator.pushNamed(context, '/Login');
-                  }, // Button to trigger form submission
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
-                  ),
-                  child: const Text('Sign Up'),
-                ),
+ElevatedButton(
+  onPressed: () {
+    _trySubmit();
+  },
+  style: ElevatedButton.styleFrom(
+    backgroundColor: Colors.blue,
+  ),
+  child: const Text(
+    'Sign Up',
+    style: TextStyle(color: Colors.white), // Set text color to white
+  ),
+),
+
               ],
             ),
           ),
@@ -140,11 +120,27 @@ class _SignUpScreenState extends State<SignUpScreen> {
     );
   }
 
-  // Function to handle form submission
   Future<void> _trySubmit() async {
-    if (_formKey.currentState!.validate()) { // Check if the form is valid
-      _formKey.currentState!.save(); // Save the form
+    if (_formKey.currentState!.validate()) {
+      _formKey.currentState!.save();
       try {
+        // Check if the username is already taken
+        final querySnapshot = await FirebaseFirestore.instance
+            .collection('users')
+            .where('username', isEqualTo: usernameController.text)
+            .get();
+
+        if (querySnapshot.docs.isNotEmpty) {
+          // Username is already taken
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Username already exists. Please choose another one.'),
+              backgroundColor: Colors.red,
+            ),
+          );
+          return;
+        }
+
         // Attempt to create a user with Firebase Auth
         UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
           email: emailController.text,
@@ -155,7 +151,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
         await FirebaseFirestore.instance.collection('users').doc(userCredential.user!.uid).set({
           'username': usernameController.text,
           'email': emailController.text,
-          'creationDate': FieldValue.serverTimestamp(), // Store the timestamp of account creation
+          'creationDate': FieldValue.serverTimestamp(),
         });
 
         // Show a success message
@@ -166,8 +162,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
           ),
         );
 
+        Navigator.pushNamed(context, '/Login'); // Navigate to the login page
+
       } on FirebaseAuthException catch (e) {
-        // Handle errors from Firebase
         var errorMessage = 'An error occurred, please check your credentials!';
         if (e.code == 'weak-password') {
           errorMessage = 'The password provided is too weak. Must have at least 8 characters';
@@ -175,7 +172,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
           errorMessage = 'The account already exists for that email.';
         }
 
-        // Show an error message
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(errorMessage),
@@ -188,7 +184,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   @override
   void dispose() {
-    // Clean up the controllers when the widget is disposed
     emailController.dispose();
     usernameController.dispose();
     passwordController.dispose();
