@@ -8,6 +8,11 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'ad_helper.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'Side_bar.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:intl/intl.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'Subscription.dart';
 
 class SwipePage extends StatefulWidget {
   const SwipePage({super.key});
@@ -21,7 +26,7 @@ class _SwipePageState extends State<SwipePage> with TickerProviderStateMixin {
   final ApiService apiService = ApiService();
   final FirestoreService _firestoreService = FirestoreService();
   StreamSubscription? _firestoreSubscription;
-   InterstitialAd? _interstitialAd;
+  InterstitialAd? _interstitialAd;
   List<Game> games = [];
   List<Game> swipedGames = [];
   Game? selectedGame;
@@ -29,7 +34,11 @@ class _SwipePageState extends State<SwipePage> with TickerProviderStateMixin {
   double _rotationAngle = 0.0;
   double _opacity = 1.0;
   final int _currentIndex = 0;
-  int _swipeCount = 0; // track the number of swipes
+  int _swipeCount = 0; // track the number of swipes for free users
+  int _adSwipeCount = 0; // track number of swipes for ads
+  static const int dailySwipeLimit = 2; // The daily limit for free users
+  static const int adSwipeInterval = 3; // show an ad every 3 swipes
+  bool _isPremium = false;
 
   AnimationController? _heartAnimationController;
   AnimationController? _heartbrokenAnimationController;
@@ -49,6 +58,8 @@ class _SwipePageState extends State<SwipePage> with TickerProviderStateMixin {
   void initState() {
     super.initState();
     _fetchGames();
+    _fetchSubscriptionStatus();
+    _loadInterstitialAd();
 
     _heartAnimationController = AnimationController(
       vsync: this,
@@ -141,6 +152,58 @@ class _SwipePageState extends State<SwipePage> with TickerProviderStateMixin {
     } catch (e) {
       print('Error fetching games: $e');
     }
+  }
+
+  // Fetch subscription status of the user and swipe data
+  Future<void> _fetchSubscriptionStatus() async {
+    User? currentUser = FirebaseAuth.instance.currentUser;
+
+    if (currentUser != null) {
+      String userId = currentUser.uid;
+      try {
+        DocumentSnapshot userDoc = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(userId)
+            .get();
+
+        if (userDoc.exists) {
+          String subscriprionStatus = userDoc.get('subscription');
+          setState(() {
+            _isPremium = subscriprionStatus == 'paid';
+          });
+        }
+      } catch (e) {
+        print("Error fetching subscription status: $e");
+      }
+    }
+
+    _fetchSwipeDate();
+  }
+
+  // Fetch swipe data count and last reset time from local storage
+  Future<void> _fetchSwipeDate() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    int savedSwipeCount = prefs.getInt('swipeCount') ?? 0;
+    String? lastReset = prefs.getString('lastReset');
+    String today = DateFormat('yyyy-MM-dd').format(DateTime.now());
+
+    if (lastReset != today) {
+      // Reset count if its a new day
+      _swipeCount = 0;
+      await prefs.setInt('swipeCount', 0);
+      await prefs.setString('lastReset', today);
+    } else {
+      _swipeCount = savedSwipeCount;
+    }
+  }
+
+  // Incrament swipe count and save to local storage
+  Future<void> _incramentSwipeCount() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _swipeCount += 1;
+    });
+    await prefs.setInt('swipeCount', _swipeCount);
   }
 
   Future<void> _fetchPricesForGames(List<Game> fetchedGames) async {
@@ -336,38 +399,42 @@ class _SwipePageState extends State<SwipePage> with TickerProviderStateMixin {
   }
 
   void _onGameSwiped(int index) {
-    if (games.isNotEmpty) {
-      setState(() {
-        swipedGames.add(games[index]);
-        games.removeAt(index);
-        _swipeOffset = Offset.zero;
-        _rotationAngle = 0.0;
-        _opacity = 1.0;
+    if (_isPremium || _swipeCount < dailySwipeLimit) {
+      // Premium users have no limit, free users are limited by dailySwipeLimit
+      _incramentSwipeCount();
 
-        _swipeCount++;
-        // Show ad after threshold met
-        if (_swipeCount >= 3) {
-          _showInterstitialAd();
-          _swipeCount = 0;
-        }
-      });
+      if (games.isNotEmpty) {
+        setState(() {
+          swipedGames.add(games[index]);
+          games.removeAt(index);
+          _swipeOffset = Offset.zero;
+          _rotationAngle = 0.0;
+          _opacity = 1.0;
+
+          // incrament swipe counts for both daily and ads
+          _adSwipeCount++;
+          _swipeCount++;
+
+          // Show ad after threshold met
+          if (!_isPremium && _adSwipeCount >= adSwipeInterval) {
+            _showInterstitialAd();
+            _adSwipeCount = 0;
+          }
+        });
+      }
+    } else {
+      // Show limit reached dialog with timer and upgrade option
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return SwipeLimitDialog();
+        },
+      );
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    // if (games.isEmpty) {
-    //   return Scaffold(
-    //     appBar: AppBar(
-    //       title: const Text('Swipe Games'),
-    //       centerTitle: true,
-    //     ),
-    //     body: const Center(
-    //       child: CircularProgressIndicator(),
-    //     ),
-    //   );
-    // }
-
     return Scaffold(
       key: _scaffoldKey, // Key for the scaffold
       appBar: AppBar(
@@ -743,7 +810,11 @@ class _SwipePageState extends State<SwipePage> with TickerProviderStateMixin {
                       backgroundColor: Colors.grey.shade300,
                       shape: const CircleBorder(),
                       onPressed: _onUndo,
-                      child: const Icon(Icons.undo, size: 32, color: Colors.black,),
+                      child: const Icon(
+                        Icons.undo,
+                        size: 32,
+                        color: Colors.black,
+                      ),
                     ),
                     FloatingActionButton(
                       heroTag: 'like',
@@ -930,5 +1001,100 @@ class CustomAdPage extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+// custom dialog with countdown timer for swipe limit reset
+class SwipeLimitDialog extends StatefulWidget {
+  @override
+  _SwipeLimitDialogState createState() => _SwipeLimitDialogState();
+}
+
+class _SwipeLimitDialogState extends State<SwipeLimitDialog> {
+  late Timer _timer;
+  late Duration _timeRemaining;
+
+  @override
+  void initState() {
+    super.initState();
+    _calculateTimeRemaining();
+    _startTimer();
+  }
+
+  void _calculateTimeRemaining() {
+    DateTime now = DateTime.now();
+    DateTime resetTime = DateTime(now.year, now.month, now.day + 1);
+    _timeRemaining = resetTime.difference(now);
+  }
+
+  void _startTimer() {
+    _timer = Timer.periodic(Duration(seconds: 1), (timer) {
+      setState(() {
+        if (_timeRemaining.inSeconds > 0) {
+          _timeRemaining -= Duration(seconds: 1);
+        } else {
+          _timer.cancel();
+        }
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    String formattedTime = _formatDuration(_timeRemaining);
+
+    return AlertDialog(
+      title: Text('Daily Swipe Limit Reached'),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+              'You have reached your daily swipe limit. Upgrade to Premium for unlimited swipes and an ad-free experience!'),
+          SizedBox(height: 16),
+          Text(
+            'Time until swipes reset: $formattedTime',
+            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.red),
+          ),
+        ],
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: Text('Cancel'),
+          style: TextButton.styleFrom(
+            foregroundColor: Colors.black,
+          ),
+        ),
+        ElevatedButton(
+          onPressed: () {
+            Navigator.of(context).pop();
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => SubscriptionManagementScreen(),
+              ),
+            );
+          },
+          child: Text('Upgrade'),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Color(0xFF41B1F1),
+            foregroundColor: Colors.white,
+          ),
+        ),
+      ],
+    );
+  }
+
+  String _formatDuration(Duration duration) {
+    String hours = duration.inHours.toString().padLeft(2, '0');
+    String minutes = (duration.inMinutes % 60).toString().padLeft(2, '0');
+    String seconds = (duration.inSeconds % 60).toString().padLeft(2, '0');
+    return '$hours:$minutes:$seconds';
   }
 }
