@@ -1,7 +1,10 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 
 class NotificationsPage extends StatefulWidget {
@@ -11,9 +14,8 @@ class NotificationsPage extends StatefulWidget {
   _NotificationsPageState createState() => _NotificationsPageState();
 }
 
-class _NotificationsPageState extends State<NotificationsPage> {
 
-  // Create temporary wishlist for testing notifications page
+class _NotificationsPageState extends State<NotificationsPage> {
   final List<String> wishlist = [
     "Injustice 2",
     "Neon Arena",
@@ -26,70 +28,91 @@ class _NotificationsPageState extends State<NotificationsPage> {
     "BioShock Infinite"
   ];
 
-  // Put some current non discounted titles and discounted titles to test the discount > 0 thing
-
-  // Use a list to hold notification widgets
   List<Widget> notifications = [];
+  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
-  // Put build method for ui stuff
+  @override
+  void initState() {
+    super.initState();
+    _initializeNotifications();
+    fetchNotifications();
+  }
+
+  Future<void> _initializeNotifications() async {
+    const AndroidInitializationSettings initializationSettingsAndroid = AndroidInitializationSettings('@mipmap/ic_launcher');
+    final InitializationSettings initializationSettings = InitializationSettings(android: initializationSettingsAndroid);
+
+    await flutterLocalNotificationsPlugin.initialize(initializationSettings);
+  }
+
+  Future<void> _showNotification(String title, String body) async {
+    const AndroidNotificationDetails androidPlatformChannelSpecifics = AndroidNotificationDetails(
+      'notification_channel',
+      'General Notifications',
+      importance: Importance.max,
+      priority: Priority.high,
+    );
+
+    const NotificationDetails platformChannelSpecifics = NotificationDetails(android: androidPlatformChannelSpecifics);
+    await flutterLocalNotificationsPlugin.show(
+      0,
+      title,
+      body,
+      platformChannelSpecifics,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // Have app bar be consistent with colors and font size
       appBar: AppBar(
         backgroundColor: const Color(0xFF41B1F1),
         title: const Text(
-          'Notifications', // App bar title
+          'Notifications',
           style: TextStyle(fontSize: 24),
         ),
       ),
-
-
       body: Column(
-        mainAxisAlignment: MainAxisAlignment.start, // Align children to start
+        mainAxisAlignment: MainAxisAlignment.start,
         children: [
           const Padding(
-            padding: EdgeInsets.all(16.0), // Padding around the title
+            padding: EdgeInsets.all(16.0),
             child: Text(
               'Notifications',
               style: TextStyle(
-                fontSize: 30, // Title font size be consistent with others
-                fontWeight: FontWeight.bold, // Make bold for consistency
+                fontSize: 30,
+                fontWeight: FontWeight.bold,
               ),
             ),
           ),
           Expanded(
-            child: notifications.isEmpty // Check if notifications list is empty
-
-                // Question mark for if else shortcut
-                ? const Center(child: Text('No notifications available.')) // Display message if empty
-                : ListView( // Display notifications if available
-              children: notifications, // Show the list of notifications
+            child: notifications.isEmpty
+                ? const Center(child: Text('No notifications available.'))
+                : ListView(
+              children: notifications,
             ),
           ),
           Padding(
             padding: const EdgeInsets.only(bottom: 16.0),
-
             child: Center(
               child: ElevatedButton(
-                onPressed: clearNotifications, // Press clear notifs button to clear list of notifications
+                onPressed: clearNotifications,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF41B1F1), // consistency
+                  backgroundColor: const Color(0xFF41B1F1),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(2.5),
                   ),
                 ),
                 child: Row(
-                  mainAxisSize: MainAxisSize.min, // Use minimum size for row
-                  mainAxisAlignment: MainAxisAlignment.center, // Center align button contents
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: const [
-
                     Icon(
                       Icons.clear,
                       color: Colors.white,
-                      size: 16, // Adjust size of icon for looks
+                      size: 16,
                     ),
-                    SizedBox(width: 8), // Space between icon and text
+                    SizedBox(width: 8),
                     Text(
                       'Clear Notifications',
                       style: TextStyle(
@@ -107,91 +130,102 @@ class _NotificationsPageState extends State<NotificationsPage> {
       ),
     );
   }
-  // Initialize the state and fetch game notifications using method and define it
-  @override
-  void initState() {
-    super.initState();
-    fetchGameNotifications(); // Fetch notifications when the page is initialized
-  }
 
-  // Use set state here
   void clearNotifications() {
     setState(() {
-      notifications.clear(); // Clear the notifications list
+      notifications.clear();
     });
   }
 
-  // Function to recieve game notifications from the API
-  Future<void> fetchGameNotifications() async {
-    List<Widget> loadedNotifications = []; // Create list for loaded notifications
+  Future<void> fetchNotifications() async {
+    List<Widget> loadedNotifications = [];
 
-    // Load game notifications for each item in the wishlist, game is constantly changed interatively in for loop
+    // Subscription expiration fetcher
+    final subscriptionNotification = await fetchSubscriptionExpirationDate();
+    if (subscriptionNotification != null) {
+      loadedNotifications.add(subscriptionNotification);
+    }
+
+    // Sale notifications for wishlist games
     for (String game in wishlist) {
-      final gameInfo = await fetchGameInfo(game); // Fetch game information
+      final gameInfo = await fetchGameInfo(game);
 
-      // Check if salePrice and normalPrice are available
-      // compare json data
       if (gameInfo['salePrice'] != null && gameInfo['normalPrice'] != null) {
-
-        // Convert to double for safe calculation
         double salePrice = double.parse(gameInfo['salePrice']);
         double normalPrice = double.parse(gameInfo['normalPrice']);
+        double discount = ((normalPrice - salePrice) / normalPrice) * 100;
 
-        //calculate discount here
-        double discount = ((normalPrice - salePrice) / normalPrice) * 100; // Calculate discount percentage
-
-        // If discount is found to be over 0, that means it should be added to the notifications
         if (discount > 0) {
-          loadedNotifications.add(NotificationCard(
-            // Notification card structure
+          // Convert discount to whole number with toStringAsFixed(0)
+          String discountStr = discount.toStringAsFixed(0);
 
-            gameTitle: gameInfo['title'], // Title of the game
-            discount: discount.toStringAsFixed(0), // Discount percentage formatted as string
-            thumbnailUrl: gameInfo['thumb'], // Thumbnail image URL
-            dealUrl: "https://www.cheapshark.com/redirect?dealID=${gameInfo['dealID']}", // URL for the deal
+          loadedNotifications.add(NotificationCard(
+            gameTitle: gameInfo['title'],
+            discount: discountStr,  // Using the whole number version
+            thumbnailUrl: gameInfo['thumb'],
+            dealUrl: "https://www.cheapshark.com/redirect?dealID=${gameInfo['dealID']}",
           ));
+
+          // Schedule notification for this game with formatted discount
+          _showNotification(gameInfo['title'], '$discountStr% off on your wishlist item!');
         }
+
       }
     }
 
-    // Add a subscription warning notification just for testing since subscription can't be shown yet
-    loadedNotifications.add(
-      WarningNotificationCard(
-        message: "Warning: Your subscription ends in two weeks.",
-      ),
-    );
+    // Add new release notification for Call of Duty: Black Ops 6
+    // loadedNotifications.add(ReleaseNotificationCard(
+    //   gameTitle: "Call of Duty: Black Ops 6",
+    //   releaseDate: "Available Now!",
+    //   thumbnailUrl: "https://example.com/cod_black_ops_6_thumbnail.jpg",
+    //   storeUrl: "https://store.steampowered.com/app/123456/Call_of_Duty_Black_Ops_6",
+    // ));
+    // _showNotification("Call of Duty: Black Ops 6", "New Release Available Now!");
 
-    // Update the state bc stateful class and need to combine notifs
     setState(() {
-      notifications = loadedNotifications; // Set the notifications state
+      notifications = loadedNotifications;
     });
   }
 
-  // Figure out here how to get the cheapshark request in flutter
-  // Function to fetch game information from the API
-  Future<Map<String, dynamic>> fetchGameInfo(String gameTitle) async {
-    final encodedTitle = Uri.encodeComponent(gameTitle); // Encode the game title for the URL
-    final url = Uri.parse('https://www.cheapshark.com/api/1.0/deals?title=$encodedTitle'); // Create the API URL
-    final response = await http.get(url); // Make the GET request
+  Future<Widget?> fetchSubscriptionExpirationDate() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      final userDoc = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
 
-    // Check if the response is successful
+      if (userDoc.exists) {
+        final subscriptionExpirationDate = userDoc.get('subscriptionExpirationDate') as String?;
+
+        if (subscriptionExpirationDate != null) {
+          return WarningNotificationCard(
+            message: "Warning: Your subscription expires on $subscriptionExpirationDate",
+          );
+        }
+      }
+    }
+    return null;
+  }
+
+  Future<Map<String, dynamic>> fetchGameInfo(String gameTitle) async {
+    final encodedTitle = Uri.encodeComponent(gameTitle);
+    final url = Uri.parse('https://www.cheapshark.com/api/1.0/deals?title=$encodedTitle');
+    final response = await http.get(url);
+
     if (response.statusCode == 200) {
-      final List<dynamic> deals = json.decode(response.body); // Decode the JSON response
+      final List<dynamic> deals = json.decode(response.body);
       if (deals.isNotEmpty) {
-        return deals[0]; // Return the first deal if available
+        return deals[0];
       } else {
-        return {}; // Return an empty map if no deals are found
+        return {};
       }
     } else {
-      throw Exception("Failed to fetch deals for $gameTitle: ${response.statusCode}"); // Throw an error if the request fails
+      throw Exception("Failed to fetch deals for $gameTitle: ${response.statusCode}");
     }
   }
 }
 
-// Widget to display individual game notifications
 class NotificationCard extends StatelessWidget {
   final String gameTitle;
-  final String discount; // Discount percentage
+  final String discount;
   final String thumbnailUrl;
   final String dealUrl;
 
@@ -206,29 +240,28 @@ class NotificationCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 15), // Margin around the card
+      margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
       child: ListTile(
         leading: Image.network(
           thumbnailUrl,
           width: 50,
           height: 50,
-          fit: BoxFit.cover, // Fit the image within the bounds
+          fit: BoxFit.cover,
         ),
         title: Text(
-          '$gameTitle - Wishlist Item Discount for $discount%', // Title text
-          style: const TextStyle(fontWeight: FontWeight.normal), // Text style
+          '$gameTitle - Wishlist Item Discount for $discount%',
+          style: const TextStyle(fontWeight: FontWeight.normal),
         ),
         trailing: IconButton(
-          icon: const Icon(Icons.link), // Link icon
+          icon: const Icon(Icons.link),
           onPressed: () async {
-            // Launch the deal URL when the icon is pressed
             if (await canLaunchUrl(Uri.parse(dealUrl))) {
               await launchUrl(
                 Uri.parse(dealUrl),
-                mode: LaunchMode.externalApplication, // Open in external browser
+                mode: LaunchMode.externalApplication,
               );
             } else {
-              throw 'Could not launch $dealUrl'; // Error if URL cannot be launched
+              throw 'Could not launch $dealUrl';
             }
           },
         ),
@@ -237,9 +270,55 @@ class NotificationCard extends StatelessWidget {
   }
 }
 
-// Widget to display a warning notification
+class ReleaseNotificationCard extends StatelessWidget {
+  final String gameTitle;
+  final String releaseDate;
+  final String thumbnailUrl;
+  final String storeUrl;
+
+  const ReleaseNotificationCard({
+    Key? key,
+    required this.gameTitle,
+    required this.releaseDate,
+    required this.thumbnailUrl,
+    required this.storeUrl,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+      child: ListTile(
+        leading: Image.network(
+          thumbnailUrl,
+          width: 50,
+          height: 50,
+          fit: BoxFit.cover,
+        ),
+        title: Text(
+          '$gameTitle - Released on $releaseDate!',
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
+        trailing: IconButton(
+          icon: const Icon(Icons.link),
+          onPressed: () async {
+            if (await canLaunchUrl(Uri.parse(storeUrl))) {
+              await launchUrl(
+                Uri.parse(storeUrl),
+                mode: LaunchMode.externalApplication,
+              );
+            } else {
+              throw 'Could not launch $storeUrl';
+            }
+          },
+        ),
+      ),
+    );
+  }
+}
+
 class WarningNotificationCard extends StatelessWidget {
-  final String message; // Warning message
+  final String message;
 
   const WarningNotificationCard({Key? key, required this.message}) : super(key: key);
 
@@ -249,7 +328,7 @@ class WarningNotificationCard extends StatelessWidget {
       margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
       child: ListTile(
         leading: const Icon(
-          Icons.warning, // Warning icon on left of card where thumbnail on other notif type would be
+          Icons.warning,
           color: Colors.amber,
           size: 50,
         ),
