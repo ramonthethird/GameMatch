@@ -25,8 +25,8 @@ class HomePage extends StatelessWidget {
                 padding: const EdgeInsets.only(top: 40.0),
                 child: Image.asset(
                   'assets/images/gamematchlogoresize.png',
-                  height: 100,
-                  width: 100,
+                  height: 200,
+                  width: 200,
                 ),
               ),
             const SizedBox(height: 30), // For spacing
@@ -50,7 +50,7 @@ class HomePage extends StatelessWidget {
             // Login Button
             ElevatedButton(
               onPressed: () {
-                Navigator.pushNamed(context, '/Log_in'); // Navigate to login page
+                Navigator.pushNamed(context, '/Login'); // Navigate to login page
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.white,

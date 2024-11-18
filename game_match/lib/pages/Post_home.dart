@@ -5,6 +5,9 @@ import 'package:game_match/pages/Side_bar.dart';
 import 'package:url_launcher/url_launcher.dart'; // Import url_launcher for opening links
 import 'api_service.dart'; // Import the ApiService
 import 'game_model.dart'; // Import the Game model
+import 'package:game_match/theme_notifier.dart';
+import 'package:provider/provider.dart';
+
 
 class WelcomePage extends StatefulWidget {
   final String username;
@@ -83,21 +86,23 @@ class _WelcomePageState extends State<WelcomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final themeNotifier = Provider.of<ThemeNotifier>(context);
     return Scaffold(
-      backgroundColor: const Color(0xFFF1F3F4),
+      //backgroundColor: const Color(0xFFF1F3F4),
       key: _scaffoldKey,
       appBar: AppBar(
+        centerTitle: true,
         title: const Text(
           'Welcome to Game Match!',
           style: TextStyle(
-            fontSize: 16,
+            fontSize: 18,
             fontWeight: FontWeight.bold,
             color: Colors.black,
           ),
         ),
         leading: IconButton(
           alignment: Alignment.topLeft,
-          icon: const Icon(Icons.menu),
+          icon: const Icon(Icons.menu, color: Colors.black,),
           onPressed: () {
             _scaffoldKey.currentState?.openDrawer();
           },
@@ -108,6 +113,7 @@ class _WelcomePageState extends State<WelcomePage> {
             icon: const Icon(Icons.notifications),
             onPressed: () {
               // Handle notification icon press
+              Navigator.of(context).pushNamed('/notif');
             },
           ),
         ],
@@ -138,8 +144,9 @@ class _WelcomePageState extends State<WelcomePage> {
         child: SideBar(
           onThemeChanged: (isDarkMode) {
             // Handle theme change here
+            themeNotifier.toggleTheme(isDarkMode);
           },
-          isDarkMode: false,
+          isDarkMode: themeNotifier.isDarkMode,
         ),
       ),
       body: _isSearching
@@ -176,7 +183,7 @@ class _WelcomePageState extends State<WelcomePage> {
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
-                    color: Colors.black87,
+                    //color: Colors.black87,
                   ),
                 );
               } else {
@@ -186,7 +193,7 @@ class _WelcomePageState extends State<WelcomePage> {
                   style: const TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
-                    color: Colors.black87,
+                    //color: Colors.black87,
                   ),
                 );
               }
@@ -197,7 +204,7 @@ class _WelcomePageState extends State<WelcomePage> {
             'Discover new games based on your preferences.',
             style: TextStyle(
               fontSize: 16,
-              color: Colors.black54,
+              //color: Colors.black54,
             ),
             textAlign: TextAlign.center,
           ),
@@ -214,14 +221,21 @@ class _WelcomePageState extends State<WelcomePage> {
             title: 'Community trends',
             description: 'Updates from the gaming community.',
             icon: Icons.people,
-            routeName: '/community_trends',
+            routeName: '/community_page',
           ),
           _buildFeatureCard(
             context,
-            title: 'Swiping games',
-            description: 'Swipe right on games you like.',
-            icon: Icons.favorite,
-            routeName: '/swiping_games',
+            title: 'Preferences',
+            description: 'Update your preferences.',
+            icon: Icons.room_preferences,
+            routeName: '/Preference_&_Interest',
+          ),
+          _buildFeatureCard(
+            context,
+            title: 'Game News',
+            description: 'Stay updated with the latest gaming news.',
+            icon: Icons.article,
+            routeName: '/Game_news',
           ),
         ],
       ),
@@ -290,7 +304,7 @@ class _WelcomePageState extends State<WelcomePage> {
                     const SizedBox(height: 5),
                     Text(
                       description,
-                      style: const TextStyle(color: Colors.black54),
+                      //style: const TextStyle(color: Colors.black54),
                     ),
                   ],
                 ),

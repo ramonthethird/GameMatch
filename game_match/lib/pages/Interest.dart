@@ -14,15 +14,15 @@ class _InterestsPageState extends State<InterestsPage> {
   String? dropdownValue2;
   String? dropdownValue3;
   String? dropdownValue4;
-
+  
   // Loading state
   bool _isLoading = false;
 
   final List<String> gameModes = [
     'Single Player',
     'Multiplayer',
-    'Co-op',
-    'Online Pvp'
+    'Co-operative',
+    'Online PvP'
   ];
 
   final List<String> playerPerspective = [
@@ -48,8 +48,8 @@ class _InterestsPageState extends State<InterestsPage> {
 
   final firestore = FirebaseFirestore.instance;
 
-  // FirebaseAuth instance
-  final FirebaseAuth _auth = FirebaseAuth.instance;
+  // User ID (set dynamically)
+  late String userId;
 
   @override
   void initState() {
@@ -80,7 +80,7 @@ class _InterestsPageState extends State<InterestsPage> {
           'platform': dropdownValue3 ?? '',
           'price': dropdownValue4 ?? '',
         }
-      }, SetOptions(merge: true)); // Merge the interests with existing data
+      }, SetOptions(merge: true));
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -103,17 +103,14 @@ class _InterestsPageState extends State<InterestsPage> {
     }
   }
 
-  // Load user's interests from Firestore
   void _loadInterests() async {
     setState(() {
       _isLoading = true;
     });
 
     try {
-      DocumentSnapshot doc =
-          await firestore.collection('users').doc(userId).get();
+      DocumentSnapshot doc = await firestore.collection('users').doc(userId).get();
 
-      // If a user already have interests saved before, load them
       if (doc.exists && doc['interests'] != null) {
         Map<String, dynamic> interests = doc['interests'];
         setState(() {
@@ -122,6 +119,7 @@ class _InterestsPageState extends State<InterestsPage> {
           dropdownValue3 = interests['platform'];
           dropdownValue4 = interests['price'];
         });
+
       } else {
         print('No interests found for the user.');
       }
@@ -137,18 +135,17 @@ class _InterestsPageState extends State<InterestsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      key: _scaffoldKey,
       appBar: AppBar(
         title: const Text(
           'Interests',
-          style: TextStyle(color: Colors.black, fontSize: 24),
+          style: TextStyle(color: Colors.black, fontSize: 18),
         ),
         centerTitle: true,
-        backgroundColor: const Color(0xFF74ACD5),
+        backgroundColor: const Color(0xFF41B1F1),
         leading: IconButton(
-          icon: const Icon(Icons.menu, color: Colors.black),
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () {
-            Navigator.pushNamed(context, "/Side_bar");
+            Navigator.pushNamed(context, "/Preference_&_Interest");
           },
         ),
       ),
@@ -167,8 +164,7 @@ class _InterestsPageState extends State<InterestsPage> {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const SizedBox(
-                      height: 30), // Space between title and dropdowns
+                  const SizedBox(height: 20), // Space between title and dropdowns
                   _buildDropdownCard(
                     icon: Icons.videogame_asset,
                     label: 'Game Mode',
@@ -180,7 +176,7 @@ class _InterestsPageState extends State<InterestsPage> {
                       });
                     },
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 15),
                   _buildDropdownCard(
                     icon: Icons.visibility,
                     label: 'Player Perspective',
@@ -192,7 +188,7 @@ class _InterestsPageState extends State<InterestsPage> {
                       });
                     },
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 15),
                   _buildDropdownCard(
                     icon: Icons.devices,
                     label: 'Platform',
@@ -204,7 +200,7 @@ class _InterestsPageState extends State<InterestsPage> {
                       });
                     },
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 15),
                   _buildDropdownCard(
                     icon: Icons.attach_money,
                     label: 'Price',
@@ -216,7 +212,7 @@ class _InterestsPageState extends State<InterestsPage> {
                       });
                     },
                   ),
-                  const SizedBox(height: 40),
+                  const SizedBox(height: 30),
                   _buildSaveButton(),
                 ],
               ),
@@ -274,7 +270,7 @@ class _InterestsPageState extends State<InterestsPage> {
     return ElevatedButton(
       onPressed: _saveInterests,
       style: ElevatedButton.styleFrom(
-        backgroundColor: const Color(0xFF74ACD5),
+        backgroundColor: const Color(0xFF41B1F1),
         padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
         textStyle: const TextStyle(fontSize: 18),
         shape: RoundedRectangleBorder(

@@ -5,28 +5,24 @@ import 'package:flutter/material.dart';
 import 'package:game_match/pages/Post_home.dart'; 
 import 'package:game_match/pages/Home.dart';
 
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(); // Initialize Firebase
-  runApp(const SignUp());
-}
+// void main() async {
+//   WidgetsFlutterBinding.ensureInitialized();
+//   await Firebase.initializeApp(); // Initialize Firebase
+//   runApp(const SignUp());
+// }
 
 // Main SignUp widget that sets up the MaterialApp
-class SignUp extends StatelessWidget {
-  const SignUp({super.key});
+// class SignUp extends StatelessWidget {
+//   const SignUp({super.key});
 
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: const SignUpScreen(),
-      routes: {
-        '/Post_home': (context) => const WelcomePage(username: 'defaultUsername'),
-        '/Home': (context) => const HomePage(title: 'Home'), // Define the route for Log_in
-      },
-    );
- }
-}
+//   @override
+//   Widget build(BuildContext context) {
+//     return const MaterialApp(
+//       debugShowCheckedModeBanner: false,
+//       home: SignUpScreen(),
+//     );
+//   }
+// }
 
 // SignUpScreen StatefulWidget that handles user registration
 class SignUpScreen extends StatefulWidget {
@@ -50,15 +46,15 @@ class _SignUpScreenState extends State<SignUpScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFFF1F3F4),
       appBar: AppBar(
-        title: const Text('Create an Account',
-            style: TextStyle(color: Colors.black)),
-        backgroundColor: Colors.white,
+        title: const Text('Create an Account', style: TextStyle(color: Colors.black, fontSize: 24,)),
+        centerTitle: true,
+        //backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () {
-            Navigator.pushNamed(context, '/Home'); // Navigate back to the previous screen
-          },
+            onPressed: () {
+              Navigator.pop(context);
+          }, 
         ),
       ),
       body: SingleChildScrollView(
@@ -69,10 +65,25 @@ class _SignUpScreenState extends State<SignUpScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
-                Image.asset(
-                  'assets/images/gamematchlogoresize.png', // Image added at the top of the form
-                  height: 100, // Set the height of the image
+                Padding(
+                padding: const EdgeInsets.only(top: 40.0),
+                child: ColorFiltered(
+                  colorFilter: Theme.of(context).brightness == Brightness.dark
+                      ? const ColorFilter.mode(
+                          Colors.white, // Makes the logo white in dark mode
+                          BlendMode.srcATop,
+                        )
+                      : const ColorFilter.mode(
+                          Colors.transparent, // No change in light mode
+                          BlendMode.srcOver,
+                        ),
+                  child: Image.asset(
+                    'assets/images/gamematchlogoresize.png',
+                    height: 260,
+                    width: 260,
+                  ),
                 ),
+              ),  
                 const SizedBox(height: 20),
                 TextFormField(
                   controller: emailController,
@@ -116,13 +127,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 ),
                 const SizedBox(height: 40),
                 ElevatedButton(
-                  onPressed: () async {
-                  bool isSuccess = await _trySubmit(); // Call the form submission function
-                    if (isSuccess) {
-                    if (mounted) {
-                      Navigator.pushNamed(context, '/Post_home'); // Navigate to home screen if successful
-                    }
-                    }
+                  onPressed: (){
+                    _trySubmit();
+                    Navigator.pushNamed(context, '/Login');
                   }, // Button to trigger form submission
                   style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.blue,

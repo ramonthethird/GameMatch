@@ -11,7 +11,7 @@ class SettingsTermsPage extends StatelessWidget {
           'Terms of Use',
           style: TextStyle(color: Colors.black, fontSize: 24),
         ),
-        backgroundColor: const Color(0xFF74ACD5),
+        backgroundColor: const Color(0xFF41B1F1),
         centerTitle: true,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),

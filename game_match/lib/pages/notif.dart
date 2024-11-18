@@ -2,13 +2,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'dart:convert';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
-
 class NotificationsPage extends StatefulWidget {
-  NotificationsPage({Key? key}) : super(key: key);
+  const NotificationsPage({super.key});
 
   @override
   _NotificationsPageState createState() => _NotificationsPageState();
@@ -230,12 +228,12 @@ class NotificationCard extends StatelessWidget {
   final String dealUrl;
 
   const NotificationCard({
-    Key? key,
+    super.key,
     required this.gameTitle,
     required this.discount,
     required this.thumbnailUrl,
     required this.dealUrl,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -320,7 +318,7 @@ class ReleaseNotificationCard extends StatelessWidget {
 class WarningNotificationCard extends StatelessWidget {
   final String message;
 
-  const WarningNotificationCard({Key? key, required this.message}) : super(key: key);
+  const WarningNotificationCard({super.key, required this.message});
 
   @override
   Widget build(BuildContext context) {

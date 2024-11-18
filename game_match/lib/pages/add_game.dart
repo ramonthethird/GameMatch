@@ -8,7 +8,7 @@ class FirestoreService {
     try {
       await _db.collection('games').add({
         'title': game.name,
-        'link': game.websites?.isNotEmpty == true ? game.websites!.first : '',
+        'link': game.websiteUrl ?? '',
         'coverUrl': game.coverUrl,
         'summary': game.summary,
         'genres': game.genres,

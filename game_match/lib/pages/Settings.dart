@@ -5,24 +5,28 @@ import 'package:provider/provider.dart';
 import 'package:game_match/theme_notifier.dart';
 import 'package:game_match/pages/Settings_Terms.dart';
 import 'package:game_match/pages/Settings_Privacy.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'Side_bar.dart';
 
 class SettingsPage extends StatefulWidget {
+  const SettingsPage({super.key});
+
   @override
   _SettingsPageState createState() => _SettingsPageState();
 }
 
 class _SettingsPageState extends State<SettingsPage> {
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   String? fetchedUsername;
+  String? profilePictureUrl; // Store profile picture URL
   bool notificationsEnabled = false;
 
   @override
   void initState() {
     super.initState();
-    _fetchUsername();
+    _fetchUserProfile();
   }
 
-  Future<void> _fetchUsername() async {
+  Future<void> _fetchUserProfile() async {
     try {
       User? user = FirebaseAuth.instance.currentUser;
 
@@ -32,9 +36,10 @@ class _SettingsPageState extends State<SettingsPage> {
             .doc(user.uid)
             .get();
 
-        if (userDoc.exists && userDoc['username'] != null) {
+        if (userDoc.exists) {
           setState(() {
-            fetchedUsername = userDoc['username'];
+            fetchedUsername = userDoc['username'] ?? 'No username found';
+            profilePictureUrl = userDoc['profileImageUrl'] ?? ''; // Fetch profile picture URL
           });
         } else {
           setState(() {
@@ -47,65 +52,11 @@ class _SettingsPageState extends State<SettingsPage> {
         });
       }
     } catch (e) {
-      print('Error fetching username: $e');
+      print('Error fetching user profile: $e');
       setState(() {
-        fetchedUsername = 'Error fetching username';
+        fetchedUsername = 'Error fetching user profile';
       });
     }
-  }
-
-  Future<void> _changeUsername() async {
-    TextEditingController usernameController = TextEditingController();
-
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text('Change Username'),
-          content: TextField(
-            controller: usernameController,
-            decoration: const InputDecoration(hintText: 'Enter new username'),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text('Cancel'),
-            ),
-            ElevatedButton(
-              onPressed: () async {
-                String newUsername = usernameController.text.trim();
-                if (newUsername.isNotEmpty) {
-                  try {
-                    User? user = FirebaseAuth.instance.currentUser;
-                    if (user != null) {
-                      await FirebaseFirestore.instance
-                          .collection('users')
-                          .doc(user.uid)
-                          .update({'username': newUsername});
-                      setState(() {
-                        fetchedUsername = newUsername;
-                      });
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Username updated to $newUsername')),
-                      );
-                    }
-                  } catch (e) {
-                    print('Error updating username: $e');
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Failed to update username.')),
-                    );
-                  }
-                  Navigator.of(context).pop();
-                }
-              },
-              child: const Text('Save'),
-            ),
-          ],
-        );
-      },
-    );
   }
 
   @override
@@ -113,6 +64,7 @@ class _SettingsPageState extends State<SettingsPage> {
     final themeNotifier = Provider.of<ThemeNotifier>(context);
 
     return Scaffold(
+      key: _scaffoldKey, // Key for the scaffold
       appBar: AppBar(
         title: const Text(
           'Settings',
@@ -122,16 +74,22 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
         ),
         centerTitle: true,
-        backgroundColor: const Color(0xFF74ACD5),
+        backgroundColor: const Color(0xFF41B1F1),
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(
-            Icons.arrow_back,
-            color: Colors.black,
-          ),
+          icon: const Icon(Icons.menu, color: Colors.black), // Sidebar Icon
           onPressed: () {
-            Navigator.pop(context);
+            _scaffoldKey.currentState?.openDrawer();
           },
+        ),
+      ),
+      drawer: Drawer(
+        child: SideBar(
+          onThemeChanged: (isDarkMode) {
+            // Handle theme change here
+            themeNotifier.toggleTheme(isDarkMode);
+          },
+          isDarkMode: themeNotifier.isDarkMode,
         ),
       ),
       body: SingleChildScrollView(
@@ -143,7 +101,9 @@ class _SettingsPageState extends State<SettingsPage> {
               const SizedBox(height: 20),
               CircleAvatar(
                 radius: 50,
-                backgroundImage: AssetImage('assets/images/profile_picture.png'),
+                backgroundImage: profilePictureUrl != null && profilePictureUrl!.isNotEmpty
+                    ? NetworkImage(profilePictureUrl!) // Use the URL if available
+                    : const AssetImage('assets/images/profile_picture.png') as ImageProvider, // Fallback to placeholder
               ),
               const SizedBox(height: 10),
               Text(
@@ -153,14 +113,6 @@ class _SettingsPageState extends State<SettingsPage> {
                   fontWeight: FontWeight.bold,
                   color: themeNotifier.isDarkMode ? Colors.white : Colors.black,
                 ),
-              ),
-              const SizedBox(height: 30),
-              buildSectionHeader('Account Information'),
-              buildSettingsOption(
-                context,
-                'Change Username',
-                _changeUsername,
-                Icons.person,
               ),
               const SizedBox(height: 20),
               buildSectionHeader('Appearance'),
@@ -189,16 +141,16 @@ class _SettingsPageState extends State<SettingsPage> {
               buildSettingsOption(
                 context,
                 'Terms of Service',
-                SettingsTermsPage(),
+                const SettingsTermsPage(),
                 Icons.description,
               ),
               buildSettingsOption(
                 context,
                 'Privacy Policy',
-                SettingsPrivacyPage(),
+                const SettingsPrivacyPage(),
                 Icons.privacy_tip,
               ),
-              const SizedBox(height: 40),
+              const SizedBox(height: 200),
             ],
           ),
         ),

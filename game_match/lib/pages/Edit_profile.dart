@@ -178,8 +178,8 @@ class _EditProfileState extends State<EditProfile> {
             Navigator.pop(context);
           },
         ),
-        title: const Text('Edit Profile'),
-        backgroundColor: const Color(0xFF74ACD5),
+        title: const Text('Edit Profile', style: TextStyle(fontSize: 18)),
+        backgroundColor: const Color(0xFF41B1F1),
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -189,9 +189,9 @@ class _EditProfileState extends State<EditProfile> {
                 Container(
                   width: double.infinity,
                   height: 120,
-                  decoration: const BoxDecoration(
+                  decoration: BoxDecoration(
                     gradient: LinearGradient(
-                      colors: [Color(0xFFF1F3F4), Color(0xFFF1F3F4)],
+                      colors: [Colors.grey[300]!],
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                     ),

@@ -5,24 +5,32 @@ import 'game_model.dart';
 import 'package:game_match/firestore_service.dart';
 import 'dart:async';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'Side_bar.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class SwipePage extends StatefulWidget {
-  const SwipePage({Key? key}) : super(key: key);
+  const SwipePage({super.key});
 
   @override
   _SwipePageState createState() => _SwipePageState();
 }
 
 class _SwipePageState extends State<SwipePage> with TickerProviderStateMixin {
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final ApiService apiService = ApiService();
   final FirestoreService _firestoreService = FirestoreService();
+  StreamSubscription? _firestoreSubscription;
   List<Game> games = [];
   List<Game> swipedGames = [];
   Game? selectedGame;
   Offset _swipeOffset = Offset.zero;
   double _rotationAngle = 0.0;
   double _opacity = 1.0;
-  int _currentIndex = 0;
+  final int _currentIndex = 0;
+  int _swipeCount = 0; // track the number of swipes
+  final int _swipeThreshold = 3; // number of swipes to trigger an ad
+
   AnimationController? _heartAnimationController;
   AnimationController? _heartbrokenAnimationController;
   Animation<double>? _heartFadeAnimation;
@@ -40,7 +48,10 @@ class _SwipePageState extends State<SwipePage> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    _fetchGames();
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      _fetchGames(user.uid);
+    }
 
     _heartAnimationController = AnimationController(
       vsync: this,
@@ -94,20 +105,40 @@ class _SwipePageState extends State<SwipePage> with TickerProviderStateMixin {
     ));
   }
 
-  Future<void> _fetchGames() async {
-    try {
-      // Try to load games from Firestore first
-      List<Game> firestoreGames = await _firestoreService.loadGames();
+  void _showCustomAd() {
+    if (!mounted) return;
 
-      if (firestoreGames.isNotEmpty) {
+    // Push the ad page on top of the current page without replacing it
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (ModalRoute.of(context)?.isCurrent ?? false) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const CustomAdPage()),
+        ).then((_) {
+          if (mounted) {
+            setState(() {
+              _swipeCount = 0; // Reset swipe count after ad
+            });
+          }
+        });
+      }
+    });
+  }
+
+  Future<void> _fetchGames(String userId) async {
+    try {
+      // Try to load recommended games from Firestore for the current user
+      List<Game> recommendedGames = await _firestoreService.loadRecommendedGames(userId);
+
+      if (recommendedGames.isNotEmpty) {
         setState(() {
-          games = firestoreGames;
+          games = recommendedGames;
           selectedGame = games[0];
         });
-        print('Games loaded from Firestore');
+        print('Recommended games loaded from Firestore');
       } else {
-        // If Firestore is empty, fetch games from the API
-        print('No games in Firestore, fetching from API...');
+        // If no recommended games, fetch games from the API
+        print('No recommended games in Firestore, fetching from API...');
         List<Game> fetchedGames = await apiService.fetchGames();
 
         if (fetchedGames.isNotEmpty) {
@@ -134,8 +165,9 @@ class _SwipePageState extends State<SwipePage> with TickerProviderStateMixin {
 
   Future<void> _fetchPricesForGames(List<Game> fetchedGames) async {
     try {
-      await apiService.fetchPricesForIGDBGames(fetchedGames);
-      fetchedGames.removeWhere((game) => game.price == null || game.price! <= 0);
+      // await apiService.fetchPricesForIGDBGames(fetchedGames);
+      fetchedGames
+          .removeWhere((game) => game.price == null || game.price! <= 0);
       setState(() {
         games = fetchedGames;
       });
@@ -163,7 +195,8 @@ class _SwipePageState extends State<SwipePage> with TickerProviderStateMixin {
     setState(() {
       _swipeOffset += details.delta;
       _rotationAngle = _swipeOffset.dx / 300;
-      _opacity = 1 - (_swipeOffset.dx.abs() / MediaQuery.of(context).size.width);
+      _opacity =
+          1 - (_swipeOffset.dx.abs() / MediaQuery.of(context).size.width);
     });
   }
 
@@ -173,6 +206,7 @@ class _SwipePageState extends State<SwipePage> with TickerProviderStateMixin {
     _instructionAnimationController?.dispose();
     _heartAnimationController?.dispose();
     _heartbrokenAnimationController?.dispose();
+    _firestoreSubscription?.cancel();
     super.dispose();
   }
 
@@ -226,10 +260,10 @@ class _SwipePageState extends State<SwipePage> with TickerProviderStateMixin {
           );
         } catch (e) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: const Text('Failed to add game to wishlist. Try again.'),
+            const SnackBar(
+              content: Text('Failed to add game to wishlist. Try again.'),
               backgroundColor: Colors.red,
-              duration: const Duration(seconds: 2),
+              duration: Duration(seconds: 2),
             ),
           );
         }
@@ -269,18 +303,18 @@ class _SwipePageState extends State<SwipePage> with TickerProviderStateMixin {
       try {
         await _firestoreService.removeFromWishlist(lastSwipedGame.id);
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Text('Action has been reverted.'),
+          const SnackBar(
+            content: Text('Action has been reverted.'),
             backgroundColor: Colors.orange,
-            duration: const Duration(seconds: 2),
+            duration: Duration(seconds: 2),
           ),
         );
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Text('Failed to revert action.'),
+          const SnackBar(
+            content: Text('Failed to revert action.'),
             backgroundColor: Colors.red,
-            duration: const Duration(seconds: 2),
+            duration: Duration(seconds: 2),
           ),
         );
       }
@@ -293,8 +327,21 @@ class _SwipePageState extends State<SwipePage> with TickerProviderStateMixin {
       });
     }
   }
-
-  void _onGameSwiped(int index) {
+// get user info (subscription status) from Firestore
+Future<Map<String, String>> getsubscriptionstatus() async {
+  User? user = FirebaseAuth.instance.currentUser;
+  if (user != null) {
+    DocumentSnapshot userDoc = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(user.uid)
+        .get();
+    String subscriptionStatus = userDoc['subscription'] ?? 'free';
+    return {'subscriptionStatus': subscriptionStatus};
+  }
+    return {'subscriptionStatus': 'free'};
+  }
+  
+  void _onGameSwiped(int index) async {
     if (games.isNotEmpty) {
       setState(() {
         swipedGames.add(games[index]);
@@ -302,34 +349,48 @@ class _SwipePageState extends State<SwipePage> with TickerProviderStateMixin {
         _swipeOffset = Offset.zero;
         _rotationAngle = 0.0;
         _opacity = 1.0;
+
+        // increment swipe count and check if custom ad should be shown
+        _swipeCount++;
       });
+
+      if (_swipeCount >= _swipeThreshold) {
+        Map<String, String> subscriptionStatus = await getsubscriptionstatus();
+        if (subscriptionStatus['subscriptionStatus'] == 'free') {
+          _showCustomAd();
+        } else {
+          setState(() {
+            _swipeCount = 0; // Reset swipe count after ad
+          });
+        }
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    if (games.isEmpty) {
-      return Scaffold(
-        appBar: AppBar(
-          title: const Text('Swipe Games'),
-        ),
-        body: const Center(
-          child: CircularProgressIndicator(),
-        ),
-      );
-    }
-
     return Scaffold(
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(100.0),
-        child: AppBar(
-          centerTitle: true,
-          leading: const Icon(Icons.menu),
-          title: Image.asset(
-            'assets/images/gamematchlogoresize.png',
-            height: 50,
-            width: 50,
-          ),
+      key: _scaffoldKey, // Key for the scaffold
+      appBar: AppBar(
+        centerTitle: true,
+        leading: IconButton(
+          icon: const Icon(Icons.menu, color: Colors.black), // Sidebar Icon
+          onPressed: () {
+            _scaffoldKey.currentState?.openDrawer();
+          },
+        ),
+        title: Image.asset(
+          'assets/images/gamematchlogoresize.png',
+          height: 50,
+          width: 50,
+        ),
+      ),
+      drawer: Drawer(
+        child: SideBar(
+          onThemeChanged: (isDarkMode) {
+            // Handle theme change here
+          },
+          isDarkMode: false, // Replace with actual theme state if implemented
         ),
       ),
       body: Stack(
@@ -404,7 +465,7 @@ class _SwipePageState extends State<SwipePage> with TickerProviderStateMixin {
                                           game.name ?? 'Unknown Game',
                                           style: const TextStyle(
                                             color: Colors.white,
-                                            fontSize: 18.0,
+                                            fontSize: 20.0,
                                             fontWeight: FontWeight.bold,
                                             shadows: [
                                               Shadow(
@@ -426,8 +487,7 @@ class _SwipePageState extends State<SwipePage> with TickerProviderStateMixin {
                                               MaterialPageRoute(
                                                 builder: (context) =>
                                                     GameDetailScreen(
-                                                        gameId:
-                                                            game.id),
+                                                        gameId: game.id),
                                               ),
                                             );
                                           },
@@ -475,9 +535,9 @@ class _SwipePageState extends State<SwipePage> with TickerProviderStateMixin {
                               crossAxisAlignment: WrapCrossAlignment.center,
                               spacing: 8,
                               children: [
-                                Text(
+                                const Text(
                                   'Platforms:',
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.bold,
                                       color: Color.fromARGB(255, 240, 98, 146)),
@@ -596,7 +656,7 @@ class _SwipePageState extends State<SwipePage> with TickerProviderStateMixin {
                                         ],
                                       );
                                     }
-                                  }).toList(),
+                                  }),
                               ],
                             ),
                           ),
@@ -608,9 +668,9 @@ class _SwipePageState extends State<SwipePage> with TickerProviderStateMixin {
                           const Icon(Icons.calendar_today,
                               size: 24), // Icon for release date
                           const SizedBox(width: 8),
-                          Text(
+                          const Text(
                             'Release Date: ',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
                               color: Colors.blue, // Color for "Release Date"
@@ -619,13 +679,12 @@ class _SwipePageState extends State<SwipePage> with TickerProviderStateMixin {
                           Expanded(
                             child: Text(
                               games.isNotEmpty
-                                  ? games.first.releaseDates?.join(", ") ??
+                                  ? games.first.releaseDates.join(", ") ??
                                       "Unknown"
                                   : " ",
                               style: const TextStyle(
                                 fontSize: 16,
-                                color: Colors
-                                    .black, // Default color for fetched text
+                                //color: Colors.black, // Default color for fetched text
                               ),
                               overflow: TextOverflow.ellipsis,
                             ),
@@ -638,9 +697,9 @@ class _SwipePageState extends State<SwipePage> with TickerProviderStateMixin {
                           const Icon(Icons.category,
                               size: 24), // Icon for genres
                           const SizedBox(width: 8),
-                          Text(
+                          const Text(
                             'Genres: ',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
                               color: Color.fromARGB(
@@ -650,13 +709,12 @@ class _SwipePageState extends State<SwipePage> with TickerProviderStateMixin {
                           Expanded(
                             child: Text(
                               games.isNotEmpty
-                                  ? games.first.genres?.join(", ") ??
+                                  ? games.first.genres.join(", ") ??
                                       "Unknown genres"
                                   : " ",
                               style: const TextStyle(
                                 fontSize: 16,
-                                color: Colors
-                                    .black, // Default color for fetched text
+                                //color: Colors.black, // Default color for fetched text
                               ),
                               overflow: TextOverflow.ellipsis,
                             ),
@@ -677,24 +735,24 @@ class _SwipePageState extends State<SwipePage> with TickerProviderStateMixin {
                       heroTag: 'dislike',
                       backgroundColor: Colors.blue,
                       shape: const CircleBorder(),
+                      onPressed: _onDislike,
                       child: const Icon(Icons.heart_broken,
                           color: Colors.white, size: 32),
-                      onPressed: _onDislike,
                     ),
                     FloatingActionButton(
                       heroTag: 'undo',
                       backgroundColor: Colors.grey.shade300,
                       shape: const CircleBorder(),
-                      child: const Icon(Icons.undo, size: 32),
                       onPressed: _onUndo,
+                      child: const Icon(Icons.undo, size: 32, color: Colors.black,),
                     ),
                     FloatingActionButton(
                       heroTag: 'like',
                       backgroundColor: Colors.pink[300],
                       shape: const CircleBorder(),
+                      onPressed: _onLike,
                       child: const Icon(Icons.favorite,
                           color: Colors.white, size: 32),
-                      onPressed: _onLike,
                     ),
                   ],
                 ),
@@ -708,15 +766,15 @@ class _SwipePageState extends State<SwipePage> with TickerProviderStateMixin {
               top: MediaQuery.of(context).size.height * 0.2,
               child: SlideTransition(
                 position: _instructionWagAnimation!,
-                child: Column(
+                child: const Column(
                   children: [
                     Icon(
                       Icons.swipe,
                       size: 100,
                       color: Colors.white,
                     ),
-                    const SizedBox(height: 8),
-                    const Text(
+                    SizedBox(height: 8),
+                    Text(
                       'Swipe to interact',
                       style: TextStyle(
                         color: Colors.white,
@@ -771,6 +829,106 @@ class _SwipePageState extends State<SwipePage> with TickerProviderStateMixin {
               ),
             ),
         ],
+      ),
+    );
+  }
+}
+
+class CustomAdPage extends StatelessWidget {
+  const CustomAdPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.grey[100], // Light background color
+      body: Center(
+        child: Card(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          elevation: 4,
+          margin: const EdgeInsets.symmetric(horizontal: 24),
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Title
+                const Text(
+                  'Sponsored by NBA',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 16),
+
+                // Image
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(10),
+                  child: Image.asset(
+                    'assets/images/nba-logo.png',
+                    width: 300,
+                    height: 300,
+                    fit: BoxFit.cover,
+                  ),
+                ),
+
+                const SizedBox(height: 16),
+
+                // Description
+                const Text(
+                  'GameMatch is proud to be sponsored by the NBA. This partnership allows us to bring you exclusive content, special events, and unique gaming experiences. Stay tuned for more exciting updates and opportunities to engage with your favorite NBA teams and players through our platform.',
+                  style: TextStyle(fontSize: 16, color: Colors.black87),
+                  textAlign: TextAlign.center,
+                ),
+
+                const SizedBox(height: 20),
+
+                // Buttons
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    // Learn Button
+                    OutlinedButton(
+                      onPressed: () {
+                        // Handle Learn action
+                      },
+                      style: OutlinedButton.styleFrom(
+                        side: const BorderSide(color: Colors.grey),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 32, vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      child: const Text(
+                        'Learn',
+                        style: TextStyle(color: Colors.black54),
+                      ),
+                    ),
+
+                    // Close Button
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF41B1F1),
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 32, vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      child: const Text('Close'),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }

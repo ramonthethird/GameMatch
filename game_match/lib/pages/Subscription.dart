@@ -30,6 +30,7 @@ class SubscriptionManagementScreen extends StatelessWidget {
         elevation: 1,
         leading: IconButton(
           icon: const Icon(Icons.menu, color: Colors.white),
+
           onPressed: () {
             _scaffoldKey.currentState?.openDrawer();
           },

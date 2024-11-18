@@ -30,9 +30,8 @@ class HomeScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: isDarkMode ? Colors.black : Colors.white,
       appBar: AppBar(
-        title: const Text("Home Screen"),
         backgroundColor:
-            isDarkMode ? Colors.grey[900] : const Color(0xFF74ACD5),
+            isDarkMode ? Colors.grey[900] : const Color(0xFF41B1F1),
       ),
       drawer: SideBar(
         onThemeChanged: onThemeChanged,
@@ -69,78 +68,102 @@ class SideBar extends StatelessWidget {
           .collection('users')
           .doc(user.uid)
           .get();
-      String userName = userDoc['username'] ?? 'Unknown';
+      var userData = userDoc.data() as Map<String, dynamic>?;
+      String userName = userData?['username'] ?? 'Unknown';
 
       DateTime? creationTime = user.metadata.creationTime;
       String memberSince = creationTime != null
           ? DateFormat('MMMM yyyy').format(creationTime)
           : 'Unknown';
-
-      String profileImageUrl = userDoc['profileImageUrl'] ?? '';
+      String profileImageUrl = userData?['profileImageUrl'] ?? '';
+      if (profileImageUrl.isEmpty) {
+        profileImageUrl = '';
+      }
+      String subscriptionStatus = userData?['subscription'] ?? 'free';
       return {
         'username': userName,
         'memberSince': memberSince,
-        'profileImageUrl': profileImageUrl
+        'profileImageUrl': profileImageUrl,
+        'subscription': subscriptionStatus
       };
     }
-    return {'username': 'Unknown', 'memberSince': 'Unknown'};
-  }
 
+    return {
+      'username': 'Unknown',
+      'memberSince': 'Unknown',
+      'profileImageUrl': ''
+    };
+  }
+  Future<void> navigateToSubscription(BuildContext context) async {
+  User? user = FirebaseAuth.instance.currentUser;
+  if (user != null) {
+    DocumentSnapshot userDoc = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(user.uid)
+        .get();
+
+    // Ensure the document data is available and contains 'subscription'
+    String subscriptionStatus = userDoc.data() != null && (userDoc.data() as Map<String, dynamic>).containsKey('subscription')
+        ? userDoc['subscription'] as String
+        : 'free';
+
+    if (subscriptionStatus == 'free') {
+      Navigator.pushNamed(context, '/Subscription'); // Free subscription page
+    } else if (subscriptionStatus == 'paid') {
+      Navigator.pushNamed(context, '/SubscriptionPremium'); // Paid subscription page
+    }
+  }
+}
   @override
   Widget build(BuildContext context) {
     return Drawer(
       width: MediaQuery.of(context).size.width *
           0.60, // Sidebar covers 60% of screen width
-      backgroundColor: isDarkMode ? Colors.black : Colors.white,
+      backgroundColor: isDarkMode ? Colors.black : const Color(0xFFF1F3F4),
       child: Column(
         children: [
           Container(
             padding: const EdgeInsets.all(20),
-            color: const Color(0xFF74ACD5),
+            color: const Color(0xFF41B1F1),
             width: double.infinity,
             child: Row(
-              children: [
+                children: [
                 GestureDetector(
                   onTap: () {
-                    Navigator.pushNamed(context, '/Profile');
+                  Navigator.pushNamed(context, '/Profile');
                   },
                   child: Container(
-                    width: 60,
-                    height: 60,
-                    decoration: const BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Colors.grey, // Background color for the icon
-                    ),
-                    child: FutureBuilder<Map<String, String>>(
-                      future: getUserInfo(),
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return const CircularProgressIndicator();
-                        } else if (snapshot.hasError) {
-                          return const Icon(Icons.error, color: Colors.red);
-                        } else {
-                          final userInfo =
-                              snapshot.data ?? {'profileImageUrl': ''};
-                          if (userInfo['profileImageUrl'] == null ||
-                              userInfo['profileImageUrl']!.isEmpty) {
-                            return const Icon(Icons.person,
-                                color: Colors.white, size: 40);
-                          } else {
-                            return Container(
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                image: DecorationImage(
-                                  image: NetworkImage(
-                                      userInfo['profileImageUrl']!),
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
-                            );
-                          }
-                        }
-                      },
-                    ),
+                  width: 60,
+                  height: 60,
+                  decoration: const BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.grey, // Background color for the icon
+                  ),
+                  child: FutureBuilder<Map<String, String>>(
+                    future: getUserInfo(),
+                    builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const CircularProgressIndicator();
+                    } else if (snapshot.hasError) {
+                      return const Icon(Icons.error, color: Colors.red);
+                    } else {
+                      final userInfo = snapshot.data ?? {'profileImageUrl': ''};
+                      if (userInfo['profileImageUrl'] == null || userInfo['profileImageUrl']!.isEmpty) {
+                        return const Icon(Icons.person, size: 40);
+                      } else {
+                        return Container(
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            image: DecorationImage(
+                              image: NetworkImage(userInfo['profileImageUrl']!),
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        );
+                      }
+                    }
+                    },
+                  ),
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -169,7 +192,7 @@ class SideBar extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  snapshot.data?['username'] ?? 'Unknown',
+                                    snapshot.data?['username'] ?? 'Unknown',
                                   style: TextStyle(
                                     fontSize: 18,
                                     color: isDarkMode
@@ -190,7 +213,7 @@ class SideBar extends StatelessWidget {
                                 ),
                                 const SizedBox(height: 4),
                                 Text(
-                                  "Diamond Tier",
+                                  snapshot.data?['subscription'] == 'paid' ? 'Premium' : '',
                                   style: TextStyle(
                                     fontSize: 14,
                                     color: isDarkMode
@@ -217,18 +240,19 @@ class SideBar extends StatelessWidget {
                 buildMenuButton(context, Icons.home, "Home", () {
                   Navigator.pushNamed(context, '/Post_home');
                 }),
-                buildMenuButton(context, Icons.room_preferences, "Preferences",
+                buildMenuButton(context, Icons.favorite, "Swipe Games", 
                     () {
-                  Navigator.pushNamed(context, '/Preference_&_Interest');
+                  Navigator.pushNamed(context, '/Swipe');
                 }),
                 buildMenuButton(context, Icons.subscriptions, "Subscription",
                     () {
-                  Navigator.pushNamed(context, '/Subscription');
+                  navigateToSubscription(context); // Check subscription status
                 }),
                 buildMenuButton(context, Icons.interests, "Wishlist", () {
                   Navigator.pushNamed(context, '/Wishlist');
                 }),
-                buildMenuButton(context, Icons.reviews, "My Reviews", () {
+                buildMenuButton(
+                    context, Icons.reviews, "My Reviews", () {
                   Navigator.pushNamed(context, '/Reviews');
                 }),
                 buildMenuButton(context, Icons.settings, "Settings", () {
@@ -247,29 +271,32 @@ class SideBar extends StatelessWidget {
                               color: isDarkMode ? Colors.white : Colors.black),
                         ),
                         actions: [
-                          TextButton(
+                          Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            TextButton(
                             child: Text(
                               "No",
                               style: TextStyle(
-                                  color:
-                                      isDarkMode ? Colors.white : Colors.black),
+                                color: isDarkMode ? Colors.white : Colors.black),
                             ),
                             onPressed: () {
                               Navigator.of(context).pop();
                             },
-                          ),
-                          TextButton(
+                            ),
+                            TextButton(
                             child: Text(
                               "Yes",
                               style: TextStyle(
-                                  color:
-                                      isDarkMode ? Colors.white : Colors.black),
+                                color: isDarkMode ? Colors.white : Colors.black),
                             ),
                             onPressed: () {
                               FirebaseAuth.instance.signOut();
                               Navigator.pushNamedAndRemoveUntil(
-                                  context, "/Home", (route) => false);
+                                context, "/Home", (route) => false);
                             },
+                            ),
+                          ],
                           ),
                         ],
                       );

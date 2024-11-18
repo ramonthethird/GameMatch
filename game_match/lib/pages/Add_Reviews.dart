@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'Submitted_Reviews.dart'; // Import the Submitted Reviews page
+// Import the Submitted Reviews page
 
 class AddReviewsPage extends StatefulWidget {
   final String gameId;
 
-  AddReviewsPage({required this.gameId});
+  const AddReviewsPage({super.key, required this.gameId});
 
   @override
   _AddReviewsPageState createState() => _AddReviewsPageState();
@@ -45,7 +45,7 @@ class _AddReviewsPageState extends State<AddReviewsPage> {
 
         // Show a success message
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
+          const SnackBar(
             content: Text('Review submitted successfully!'),
             backgroundColor: Colors.green,
             duration: Duration(seconds: 3),
@@ -54,7 +54,7 @@ class _AddReviewsPageState extends State<AddReviewsPage> {
       } catch (e) {
         // Show an error message if the review submission fails
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
+          const SnackBar(
             content: Text('Failed to submit review. Please try again.'),
             backgroundColor: Colors.red,
             duration: Duration(seconds: 3),
@@ -68,8 +68,8 @@ class _AddReviewsPageState extends State<AddReviewsPage> {
 
   // Function to update the rating based on user's interaction with the stars
   void _updateRating(double localX) {
-    final double starWidth = 32.0; // Each star's width
-    final double totalWidth = starWidth * 5; // Total width for all stars
+    const double starWidth = 32.0; // Each star's width
+    const double totalWidth = starWidth * 5; // Total width for all stars
 
     // Ensure the x position is within valid bounds
     if (localX < 0) localX = 0;
@@ -86,12 +86,16 @@ class _AddReviewsPageState extends State<AddReviewsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Create New Review'),
+        title: const Text('Create New Review',
+        style: TextStyle(
+              color: Colors.black, 
+              fontSize: 18,
+            ),),
         centerTitle: true,
-        backgroundColor: Colors.white,
+        //backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.black),
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () {
             Navigator.pop(context); // Navigate back to the previous screen
           },
@@ -103,11 +107,11 @@ class _AddReviewsPageState extends State<AddReviewsPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Review Title Input
-            Text(
+            const Text(
               'Review Title',
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
             TextField(
               controller: titleController,
               decoration: InputDecoration(
@@ -120,14 +124,14 @@ class _AddReviewsPageState extends State<AddReviewsPage> {
                 ),
               ),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
 
             // Review Body Input
-            Text(
+            const Text(
               'Review Body',
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
             TextField(
               controller: bodyController,
               maxLines: 8,
@@ -142,14 +146,14 @@ class _AddReviewsPageState extends State<AddReviewsPage> {
                 ),
               ),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
 
             // Star Rating Row
-            Text(
+            const Text(
               'Rating:',
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
             GestureDetector(
               onPanUpdate: (details) {
                 _updateRating(details.localPosition.dx); // Update rating based on drag
@@ -170,7 +174,7 @@ class _AddReviewsPageState extends State<AddReviewsPage> {
                 }),
               ),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
 
             // Post Review Button
             SizedBox(
@@ -180,47 +184,47 @@ class _AddReviewsPageState extends State<AddReviewsPage> {
                   _addReview(titleController.text, bodyController.text, rating); // Call the function to submit the review
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue,
-                  padding: EdgeInsets.symmetric(vertical: 16),
+                  backgroundColor: const Color(0xFF41B1F1),
+                  padding: const EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),
                 ),
-                child: Text(
+                child: const Text(
                   'Post Review',
                   style: TextStyle(color: Colors.white, fontSize: 16),
                 ),
               ),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
 
             // Navigate to Submitted Reviews Button
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => SubmittedReviewsPage()), // Navigate to the SubmittedReviewsPage
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.grey,
-                  padding: EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-                child: Text(
-                  'Submitted Reviews',
-                  style: TextStyle(color: Colors.white, fontSize: 16),
-                ),
-              ),
-            ),
+            // SizedBox(
+            //   width: double.infinity,
+            //   child: ElevatedButton(
+            //     onPressed: () {
+            //       Navigator.push(
+            //         context,
+            //         MaterialPageRoute(builder: (context) => SubmittedReviewsPage()), // Navigate to the SubmittedReviewsPage
+            //       );
+            //     },
+            //     style: ElevatedButton.styleFrom(
+            //       backgroundColor: Color(0xFF41B1F1),
+            //       padding: EdgeInsets.symmetric(vertical: 16),
+            //       shape: RoundedRectangleBorder(
+            //         borderRadius: BorderRadius.circular(10),
+            //       ),
+            //     ),
+            //     child: Text(
+            //       'Submitted Reviews',
+            //       style: TextStyle(color: Colors.white, fontSize: 16),
+            //     ),
+            //   ),
+            // ),
 
             // Guidelines Text
-            SizedBox(height: 20),
-            Text(
+            //SizedBox(height: 20),
+            const Text(
               'Please ensure your review follows our community guidelines.',
               style: TextStyle(color: Colors.grey, fontSize: 14),
               textAlign: TextAlign.center,
