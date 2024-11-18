@@ -160,6 +160,7 @@ class _ViewReviewsPageState extends State<ViewReviewsPage> {
       });
     }
   }
+  
 
   Future<void> _editReview(String reviewId, Map<String, dynamic> currentReview) async {
   TextEditingController titleController = TextEditingController(text: currentReview['title']);
@@ -178,7 +179,7 @@ class _ViewReviewsPageState extends State<ViewReviewsPage> {
             builder: (context, setState) {
               void updateRating(double localX) {
                 const double starWidth = 32.0;
-                final double totalWidth = starWidth * 5;
+                const double totalWidth = starWidth * 5;
                 if (localX < 0) localX = 0;
                 if (localX > totalWidth) localX = totalWidth;
                 double newRating = (localX / starWidth);
@@ -537,16 +538,22 @@ Future<void> _deleteReview(String reviewId) async {
             children: [
               Row(
                 children: [
-                  CircleAvatar(
-                    backgroundColor: Colors.grey[300],
-                    radius: 20,
-                    backgroundImage: profilePictureUrl != null && profilePictureUrl!.isNotEmpty
-                        ? NetworkImage(profilePictureUrl!)
-                        : null,
-                    child: profilePictureUrl == null || profilePictureUrl!.isEmpty
-                        ? Icon(Icons.person, color: Colors.grey[600])
-                        : null,
-                  ),
+                    GestureDetector(
+                      onTap: () {
+                        // Pass the userId when navigating to the profile page
+                        Navigator.pushNamed(context, '/View_profile', arguments: userId);
+                      },
+                      child: CircleAvatar(
+                        backgroundColor: Colors.grey[300],
+                        radius: 20,
+                        backgroundImage: profilePictureUrl != null && profilePictureUrl!.isNotEmpty
+                          ? NetworkImage(profilePictureUrl!)
+                          : null,
+                        child: profilePictureUrl == null || profilePictureUrl!.isEmpty
+                          ? Icon(Icons.person, color: Colors.grey[600])
+                          : null,
+                      ),
+                    ),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Column(
@@ -696,7 +703,7 @@ Future<void> _deleteReview(String reviewId) async {
         title: const Text('View Reviews',
           style: TextStyle(
               color: Colors.black, 
-              fontSize: 24,
+              fontSize: 18,
             ),
           ),
         centerTitle: true,

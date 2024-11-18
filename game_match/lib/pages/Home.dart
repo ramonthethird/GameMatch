@@ -25,8 +25,8 @@ class HomePage extends StatelessWidget {
                 padding: const EdgeInsets.only(top: 40.0),
                 child: Image.asset(
                   'assets/images/gamematchlogoresize.png',
-                  height: 260,
-                  width: 260,
+                  height: 200,
+                  width: 200,
                 ),
               ),
             const SizedBox(height: 30), // For spacing

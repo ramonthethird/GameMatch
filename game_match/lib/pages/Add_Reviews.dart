@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'Submitted_Reviews.dart'; // Import the Submitted Reviews page
+// Import the Submitted Reviews page
 
 class AddReviewsPage extends StatefulWidget {
   final String gameId;
@@ -69,7 +69,7 @@ class _AddReviewsPageState extends State<AddReviewsPage> {
   // Function to update the rating based on user's interaction with the stars
   void _updateRating(double localX) {
     const double starWidth = 32.0; // Each star's width
-    final double totalWidth = starWidth * 5; // Total width for all stars
+    const double totalWidth = starWidth * 5; // Total width for all stars
 
     // Ensure the x position is within valid bounds
     if (localX < 0) localX = 0;
@@ -89,7 +89,7 @@ class _AddReviewsPageState extends State<AddReviewsPage> {
         title: const Text('Create New Review',
         style: TextStyle(
               color: Colors.black, 
-              fontSize: 24,
+              fontSize: 18,
             ),),
         centerTitle: true,
         //backgroundColor: Colors.white,

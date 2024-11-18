@@ -25,7 +25,7 @@ class _AddThreadsPageState extends State<AddThreadsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Create New Thread'),
+        title: const Text('Create New Thread', style: TextStyle(fontSize: 18,)),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {

@@ -93,7 +93,7 @@ class ApiService {
           if (game.coverUrl == null || game.coverUrl!.isEmpty) return false;
           if (game.screenshotUrls == null || game.screenshotUrls!.isEmpty) return false;
           if (game.summary == null || game.summary!.isEmpty) return false;
-          if (game.releaseDates == null || game.releaseDates.isEmpty) return false;
+          if (game.releaseDates.isEmpty) return false;
 
           DateTime? releaseDate = _parseReleaseDate(game.releaseDates.first);
           return releaseDate != null && releaseDate.year >= 2020;
@@ -316,7 +316,7 @@ class ApiService {
     }
 
     final Uri url = Uri.parse('https://api.igdb.com/v4/genres');
-    final String body = '''
+    const String body = '''
     fields id, name;
     limit 50;
     '''; // Genre({required this.id, required this.name});
@@ -587,7 +587,7 @@ class ApiService {
   Future<List<Game>> fetchPopularGames() async {
     final accessToken = await retrieveAccessToken();
     final Uri url = Uri.parse('$baseUrl/games');
-    final String body = '''
+    const String body = '''
       fields name, summary, genres.name, cover.url, platforms.name, release_dates.human, websites.url;
       sort popularity desc;
       limit 10;

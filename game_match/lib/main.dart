@@ -1,8 +1,7 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:game_match/pages/Billing_info.dart';
-import 'package:game_match/pages/Community.dart';
+import 'package:game_match/pages/community_page.dart';
 import 'package:game_match/pages/Edit_profile.dart';
 import 'package:game_match/pages/Home.dart';
 import 'package:game_match/pages/Settings_Privacy.dart';
@@ -10,32 +9,31 @@ import 'package:game_match/pages/Settings_Terms.dart';
 import 'package:game_match/pages/Submitted_Reviews.dart';
 //import 'package:game_match/pages/Add_Threads.dart';
 import 'package:game_match/pages/Swipe.dart';
-import 'package:game_match/pages/Wish_list.dart';
-import 'package:game_match/pages/genre_model.dart';
 import 'package:game_match/pages/preference_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'firebase_options.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
 import 'theme_notifier.dart';
+import 'pages/View_profile.dart';
 
 // Import all your pages
 import 'pages/Preference_Interest.dart';
-import 'pages/game_info.dart';
 import 'pages/Profile.dart';
 import 'pages/Side_bar.dart';
 import 'pages/Interest.dart';
 //import 'pages/Edit_profile.dart';
 import 'pages/Sign_up.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'pages/Settings.dart';
 import 'pages/Settings_Appearance.dart';
 import 'pages/Log_in.dart';
-import 'pages/Threads.dart';
 import 'pages/Subscription.dart';
-import 'pages/Home.dart';
 import 'pages/Post_home.dart';
 import 'pages/New_Releases.dart';
+import 'pages/Game_news.dart';
+import 'pages/Wish_list.dart';
+import 'pages/SubscriptionPremium.dart';
+import 'pages/notif.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -114,7 +112,7 @@ class GameMatchApp extends StatelessWidget {
                   },
                   isDarkMode: themeNotifier.isDarkMode,
                 ),
-            '/Settings': (context) => SettingsPage(),
+            '/Settings': (context) => const SettingsPage(),
             '/Appearance': (context) => SettingsAppearancePage(
                   isDarkMode: themeNotifier.isDarkMode,
                   onThemeChanged: (bool isDarkMode) {
@@ -123,22 +121,27 @@ class GameMatchApp extends StatelessWidget {
                 ),
             '/Login': (context) => const MyLoginPage(title: 'Login'),
             '/Home': (context) => const HomePage(
-              title: 'Home',
-            ),
+                  title: 'Home',
+                ),
             '/Post_home': (context) =>
                 const WelcomePage(username: 'defaultUsername'),
-            '/swiping_games': (context) => const SwipePage(),
-            '/Reviews': (context) => SubmittedReviewsPage(),
-            '/Subscription': (context) => const SubscriptionManagementScreen(),
-            '/Billing_info': (context) => BillingInfoPage(),
+            '/Swipe': (context) => const SwipePage(),
+            '/Reviews': (context) => const SubmittedReviewsPage(),
+            '/Subscription': (context) => SubscriptionManagementScreen(),
+            '/Billing_info': (context) => const BillingInfoPage(),
             '/New_Releases': (context) =>
                 const NewReleasesGames(), // Route to TopRatedGames widget
             //'/game_info': (context) => const GameListScreen(),
-            '/preference_page': (context) =>  GenrePreferencePage(), // Route to PreferencePage widget
+            '/preference_page': (context) =>
+                const GenrePreferencePage(), // Route to PreferencePage widget
             '/Terms': (context) => const SettingsTermsPage(),
             '/Privacy': (context) => const SettingsPrivacyPage(),
-            '/Wishlist': (context) => WishlistPage(),
-            '/community_trends': (context) => GameListScreen(),
+            '/Wishlist': (context) =>  WishlistPage(),
+            '/community_page': (context) => const GameListScreen(),
+            '/Game_news': (context) =>  const GamingNewsPage(),
+            '/View_profile': (context) => const ViewProfile(),
+            '/SubscriptionPremium': (context) => const PremiumSubscriptionPage(),
+            '/notif': (context) => const NotificationsPage(),
           },
         );
       },

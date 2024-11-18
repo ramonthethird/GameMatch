@@ -6,6 +6,8 @@ import 'package:game_match/firestore_service.dart';
 import 'dart:async';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'Side_bar.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class SwipePage extends StatefulWidget {
   const SwipePage({super.key});
@@ -46,7 +48,10 @@ class _SwipePageState extends State<SwipePage> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    _fetchGames();
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      _fetchGames(user.uid);
+    }
 
     _heartAnimationController = AnimationController(
       vsync: this,
@@ -120,20 +125,20 @@ class _SwipePageState extends State<SwipePage> with TickerProviderStateMixin {
     });
   }
 
-  Future<void> _fetchGames() async {
+  Future<void> _fetchGames(String userId) async {
     try {
-      // Try to load games from Firestore first
-      List<Game> firestoreGames = await _firestoreService.loadGames();
+      // Try to load recommended games from Firestore for the current user
+      List<Game> recommendedGames = await _firestoreService.loadRecommendedGames(userId);
 
-      if (firestoreGames.isNotEmpty) {
+      if (recommendedGames.isNotEmpty) {
         setState(() {
-          games = firestoreGames;
+          games = recommendedGames;
           selectedGame = games[0];
         });
-        print('Games loaded from Firestore');
+        print('Recommended games loaded from Firestore');
       } else {
-        // If Firestore is empty, fetch games from the API
-        print('No games in Firestore, fetching from API...');
+        // If no recommended games, fetch games from the API
+        print('No recommended games in Firestore, fetching from API...');
         List<Game> fetchedGames = await apiService.fetchGames();
 
         if (fetchedGames.isNotEmpty) {
@@ -322,8 +327,21 @@ class _SwipePageState extends State<SwipePage> with TickerProviderStateMixin {
       });
     }
   }
-
-  void _onGameSwiped(int index) {
+// get user info (subscription status) from Firestore
+Future<Map<String, String>> getsubscriptionstatus() async {
+  User? user = FirebaseAuth.instance.currentUser;
+  if (user != null) {
+    DocumentSnapshot userDoc = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(user.uid)
+        .get();
+    String subscriptionStatus = userDoc['subscription'] ?? 'free';
+    return {'subscriptionStatus': subscriptionStatus};
+  }
+    return {'subscriptionStatus': 'free'};
+  }
+  
+  void _onGameSwiped(int index) async {
     if (games.isNotEmpty) {
       setState(() {
         swipedGames.add(games[index]);
@@ -332,31 +350,25 @@ class _SwipePageState extends State<SwipePage> with TickerProviderStateMixin {
         _rotationAngle = 0.0;
         _opacity = 1.0;
 
-        // increment swipe count and check it custom ad should be shown
+        // increment swipe count and check if custom ad should be shown
         _swipeCount++;
-        if (_swipeCount >= _swipeThreshold) {
-          if (ModalRoute.of(context)?.isCurrent ?? false) {
-            _showCustomAd();
-          }
-        }
       });
+
+      if (_swipeCount >= _swipeThreshold) {
+        Map<String, String> subscriptionStatus = await getsubscriptionstatus();
+        if (subscriptionStatus['subscriptionStatus'] == 'free') {
+          _showCustomAd();
+        } else {
+          setState(() {
+            _swipeCount = 0; // Reset swipe count after ad
+          });
+        }
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    // if (games.isEmpty) {
-    //   return Scaffold(
-    //     appBar: AppBar(
-    //       title: const Text('Swipe Games'),
-    //       centerTitle: true,
-    //     ),
-    //     body: const Center(
-    //       child: CircularProgressIndicator(),
-    //     ),
-    //   );
-    // }
-
     return Scaffold(
       key: _scaffoldKey, // Key for the scaffold
       appBar: AppBar(

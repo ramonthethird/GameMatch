@@ -1,8 +1,8 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'dart:convert';
 import 'package:url_launcher/url_launcher.dart';
-
 
 class NotificationsPage extends StatefulWidget {
   const NotificationsPage({super.key});
@@ -12,7 +12,6 @@ class NotificationsPage extends StatefulWidget {
 }
 
 class _NotificationsPageState extends State<NotificationsPage> {
-
   // Create temporary wishlist for testing notifications page
   final List<String> wishlist = [
     "Injustice 2",
@@ -40,10 +39,9 @@ class _NotificationsPageState extends State<NotificationsPage> {
         backgroundColor: const Color(0xFF41B1F1),
         title: const Text(
           'Notifications', // App bar title
-          style: TextStyle(fontSize: 24),
+          style: TextStyle(fontSize: 18),
         ),
       ),
-
 
       body: Column(
         mainAxisAlignment: MainAxisAlignment.start, // Align children to start
@@ -62,17 +60,20 @@ class _NotificationsPageState extends State<NotificationsPage> {
             child: notifications.isEmpty // Check if notifications list is empty
 
                 // Question mark for if else shortcut
-                ? const Center(child: Text('No notifications available.')) // Display message if empty
-                : ListView( // Display notifications if available
-              children: notifications, // Show the list of notifications
-            ),
+                ? const Center(
+                    child: Text(
+                        'No notifications available.')) // Display message if empty
+                : ListView(
+                    // Display notifications if available
+                    children: notifications, // Show the list of notifications
+                  ),
           ),
           Padding(
             padding: const EdgeInsets.only(bottom: 16.0),
-
             child: Center(
               child: ElevatedButton(
-                onPressed: clearNotifications, // Press clear notifs button to clear list of notifications
+                onPressed:
+                    clearNotifications, // Press clear notifs button to clear list of notifications
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF41B1F1), // consistency
                   shape: RoundedRectangleBorder(
@@ -81,9 +82,9 @@ class _NotificationsPageState extends State<NotificationsPage> {
                 ),
                 child: const Row(
                   mainAxisSize: MainAxisSize.min, // Use minimum size for row
-                  mainAxisAlignment: MainAxisAlignment.center, // Center align button contents
+                  mainAxisAlignment:
+                      MainAxisAlignment.center, // Center align button contents
                   children: [
-
                     Icon(
                       Icons.clear,
                       color: Colors.white,
@@ -107,6 +108,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
       ),
     );
   }
+
   // Initialize the state and fetch game notifications using method and define it
   @override
   void initState() {
@@ -123,7 +125,8 @@ class _NotificationsPageState extends State<NotificationsPage> {
 
   // Function to recieve game notifications from the API
   Future<void> fetchGameNotifications() async {
-    List<Widget> loadedNotifications = []; // Create list for loaded notifications
+    List<Widget> loadedNotifications =
+        []; // Create list for loaded notifications
 
     // Load game notifications for each item in the wishlist, game is constantly changed interatively in for loop
     for (String game in wishlist) {
@@ -132,13 +135,13 @@ class _NotificationsPageState extends State<NotificationsPage> {
       // Check if salePrice and normalPrice are available
       // compare json data
       if (gameInfo['salePrice'] != null && gameInfo['normalPrice'] != null) {
-
         // Convert to double for safe calculation
         double salePrice = double.parse(gameInfo['salePrice']);
         double normalPrice = double.parse(gameInfo['normalPrice']);
 
         //calculate discount here
-        double discount = ((normalPrice - salePrice) / normalPrice) * 100; // Calculate discount percentage
+        double discount = ((normalPrice - salePrice) / normalPrice) *
+            100; // Calculate discount percentage
 
         // If discount is found to be over 0, that means it should be added to the notifications
         if (discount > 0) {
@@ -146,9 +149,11 @@ class _NotificationsPageState extends State<NotificationsPage> {
             // Notification card structure
 
             gameTitle: gameInfo['title'], // Title of the game
-            discount: discount.toStringAsFixed(0), // Discount percentage formatted as string
+            discount: discount
+                .toStringAsFixed(0), // Discount percentage formatted as string
             thumbnailUrl: gameInfo['thumb'], // Thumbnail image URL
-            dealUrl: "https://www.cheapshark.com/redirect?dealID=${gameInfo['dealID']}", // URL for the deal
+            dealUrl:
+                "https://www.cheapshark.com/redirect?dealID=${gameInfo['dealID']}", // URL for the deal
           ));
         }
       }
@@ -170,20 +175,24 @@ class _NotificationsPageState extends State<NotificationsPage> {
   // Figure out here how to get the cheapshark request in flutter
   // Function to fetch game information from the API
   Future<Map<String, dynamic>> fetchGameInfo(String gameTitle) async {
-    final encodedTitle = Uri.encodeComponent(gameTitle); // Encode the game title for the URL
-    final url = Uri.parse('https://www.cheapshark.com/api/1.0/deals?title=$encodedTitle'); // Create the API URL
+    final encodedTitle =
+        Uri.encodeComponent(gameTitle); // Encode the game title for the URL
+    final url = Uri.parse(
+        'https://www.cheapshark.com/api/1.0/deals?title=$encodedTitle'); // Create the API URL
     final response = await http.get(url); // Make the GET request
 
     // Check if the response is successful
     if (response.statusCode == 200) {
-      final List<dynamic> deals = json.decode(response.body); // Decode the JSON response
+      final List<dynamic> deals =
+          json.decode(response.body); // Decode the JSON response
       if (deals.isNotEmpty) {
         return deals[0]; // Return the first deal if available
       } else {
         return {}; // Return an empty map if no deals are found
       }
     } else {
-      throw Exception("Failed to fetch deals for $gameTitle: ${response.statusCode}"); // Throw an error if the request fails
+      throw Exception(
+          "Failed to fetch deals for $gameTitle: ${response.statusCode}"); // Throw an error if the request fails
     }
   }
 }
@@ -206,7 +215,8 @@ class NotificationCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 15), // Margin around the card
+      margin: const EdgeInsets.symmetric(
+          vertical: 10, horizontal: 15), // Margin around the card
       child: ListTile(
         leading: Image.network(
           thumbnailUrl,
@@ -225,7 +235,8 @@ class NotificationCard extends StatelessWidget {
             if (await canLaunchUrl(Uri.parse(dealUrl))) {
               await launchUrl(
                 Uri.parse(dealUrl),
-                mode: LaunchMode.externalApplication, // Open in external browser
+                mode:
+                    LaunchMode.externalApplication, // Open in external browser
               );
             } else {
               throw 'Could not launch $dealUrl'; // Error if URL cannot be launched
@@ -249,7 +260,8 @@ class WarningNotificationCard extends StatelessWidget {
       margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
       child: ListTile(
         leading: const Icon(
-          Icons.warning, // Warning icon on left of card where thumbnail on other notif type would be
+          Icons
+              .warning, // Warning icon on left of card where thumbnail on other notif type would be
           color: Colors.amber,
           size: 50,
         ),

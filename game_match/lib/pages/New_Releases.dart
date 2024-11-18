@@ -48,7 +48,7 @@ class _NewReleasesGamesState extends State<NewReleasesGames> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('New Releases'),
+        title: const Text('New Releases', style: TextStyle(fontSize: 18)),
         backgroundColor: const Color(0xFFF1F3F4),
       ),
       body: _isLoading

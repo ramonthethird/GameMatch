@@ -21,7 +21,7 @@ class _InterestsPageState extends State<InterestsPage> {
   final List<String> gameModes = [
     'Single Player',
     'Multiplayer',
-    'Co-op',
+    'Co-operative',
     'Online PvP'
   ];
 
@@ -138,10 +138,10 @@ class _InterestsPageState extends State<InterestsPage> {
       appBar: AppBar(
         title: const Text(
           'Interests',
-          style: TextStyle(color: Colors.black, fontSize: 24),
+          style: TextStyle(color: Colors.black, fontSize: 18),
         ),
         centerTitle: true,
-        backgroundColor: Color(0xFF41B1F1),
+        backgroundColor: const Color(0xFF41B1F1),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () {
@@ -164,7 +164,7 @@ class _InterestsPageState extends State<InterestsPage> {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const SizedBox(height: 30), // Space between title and dropdowns
+                  const SizedBox(height: 20), // Space between title and dropdowns
                   _buildDropdownCard(
                     icon: Icons.videogame_asset,
                     label: 'Game Mode',
@@ -176,7 +176,7 @@ class _InterestsPageState extends State<InterestsPage> {
                       });
                     },
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 15),
                   _buildDropdownCard(
                     icon: Icons.visibility,
                     label: 'Player Perspective',
@@ -188,7 +188,7 @@ class _InterestsPageState extends State<InterestsPage> {
                       });
                     },
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 15),
                   _buildDropdownCard(
                     icon: Icons.devices,
                     label: 'Platform',
@@ -200,7 +200,7 @@ class _InterestsPageState extends State<InterestsPage> {
                       });
                     },
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 15),
                   _buildDropdownCard(
                     icon: Icons.attach_money,
                     label: 'Price',
@@ -212,7 +212,7 @@ class _InterestsPageState extends State<InterestsPage> {
                       });
                     },
                   ),
-                  const SizedBox(height: 40),
+                  const SizedBox(height: 30),
                   _buildSaveButton(),
                 ],
               ),

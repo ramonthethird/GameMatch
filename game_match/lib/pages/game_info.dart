@@ -11,7 +11,7 @@ import 'package:provider/provider.dart';
 class GameDetailScreen extends StatefulWidget {
   final String gameId;
 
-  const GameDetailScreen({Key? key, required this.gameId}) : super(key: key);
+  const GameDetailScreen({super.key, required this.gameId});
 
   @override
   _GameDetailScreenState createState() => _GameDetailScreenState();
@@ -27,20 +27,23 @@ class _GameDetailScreenState extends State<GameDetailScreen> {
     super.initState();
     _fetchGameDetails();
   }
-
   Future<void> _fetchGameDetails() async {
-    try {
-      selectedGame = await _firestoreService.getGameById(widget.gameId);
-      if (selectedGame != null) {
-        setState(() {});
-      }
-    } catch (e) {
-      print('Error fetching game details: $e');
+  try {
+    selectedGame = await _firestoreService.getGameById(widget.gameId);
+    if (selectedGame != null) {
+      setState(() {});
+    } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Game not found or failed to load')),
+        const SnackBar(content: Text('Game not found in recommendations')),
       );
     }
+  } catch (e) {
+    print('Error fetching game details: $e');
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Game not found or failed to load')),
+    );
   }
+}
 
   void _showEnlargedImage(List<String> imageUrls, int initialIndex) {
     showDialog(
@@ -48,13 +51,13 @@ class _GameDetailScreenState extends State<GameDetailScreen> {
       builder: (context) {
         return Dialog(
           backgroundColor: Colors.transparent,
-          insetPadding: EdgeInsets.all(10),
+          insetPadding: const EdgeInsets.all(10),
           child: StatefulBuilder(
             builder: (context, setState) {
               return GestureDetector(
                 onTap: () => Navigator.of(context).pop(),
                 child: InteractiveViewer(
-                  boundaryMargin: EdgeInsets.all(20),
+                  boundaryMargin: const EdgeInsets.all(20),
                   minScale: 0.5,
                   maxScale: 4.0,
                   child: PageView.builder(
@@ -93,7 +96,7 @@ class _GameDetailScreenState extends State<GameDetailScreen> {
           'Game Details',
           style: TextStyle(
             color: Colors.black,
-            fontSize: 24,
+            fontSize: 18,
           ),
         ),
         centerTitle: true,
@@ -150,10 +153,17 @@ class _GameDetailScreenState extends State<GameDetailScreen> {
                     ),
                   ),
                   const SizedBox(height: 8),
-                  Text(
-                    selectedGame!.summary ?? 'No description available',
-                    style: const TextStyle(fontSize: 16),
-                  ),
+                    Container(
+                    constraints: const BoxConstraints(
+                      maxHeight: 100, // Set a max height for the summary container
+                    ),
+                    child: SingleChildScrollView(
+                      child: Text(
+                      selectedGame!.summary ?? 'No description available',
+                      style: const TextStyle(fontSize: 16),
+                      ),
+                    ),
+                    ),
                   const SizedBox(height: 16),
 
                   // Container for Price and Developer
@@ -167,10 +177,10 @@ class _GameDetailScreenState extends State<GameDetailScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          '\$${selectedGame!.price!.toStringAsFixed(2)}',
+                            '\$${(selectedGame!.price ?? (5.99 + (1.5 * (widget.gameId.hashCode % 2.5)))).toStringAsFixed(2)}',
                           style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
                           ),
                         ),
                         Text(
@@ -196,15 +206,19 @@ class _GameDetailScreenState extends State<GameDetailScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Expanded(
-                          child: Text(
-                            'Platforms: ${selectedGame!.platforms?.join(', ') ?? 'Unknown platforms'}',
-                            style: const TextStyle(fontSize: 16),
-                          ),
+                            child: SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: Text(
+                              'Platforms: ${selectedGame!.platforms.join(', ')}',
+                              style: const TextStyle(fontSize: 16),
+                              maxLines: 2,
+                            ),
+                            ),
                         ),
                         const SizedBox(width: 8), // Space between items
                         Expanded(
                           child: Text(
-                            'Release Date: ${selectedGame!.releaseDates?.join(', ') ?? 'Unknown release date'}',
+                            'Release Date: ${selectedGame!.releaseDates.isNotEmpty ? selectedGame!.releaseDates.last : 'Unknown release date'}',
                             style: const TextStyle(fontSize: 16),
                           ),
                         ),
@@ -232,7 +246,7 @@ class _GameDetailScreenState extends State<GameDetailScreen> {
                           icon: const Icon(Icons.rate_review),
                           label: const Text('See Reviews'),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Color(0xFF41B1F1),
+                            backgroundColor: const Color(0xFF41B1F1),
                             foregroundColor: Colors.white,
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                             padding: const EdgeInsets.symmetric(vertical: 12),
@@ -255,7 +269,7 @@ class _GameDetailScreenState extends State<GameDetailScreen> {
                           icon: const Icon(Icons.forum),
                           label: const Text('See Threads'),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Color(0xFF41B1F1),
+                            backgroundColor: const Color(0xFF41B1F1),
                             foregroundColor: Colors.white,
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                             padding: const EdgeInsets.symmetric(vertical: 12),
@@ -289,7 +303,7 @@ class _GameDetailScreenState extends State<GameDetailScreen> {
                     icon: const Icon(Icons.shopping_cart),
                     label: const Text('Buy'),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Color(0xFF41B1F1),
+                      backgroundColor: const Color(0xFF41B1F1),
                       foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),

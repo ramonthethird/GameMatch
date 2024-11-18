@@ -8,6 +8,7 @@ import 'game_model.dart'; // Import the Game model
 import 'package:game_match/theme_notifier.dart';
 import 'package:provider/provider.dart';
 
+
 class WelcomePage extends StatefulWidget {
   final String username;
 
@@ -94,7 +95,7 @@ class _WelcomePageState extends State<WelcomePage> {
         title: const Text(
           'Welcome to Game Match!',
           style: TextStyle(
-            fontSize: 24,
+            fontSize: 18,
             fontWeight: FontWeight.bold,
             color: Colors.black,
           ),
@@ -112,6 +113,7 @@ class _WelcomePageState extends State<WelcomePage> {
             icon: const Icon(Icons.notifications),
             onPressed: () {
               // Handle notification icon press
+              Navigator.of(context).pushNamed('/notif');
             },
           ),
         ],
@@ -219,14 +221,21 @@ class _WelcomePageState extends State<WelcomePage> {
             title: 'Community trends',
             description: 'Updates from the gaming community.',
             icon: Icons.people,
-            routeName: '/community_trends',
+            routeName: '/community_page',
           ),
           _buildFeatureCard(
             context,
-            title: 'Swiping games',
-            description: 'Swipe right on games you like.',
-            icon: Icons.favorite,
-            routeName: '/swiping_games',
+            title: 'Preferences',
+            description: 'Update your preferences.',
+            icon: Icons.room_preferences,
+            routeName: '/Preference_&_Interest',
+          ),
+          _buildFeatureCard(
+            context,
+            title: 'Game News',
+            description: 'Stay updated with the latest gaming news.',
+            icon: Icons.article,
+            routeName: '/Game_news',
           ),
         ],
       ),

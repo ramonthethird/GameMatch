@@ -31,7 +31,7 @@ class _PreferenceInterestPageState extends State<PreferenceInterestPage> {
             'Preferences & Interests',
             style: TextStyle(
               color: Colors.black, 
-              fontSize: 24,
+              fontSize: 18,
             ),
           ),
           centerTitle: true,
@@ -159,7 +159,7 @@ class CustomButton extends StatelessWidget {
                 children: [
                   Text(
                     title,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
@@ -167,7 +167,7 @@ class CustomButton extends StatelessWidget {
                   const SizedBox(height: 5),
                   Text(
                     subtitle,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 14,
                     ),
                   ),

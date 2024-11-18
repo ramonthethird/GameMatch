@@ -16,8 +16,8 @@ class Profile extends StatefulWidget {
 class _ProfileState extends State<Profile> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   String? _profileImageUrl;
-  String _username = "User";
-  String _bio = "This is the bio.";
+  String _username = 'User';
+  String _bio = "Bio.";
   String _favoriteGame1 = "Game 1";
   String _favoriteGame2 = "Game 2";
   String _favoriteGame3 = "Game 3";
@@ -27,7 +27,6 @@ class _ProfileState extends State<Profile> {
     super.initState();
     _loadUserData();
   }
-
   Future<void> _loadUserData() async {
     String? userId = FirebaseAuth.instance.currentUser?.uid;
     if (userId != null) {
@@ -35,13 +34,12 @@ class _ProfileState extends State<Profile> {
           .collection('users')
           .doc(userId)
           .get();
-
       setState(() {
         _username = userDoc['username'] ?? 'User';
-        _bio = userDoc['bio'] ?? 'This is the bio.';
-        _favoriteGame1 = userDoc['favoriteGames']['game1'] ?? 'Game 1';
-        _favoriteGame2 = userDoc['favoriteGames']['game2'] ?? 'Game 2';
-        _favoriteGame3 = userDoc['favoriteGames']['game3'] ?? 'Game 3';
+        _bio = userDoc.data()?.containsKey('bio') == true ? userDoc['bio'] : '';
+        _favoriteGame1 = userDoc.data()?.containsKey('favoriteGames') == true ? userDoc['favoriteGames']['game1'] ?? '' : '';
+        _favoriteGame2 = userDoc.data()?.containsKey('favoriteGames') == true ? userDoc['favoriteGames']['game2'] ?? '' : '';
+        _favoriteGame3 = userDoc.data()?.containsKey('favoriteGames') == true ? userDoc['favoriteGames']['game3'] ?? '' : '';
         _profileImageUrl = userDoc['profileImageUrl'];
       });
     }
@@ -54,11 +52,11 @@ class _ProfileState extends State<Profile> {
       key: _scaffoldKey,
       appBar: AppBar(
         centerTitle: true,
-        title: Text(
+        title: const Text(
           'Profile',
           style: TextStyle(
             color: Colors.black,
-            fontSize: 24,
+            fontSize: 18,
           ),
         ),
         //backgroundColor: const Color(0xFF74ACD5),
@@ -86,12 +84,9 @@ class _ProfileState extends State<Profile> {
                 Container(
                   width: double.infinity,
                   height: 140,
-                  decoration: const BoxDecoration(
+                  decoration: BoxDecoration(
                     gradient: LinearGradient(
-                      colors: [
-                        Color(0xFFF1F3F4),
-                        Color(0xFFF1F3F4)
-                      ],
+                      colors: [Colors.grey[300]!],
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                     ),
@@ -104,8 +99,7 @@ class _ProfileState extends State<Profile> {
                     icon: const Icon(Icons.edit),
                     label: const Text("Edit Profile"),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue, // Background color
-                      foregroundColor: Colors.white, // Text color
+                          backgroundColor: const Color(0xFF41B1F1),
                     ),
                     onPressed: () {
                       // Navigate to Edit Profile Page

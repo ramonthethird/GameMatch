@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'game_model.dart';
-import 'community.dart';
 import 'Api_Service.dart';
-import 'game_model.dart';
 
 
 class GameDescriptionPage extends StatefulWidget {
