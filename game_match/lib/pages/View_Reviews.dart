@@ -107,7 +107,6 @@ class _ViewReviewsPageState extends State<ViewReviewsPage> {
           profilePictureUrl = userData?['profileImageUrl'] ?? ''; // Fetch profile image
         }
 
-
         Timestamp? timestamp = reviewData['timestamp'];
         String formattedDate = '';
         if (timestamp != null) {
@@ -311,7 +310,6 @@ Future<void> _deleteReview(String reviewId) async {
   }
 }
 
-
   // Function to toggle like or dislike for a review
   Future<void> _toggleLikeOrDislike(
       String docId, String action, int index) async {
@@ -504,7 +502,6 @@ Future<void> _deleteReview(String reviewId) async {
       ],
     );
   }
-
     // Widget to build the list of reviews
   Widget _buildReviewList() {
     if (reviews.isEmpty) {

@@ -101,7 +101,7 @@ class SideBar extends StatelessWidget {
         .collection('users')
         .doc(user.uid)
         .get();
-
+    
     // Ensure the document data is available and contains 'subscription'
     String subscriptionStatus = userDoc.data() != null && (userDoc.data() as Map<String, dynamic>).containsKey('subscription')
         ? userDoc['subscription'] as String
@@ -114,6 +114,7 @@ class SideBar extends StatelessWidget {
     }
   }
 }
+
   @override
   Widget build(BuildContext context) {
     return Drawer(

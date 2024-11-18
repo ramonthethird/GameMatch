@@ -70,7 +70,7 @@ class _SettingsPageState extends State<SettingsPage> {
           'Settings',
           style: TextStyle(
             color: Colors.black,
-            fontSize: 24,
+            fontSize: 16,
           ),
         ),
         centerTitle: true,
@@ -182,7 +182,7 @@ class _SettingsPageState extends State<SettingsPage> {
         title: Text(
           title,
           style: TextStyle(
-            fontSize: 16.0,
+            fontSize: 14.0,
             color: themeNotifier.isDarkMode ? Colors.white : Colors.black,
           ),
         ),
@@ -244,7 +244,7 @@ class _SettingsPageState extends State<SettingsPage> {
             Text(
               title,
               style: TextStyle(
-                fontSize: 16.0,
+                fontSize: 14.0,
                 color: themeNotifier.isDarkMode ? Colors.white : Colors.black,
               ),
             ),

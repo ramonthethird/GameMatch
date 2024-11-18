@@ -27,7 +27,6 @@ class GameMatchApp extends StatelessWidget {
 
 class GamingNewsPage extends StatefulWidget {
   const GamingNewsPage({super.key});
-
   @override
   _GamingNewsPageState createState() => _GamingNewsPageState();
 }

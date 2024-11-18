@@ -6,6 +6,7 @@ class FirestoreService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
+
   // ------------------ Game Management Methods ------------------
 
   Future<void> addToWishlist(Game game) async {
@@ -30,6 +31,7 @@ class FirestoreService {
     }
   }
 
+  // Retrieve games from the user's wishlist
   Future<List<Game>> getWishlist() async {
     User? user = _auth.currentUser;
 
@@ -53,6 +55,7 @@ class FirestoreService {
     }
   }
 
+  // Remove a game from the user's wishlist
   Future<void> removeFromWishlist(String gameId) async {
     User? user = _auth.currentUser;
 
@@ -74,6 +77,7 @@ class FirestoreService {
     }
   }
 
+  // Check if a game is already in the user's wishlist
   Future<bool> isGameInWishlist(String gameId) async {
     User? user = _auth.currentUser;
 
@@ -97,6 +101,7 @@ class FirestoreService {
     }
   }
 
+  // Save games in bulk to Firestore (for caching purposes)
   Future<void> saveGames(List<Game> games) async {
     try {
       WriteBatch batch = _db.batch();
@@ -111,6 +116,7 @@ class FirestoreService {
     }
   }
 
+  // Load games from Firestore
   Future<List<Game>> loadGames() async {
     try {
       QuerySnapshot snapshot = await _db.collection('games').get();
@@ -216,6 +222,8 @@ Future<Game?> getGameById(dynamic gameId) async {
     return null;
   }
 }
+
+  // Save a single game to Firestore (for individual caching)
   Future<void> saveGameToFirestore(Game game) async {
     try {
       await _db.collection('games').doc(game.id).set(game.toMap());

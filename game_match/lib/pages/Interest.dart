@@ -14,7 +14,7 @@ class _InterestsPageState extends State<InterestsPage> {
   String? dropdownValue2;
   String? dropdownValue3;
   String? dropdownValue4;
-  
+
   // Loading state
   bool _isLoading = false;
 

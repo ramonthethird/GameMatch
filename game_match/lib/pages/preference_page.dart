@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'api_service.dart'; // Ensure the correct path is used here
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'side_bar.dart';
 
 class MoreGenresPage extends StatelessWidget {
   final List<String> selectedGenres;

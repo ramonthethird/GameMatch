@@ -165,7 +165,6 @@ class _GameDetailScreenState extends State<GameDetailScreen> {
                     ),
                     ),
                   const SizedBox(height: 16),
-
                   // Container for Price and Developer
                   Container(
                     padding: const EdgeInsets.all(12),
