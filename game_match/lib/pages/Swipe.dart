@@ -6,6 +6,15 @@ import 'package:game_match/firestore_service.dart';
 import 'dart:async';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'Side_bar.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:game_match/theme_notifier.dart';
+import 'package:provider/provider.dart';
+import 'ad_helper.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:intl/intl.dart';
+import 'Subscription.dart';
 
 class SwipePage extends StatefulWidget {
   const SwipePage({super.key});
@@ -19,6 +28,7 @@ class _SwipePageState extends State<SwipePage> with TickerProviderStateMixin {
   final ApiService apiService = ApiService();
   final FirestoreService _firestoreService = FirestoreService();
   StreamSubscription? _firestoreSubscription;
+  InterstitialAd? _interstitialAd;
   List<Game> games = [];
   List<Game> swipedGames = [];
   Game? selectedGame;
@@ -26,7 +36,11 @@ class _SwipePageState extends State<SwipePage> with TickerProviderStateMixin {
   double _rotationAngle = 0.0;
   double _opacity = 1.0;
   final int _currentIndex = 0;
-  int _swipeCount = 0; // track the number of swipes
+  int _swipeCount = 0; // track the number of swipes for free users
+  int _adSwipeCount = 0; // track number of swipes for ads
+  static const int dailySwipeLimit = 4; // The daily limit for free users
+  static const int adSwipeInterval = 3; // show an ad every 3 swipes
+  bool _isPremium = false;
   final int _swipeThreshold = 3; // number of swipes to trigger an ad
 
   AnimationController? _heartAnimationController;
@@ -46,7 +60,12 @@ class _SwipePageState extends State<SwipePage> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    _fetchGames();
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      _fetchGames(user.uid);
+    }
+    _fetchSubscriptionStatus();
+    _loadInterstitialAd();
 
     _heartAnimationController = AnimationController(
       vsync: this,
@@ -98,42 +117,28 @@ class _SwipePageState extends State<SwipePage> with TickerProviderStateMixin {
       parent: _instructionAnimationController!,
       curve: Curves.easeInOut,
     ));
+
+    // load the first ad
+    _loadInterstitialAd();
+
   }
 
-  void _showCustomAd() {
-    if (!mounted) return;
+   
 
-    // Push the ad page on top of the current page without replacing it
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (ModalRoute.of(context)?.isCurrent ?? false) {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => CustomAdPage()),
-        ).then((_) {
-          if (mounted) {
-            setState(() {
-              _swipeCount = 0; // Reset swipe count after ad
-            });
-          }
-        });
-      }
-    });
-  }
-
-  Future<void> _fetchGames() async {
+   Future<void> _fetchGames(String userId) async {
     try {
-      // Try to load games from Firestore first
-      List<Game> firestoreGames = await _firestoreService.loadGames();
+      // Try to load recommended games from Firestore for the current user
+      List<Game> recommendedGames = await _firestoreService.loadRecommendedGames(userId);
 
-      if (firestoreGames.isNotEmpty) {
+      if (recommendedGames.isNotEmpty) {
         setState(() {
-          games = firestoreGames;
+          games = recommendedGames;
           selectedGame = games[0];
         });
-        print('Games loaded from Firestore');
+        print('Recommended games loaded from Firestore');
       } else {
-        // If Firestore is empty, fetch games from the API
-        print('No games in Firestore, fetching from API...');
+        // If no recommended games, fetch games from the API
+        print('No recommended games in Firestore, fetching from API...');
         List<Game> fetchedGames = await apiService.fetchGames();
 
         if (fetchedGames.isNotEmpty) {
@@ -158,6 +163,112 @@ class _SwipePageState extends State<SwipePage> with TickerProviderStateMixin {
     }
   }
 
+  // Fetch subscription status of the user and swipe data
+  Future<void> _fetchSubscriptionStatus() async {
+    User? currentUser = FirebaseAuth.instance.currentUser;
+
+    if (currentUser != null) {
+      String userId = currentUser.uid;
+      try {
+        DocumentSnapshot userDoc = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(userId)
+            .get();
+
+        if (userDoc.exists) {
+          String subscriprionStatus = userDoc.get('subscription');
+          setState(() {
+            _isPremium = subscriprionStatus == 'paid';
+          });
+          // Fetch swipe count and last reset time
+          _fetchSwipeDataFromFirestore(userId);
+        }
+      } catch (e) {
+        print("Error fetching subscription status: $e");
+      }
+    }
+
+    // _fetchSwipeDate();
+  }
+
+  // Fetch swipe data count and last reset time from local storage
+//   Future<void> _fetchSwipeDate() async {
+//   SharedPreferences prefs = await SharedPreferences.getInstance();
+//   String today = DateFormat('yyyy-MM-dd').format(DateTime.now());
+
+//   // Check last reset date and reset if it doesn't match today's date
+//   if (prefs.getString('lastReset') != today) {
+//     _swipeCount = 0; // Reset count for a new day
+//     await prefs.setInt('swipeCount', _swipeCount);
+//     await prefs.setString('lastReset', today);
+//   } else {
+//     _swipeCount = prefs.getInt('swipeCount') ?? 0;
+//   }
+
+//   setState(() {}); // Refresh state to use the updated _swipeCount
+// }
+
+  // Fetch Swipe data from firestore
+  Future<void> _fetchSwipeDataFromFirestore(String userId) async {
+    try {
+      DocumentSnapshot userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userId)
+          .get();
+
+      if (userDoc.exists) {
+        // Get swipe count and last reset date from Firestore
+        int savedSwipeCount = userDoc.get('swipeCount') ?? 0;
+        String? lastReset = userDoc.get('lastReset');
+        String today = DateFormat('yyyy-MM-dd').format(DateTime.now());
+
+        if (lastReset != today) {
+          // Reset swipe count if it's a new day
+          _swipeCount = 0;
+          await FirebaseFirestore.instance
+              .collection('users')
+              .doc(userId)
+              .update({
+            'swipeCount': 0,
+            'lastReset': today,
+          });
+        } else {
+          _swipeCount = savedSwipeCount;
+        }
+      }
+    } catch (e) {
+      print("Error fetching swipe data from Firestore: $e");
+    }
+  }
+
+  // Incrament swipe count and save to local storage
+  Future<void> _incramentSwipeCount() async {
+    User? currentUser = FirebaseAuth.instance.currentUser;
+    if (currentUser != null) {
+      String userId = currentUser.uid;
+      setState(() {
+        _swipeCount += 1;
+      });
+      try {
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(userId)
+            .update({
+          'swipeCount': _swipeCount,
+        });
+      } catch (e) {
+        print("Error updating swipe count in Firestore: $e");
+      }
+    }
+  }
+
+//   // Incrament swipe count and save to local storage
+//   Future<void> _incramentSwipeCount() async {
+//   SharedPreferences prefs = await SharedPreferences.getInstance();
+//   _swipeCount += 1;
+//   await prefs.setInt('swipeCount', _swipeCount);
+// }
+
   Future<void> _fetchPricesForGames(List<Game> fetchedGames) async {
     try {
       // await apiService.fetchPricesForIGDBGames(fetchedGames);
@@ -168,6 +279,32 @@ class _SwipePageState extends State<SwipePage> with TickerProviderStateMixin {
       });
     } catch (e) {
       print('Error fetching game prices: $e');
+    }
+  }
+
+  // Load an interstitial ad
+  void _loadInterstitialAd() {
+    InterstitialAd.load(
+      adUnitId: AdHelper.interstitialAdUnitId,
+      request: const AdRequest(),
+      adLoadCallback: InterstitialAdLoadCallback(
+        onAdLoaded: (InterstitialAd ad) {
+          _interstitialAd = ad;
+        },
+        onAdFailedToLoad: (LoadAdError error) {
+          print('Failed to load interstitial ad');
+          _interstitialAd = null;
+        },
+      ),
+    );
+  }
+
+  // Display the interstitial ad
+  void _showInterstitialAd() {
+    if (_interstitialAd != null) {
+      _interstitialAd!.show();
+      _interstitialAd = null; // Reset the ad
+      _loadInterstitialAd(); // Load a new ad for the next time
     }
   }
 
@@ -187,16 +324,18 @@ class _SwipePageState extends State<SwipePage> with TickerProviderStateMixin {
         _showSwipeInstruction = false;
       });
     }
-    setState(() {
-      _swipeOffset += details.delta;
-      _rotationAngle = _swipeOffset.dx / 300;
-      _opacity =
-          1 - (_swipeOffset.dx.abs() / MediaQuery.of(context).size.width);
-    });
+    // Inside _onPanUpdate method
+setState(() {
+  _swipeOffset += details.delta;
+  _rotationAngle = _swipeOffset.dx / 300;
+  _opacity = (1 - (_swipeOffset.dx.abs() / MediaQuery.of(context).size.width)).clamp(0.0, 1.0);
+});
+
   }
 
   @override
   void dispose() {
+    _interstitialAd?.dispose();
     _instructionFadeController?.dispose();
     _instructionAnimationController?.dispose();
     _heartAnimationController?.dispose();
@@ -226,7 +365,7 @@ class _SwipePageState extends State<SwipePage> with TickerProviderStateMixin {
 
     setState(() {
       _swipeOffset = Offset(endX, endY);
-      _opacity = 0.0;
+      _opacity = 0.0.clamp(0.0, 1.0); // Ensure it stays within bounds even if forced to 0
     });
 
     Future.delayed(const Duration(milliseconds: 300), () {
@@ -322,8 +461,27 @@ class _SwipePageState extends State<SwipePage> with TickerProviderStateMixin {
       });
     }
   }
+// get user info (subscription status) from Firestore
+Future<Map<String, String>> getsubscriptionstatus() async {
+  User? user = FirebaseAuth.instance.currentUser;
+  if (user != null) {
+    DocumentSnapshot userDoc = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(user.uid)
+        .get();
+    String subscriptionStatus = userDoc['subscription'] ?? 'free';
+    return {'subscriptionStatus': subscriptionStatus};
+  }
+    return {'subscriptionStatus': 'free'};
+  }
+  
+  // Adjusted the _onGameSwiped method
 
-  void _onGameSwiped(int index) {
+void _onGameSwiped(int index) async {
+  if (_isPremium || _swipeCount < dailySwipeLimit) {
+    // Increment the swipe count for free users and save to preferences
+    await _incramentSwipeCount();
+
     if (games.isNotEmpty) {
       setState(() {
         swipedGames.add(games[index]);
@@ -332,31 +490,34 @@ class _SwipePageState extends State<SwipePage> with TickerProviderStateMixin {
         _rotationAngle = 0.0;
         _opacity = 1.0;
 
-        // increment swipe count and check it custom ad should be shown
-        _swipeCount++;
-        if (_swipeCount >= _swipeThreshold) {
-          if (ModalRoute.of(context)?.isCurrent ?? false) {
-            _showCustomAd();
+        // incrament swipe counts for both daily and ads
+          _adSwipeCount++;
+          // Show ad after threshold met
+          if (!_isPremium && _adSwipeCount >= adSwipeInterval) {
+            _showInterstitialAd();
+            _adSwipeCount = 0;
           }
-        }
-      });
-    }
+        });
+      }
+    } else {
+      // Show limit reached dialog with timer and upgrade option
+    Future.delayed(const Duration(milliseconds: 300), () {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return SwipeLimitDialog();
+        },
+      );
+    });
   }
+}
+
+
+
 
   @override
   Widget build(BuildContext context) {
-    // if (games.isEmpty) {
-    //   return Scaffold(
-    //     appBar: AppBar(
-    //       title: const Text('Swipe Games'),
-    //       centerTitle: true,
-    //     ),
-    //     body: const Center(
-    //       child: CircularProgressIndicator(),
-    //     ),
-    //   );
-    // }
-
+    final themeNotifier = Provider.of<ThemeNotifier>(context);
     return Scaffold(
       key: _scaffoldKey, // Key for the scaffold
       appBar: AppBar(
@@ -376,9 +537,9 @@ class _SwipePageState extends State<SwipePage> with TickerProviderStateMixin {
       drawer: Drawer(
         child: SideBar(
           onThemeChanged: (isDarkMode) {
-            // Handle theme change here
+            themeNotifier.toggleTheme(isDarkMode);
           },
-          isDarkMode: false, // Replace with actual theme state if implemented
+          isDarkMode: themeNotifier.isDarkMode,
         ),
       ),
       body: Stack(
@@ -516,135 +677,61 @@ class _SwipePageState extends State<SwipePage> with TickerProviderStateMixin {
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const FaIcon(Icons.gamepad, size: 24), // Gamepad icon
+                          const FaIcon(Icons.gamepad, size: 24, color: Color(0xFF74ACD5)), // Gamepad icon
                           const SizedBox(width: 8),
                           Expanded(
-                            child: Wrap(
-                              crossAxisAlignment: WrapCrossAlignment.center,
-                              spacing: 8,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                const Text(
-                                  'Platforms:',
-                                  style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                      color: Color.fromARGB(255, 240, 98, 146)),
+                                Wrap(
+                                  crossAxisAlignment: WrapCrossAlignment.center,
+                                  spacing: 8,
+                                  children: [
+                                    const Text(
+                                      'Platforms:',
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.bold,
+                                        color: Color.fromARGB(255, 240, 98, 146),
+                                      ),
+                                    ),
+                                    if (games.isNotEmpty)
+                                      ...games.first.platforms.map((platform) {
+                                        // Check the platform to set the correct icon
+                                        IconData icon;
+                                        if (platform.toLowerCase().contains('playstation')) {
+                                          icon = FontAwesomeIcons.playstation;
+                                        } else if (platform.toLowerCase().contains('xbox')) {
+                                          icon = FontAwesomeIcons.xbox;
+                                        } else if (platform.toLowerCase().contains('pc')) {
+                                          icon = FontAwesomeIcons.desktop;
+                                        } else if (platform.toLowerCase().contains('android')) {
+                                          icon = FontAwesomeIcons.android;
+                                        } else if (platform.toLowerCase().contains('ios')) {
+                                          icon = FontAwesomeIcons.apple;
+                                        } else if (platform.toLowerCase().contains('nintendo')) {
+                                          icon = FontAwesomeIcons.gamepad;
+                                        } else {
+                                          icon = Icons.videogame_asset;
+                                        }
+                                        // Return a Row for each platform icon and text
+                                        return Padding(
+                                          padding: const EdgeInsets.only(top: 4.0), // Adds spacing between lines
+                                          child: Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              FaIcon(icon, size: 20),
+                                              const SizedBox(width: 4),
+                                              Text(
+                                                platform,
+                                                style: const TextStyle(fontSize: 14),
+                                              ),
+                                            ],
+                                          ),
+                                        );
+                                      }).toList(),
+                                  ],
                                 ),
-                                if (games.isNotEmpty)
-                                  ...games.first.platforms.map((platform) {
-                                    if (platform
-                                        .toLowerCase()
-                                        .contains('playstation')) {
-                                      return Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          const FaIcon(
-                                              FontAwesomeIcons.playstation,
-                                              size: 20),
-                                          const SizedBox(width: 4),
-                                          Text(
-                                            platform,
-                                            style:
-                                                const TextStyle(fontSize: 16),
-                                          ),
-                                        ],
-                                      );
-                                    } else if (platform
-                                        .toLowerCase()
-                                        .contains('xbox')) {
-                                      return Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          const FaIcon(FontAwesomeIcons.xbox,
-                                              size: 20),
-                                          const SizedBox(width: 4),
-                                          Text(
-                                            platform,
-                                            style:
-                                                const TextStyle(fontSize: 16),
-                                          ),
-                                        ],
-                                      );
-                                    } else if (platform
-                                        .toLowerCase()
-                                        .contains('pc')) {
-                                      return Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          const FaIcon(FontAwesomeIcons.desktop,
-                                              size: 20),
-                                          const SizedBox(width: 4),
-                                          Text(
-                                            platform,
-                                            style:
-                                                const TextStyle(fontSize: 16),
-                                          ),
-                                        ],
-                                      );
-                                    } else if (platform
-                                        .toLowerCase()
-                                        .contains('android')) {
-                                      return Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          const FaIcon(FontAwesomeIcons.android,
-                                              size: 20),
-                                          const SizedBox(width: 4),
-                                          Text(
-                                            platform,
-                                            style:
-                                                const TextStyle(fontSize: 16),
-                                          ),
-                                        ],
-                                      );
-                                    } else if (platform
-                                        .toLowerCase()
-                                        .contains('ios')) {
-                                      return Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          const FaIcon(FontAwesomeIcons.apple,
-                                              size: 20),
-                                          const SizedBox(width: 4),
-                                          Text(
-                                            platform,
-                                            style:
-                                                const TextStyle(fontSize: 16),
-                                          ),
-                                        ],
-                                      );
-                                    } else if (platform
-                                        .toLowerCase()
-                                        .contains('nintendo')) {
-                                      return Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          const FaIcon(FontAwesomeIcons.gamepad,
-                                              size: 20),
-                                          const SizedBox(width: 4),
-                                          Text(
-                                            platform,
-                                            style:
-                                                const TextStyle(fontSize: 16),
-                                          ),
-                                        ],
-                                      );
-                                    } else {
-                                      return Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          const FaIcon(Icons.videogame_asset,
-                                              size: 20),
-                                          const SizedBox(width: 4),
-                                          Text(
-                                            platform,
-                                            style:
-                                                const TextStyle(fontSize: 16),
-                                          ),
-                                        ],
-                                      );
-                                    }
-                                  }),
                               ],
                             ),
                           ),
@@ -652,59 +739,57 @@ class _SwipePageState extends State<SwipePage> with TickerProviderStateMixin {
                       ),
                       const SizedBox(height: 5),
                       Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Icon(Icons.calendar_today,
-                              size: 24), // Icon for release date
+                          const Icon(Icons.calendar_today, size: 24, color: Color(0xFF74ACD5)), // Icon for release date
                           const SizedBox(width: 8),
                           const Text(
                             'Release Date: ',
                             style: TextStyle(
-                              fontSize: 16,
+                              fontSize: 14,
                               fontWeight: FontWeight.bold,
-                              color: Colors.blue, // Color for "Release Date"
+                              color: Colors.blue,
                             ),
                           ),
                           Expanded(
                             child: Text(
-                              games.isNotEmpty
-                                  ? games.first.releaseDates.join(", ") ??
-                                      "Unknown"
-                                  : " ",
-                              style: const TextStyle(
-                                fontSize: 16,
-                                //color: Colors.black, // Default color for fetched text
-                              ),
-                              overflow: TextOverflow.ellipsis,
+                              games.isNotEmpty ? games.first.releaseDates.join(", ") ?? "Unknown release date" : " ",
+                              style: const TextStyle(fontSize: 14),
+                              overflow: TextOverflow.visible, // Allows multiline display
                             ),
                           ),
                         ],
                       ),
                       const SizedBox(height: 5),
                       Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           const Icon(Icons.category,
-                              size: 24), // Icon for genres
+                              size: 24, color: Color(0xFF74ACD5)), // Icon for genres
                           const SizedBox(width: 8),
                           const Text(
                             'Genres: ',
                             style: TextStyle(
-                              fontSize: 16,
+                              fontSize: 14,
                               fontWeight: FontWeight.bold,
-                              color: Color.fromARGB(
-                                  255, 240, 98, 146), // Color for "Genres"
+                              color: Color.fromARGB(255, 240, 98, 146), // Color for "Genres"
                             ),
                           ),
                           Expanded(
-                            child: Text(
-                              games.isNotEmpty
-                                  ? games.first.genres.join(", ") ??
-                                      "Unknown genres"
-                                  : " ",
-                              style: const TextStyle(
-                                fontSize: 16,
-                                //color: Colors.black, // Default color for fetched text
-                              ),
-                              overflow: TextOverflow.ellipsis,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  games.isNotEmpty
+                                      ? games.first.genres.join(", ") ?? "Unknown genres"
+                                      : " ",
+                                  style: const TextStyle(
+                                    fontSize: 14,
+                                    // color: Colors.black, // Default color for fetched text
+                                  ),
+                                  maxLines: null, // Allow text to expand vertically
+                                ),
+                              ],
                             ),
                           ),
                         ],
@@ -750,7 +835,7 @@ class _SwipePageState extends State<SwipePage> with TickerProviderStateMixin {
           // Swiping instruction UI
           if (_showSwipeInstruction)
             Positioned(
-              left: MediaQuery.of(context).size.width / 1.8 - 80,
+              left: MediaQuery.of(context).size.width / 1.9 - 80,
               top: MediaQuery.of(context).size.height * 0.2,
               child: SlideTransition(
                 position: _instructionWagAnimation!,
@@ -919,5 +1004,99 @@ class CustomAdPage extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+// custom dialog with countdown timer for swipe limit reset
+class SwipeLimitDialog extends StatefulWidget {
+  @override
+  _SwipeLimitDialogState createState() => _SwipeLimitDialogState();
+}
+
+class _SwipeLimitDialogState extends State<SwipeLimitDialog> {
+  late Timer _timer;
+  late Duration _timeRemaining;
+
+  @override
+  void initState() {
+    super.initState();
+    _calculateTimeRemaining();
+    _startTimer();
+  }
+
+  void _calculateTimeRemaining() {
+    DateTime now = DateTime.now();
+    DateTime resetTime = DateTime(now.year, now.month, now.day + 1);
+    _timeRemaining = resetTime.difference(now);
+  }
+
+  void _startTimer() {
+    _timer = Timer.periodic(Duration(seconds: 1), (timer) {
+      setState(() {
+        if (_timeRemaining.inSeconds > 0) {
+          _timeRemaining -= Duration(seconds: 1);
+        } else {
+          _timer.cancel();
+        }
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    String formattedTime = _formatDuration(_timeRemaining);
+
+    return AlertDialog(
+      title: Text('Daily Swipe Limit Reached'),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+              'You have reached your daily swipe limit. Upgrade to Premium for unlimited swipes and an ad-free experience!'),
+          SizedBox(height: 16),
+          Text(
+            'Time until swipes reset: $formattedTime',
+            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.red),
+          ),
+        ],
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: Text('Cancel'),
+          style: TextButton.styleFrom(
+            foregroundColor: Colors.black,
+          ),
+        ),
+        ElevatedButton(
+          onPressed: () {
+            Navigator.of(context).pop();
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => SubscriptionManagementScreen(),
+              ),
+            );
+          },
+          child: Text('Upgrade'),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Color(0xFF41B1F1),
+            foregroundColor: Colors.white,
+          ),
+        ),
+      ],
+    );
+  }
+
+  String _formatDuration(Duration duration) {
+    String hours = duration.inHours.toString().padLeft(2, '0');
+    String minutes = (duration.inMinutes % 60).toString().padLeft(2, '0');
+    String seconds = (duration.inSeconds % 60).toString().padLeft(2, '0');
+    return '$hours:$minutes:$seconds';
   }
 }

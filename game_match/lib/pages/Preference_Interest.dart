@@ -31,14 +31,15 @@ class _PreferenceInterestPageState extends State<PreferenceInterestPage> {
             'Preferences & Interests',
             style: TextStyle(
               color: Colors.black, 
-              fontSize: 24,
+              fontSize: 16,
             ),
           ),
           centerTitle: true,
           backgroundColor: const Color(0xFF41B1F1),
           elevation: 0,
           leading: IconButton(
-          icon: const Icon(Icons.menu, color: Colors.black), // Sidebar Icon
+          alignment: Alignment.topLeft,
+          icon: const Icon(Icons.menu, color: Colors.black,),
           onPressed: () {
             _scaffoldKey.currentState?.openDrawer();
           },
@@ -72,7 +73,7 @@ class _PreferenceInterestPageState extends State<PreferenceInterestPage> {
                   
                   // Manage Preference button
                   CustomButton(
-                    title: 'Manage preferences',
+                    title: 'Manage Preferences',
                     subtitle: 'Edit and Save genre preferences',
                     icon: Icons.tune,
                     onPressed: () {
@@ -85,7 +86,7 @@ class _PreferenceInterestPageState extends State<PreferenceInterestPage> {
 
                   // Manage Interest button
                   CustomButton(
-                    title: 'Manage interests & other options',
+                    title: 'Manage Interests',
                     subtitle: 'Edit and Save other filter options',
                     icon: Icons.filter_list,
                     onPressed: () {
@@ -139,7 +140,7 @@ class CustomButton extends StatelessWidget {
         style: ElevatedButton.styleFrom(
           backgroundColor: isDarkMode ? const Color.fromARGB(255, 50, 50, 50) : Colors.white,
           foregroundColor: isDarkMode ? Colors.white : Colors.black,
-          padding: const EdgeInsets.all(25),
+          padding: const EdgeInsets.all(16),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(15),
           ),
@@ -150,7 +151,7 @@ class CustomButton extends StatelessWidget {
             Icon(
               icon,
               size: 40,
-              color: isDarkMode ? Colors.white : Colors.black,
+              color: const Color(0xFF74ACD5)
             ),
             const SizedBox(width: 20),
             Expanded(
@@ -160,7 +161,7 @@ class CustomButton extends StatelessWidget {
                   Text(
                     title,
                     style: TextStyle(
-                      fontSize: 18,
+                      fontSize: 16,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -168,7 +169,7 @@ class CustomButton extends StatelessWidget {
                   Text(
                     subtitle,
                     style: TextStyle(
-                      fontSize: 14,
+                      fontSize: 12,
                     ),
                   ),
                 ],

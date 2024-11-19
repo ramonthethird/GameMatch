@@ -25,9 +25,16 @@ class _AddThreadsPageState extends State<AddThreadsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Create New Thread'),
+        title: Text(
+          'Create a New Thread',
+          style: TextStyle(
+            color: Colors.black,
+            fontSize: 16,
+          ),
+        ),
+        centerTitle: true,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back, color: Colors.black,),
           onPressed: () {
             Navigator.of(context).pop();
           },
@@ -71,18 +78,18 @@ class _AddThreadsPageState extends State<AddThreadsPage> {
       children: [
         TextField(
           controller: _descriptionController,
-          maxLines: 20,
+          maxLines: 15,
           maxLength: 300,
           decoration: InputDecoration(
             hintText: 'Describe your thread in detail...',
             border: OutlineInputBorder(),
             filled: true,
-            fillColor: Colors.grey[200],
+            fillColor: Theme.of(context).cardColor,
           ),
         ),
         if (_selectedPhoto != null)
           Positioned(
-            bottom: 40,
+            bottom: 45,
             left: 20,
             child: Stack(
               children: [
@@ -176,18 +183,28 @@ class _AddThreadsPageState extends State<AddThreadsPage> {
   }
 
   Widget _buildPostButton() {
-    return SizedBox(
-      width: double.infinity,
-      child: ElevatedButton(
-        onPressed: _postThread,
-        style: ElevatedButton.styleFrom(
-          padding: const EdgeInsets.symmetric(vertical: 16),
-          backgroundColor: Colors.blue,
+  return SizedBox(
+    width: double.infinity,
+    child: ElevatedButton(
+      onPressed: _postThread,
+      style: ElevatedButton.styleFrom(
+        backgroundColor: const Color(0xFF41B1F1), // Match color
+        padding: const EdgeInsets.symmetric(vertical: 16), // Same padding
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10), // Rounded corners
         ),
-        child: const Text('Post Thread'),
       ),
-    );
-  }
+      child: const Text(
+        'Post Thread',
+        style: TextStyle(
+          color: Colors.white,
+          fontSize: 16,
+        ),
+      ),
+    ),
+  );
+}
+
 
   Future<void> _postThread() async {
     if (_descriptionController.text.isEmpty) {

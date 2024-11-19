@@ -43,7 +43,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Create an Account', style: TextStyle(color: Colors.black, fontSize: 24,)),
+        title: const Text('Create an Account', style: TextStyle(color: Colors.black, fontSize: 16,)),
         centerTitle: true,
         //backgroundColor: Colors.white,
         elevation: 0,
@@ -63,7 +63,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
                 Padding(
-                padding: const EdgeInsets.only(top: 40.0),
+                padding: const EdgeInsets.only(top: 0.0),
                 child: ColorFiltered(
                   colorFilter: Theme.of(context).brightness == Brightness.dark
                       ? const ColorFilter.mode(
@@ -87,6 +87,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   decoration: const InputDecoration(
                     labelText: 'Email',
                     border: OutlineInputBorder(),
+                    contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
                   ),
                 ),
                 const SizedBox(height: 20),
@@ -95,6 +96,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   decoration: const InputDecoration(
                     labelText: 'Username',
                     border: OutlineInputBorder(),
+                    contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
                   ),
                 ),
                 const SizedBox(height: 20),
@@ -104,6 +106,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   decoration: const InputDecoration(
                     labelText: 'Password',
                     border: OutlineInputBorder(),
+                    contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
                   ),
                 ),
                 const SizedBox(height: 20),
@@ -113,6 +116,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   decoration: const InputDecoration(
                     labelText: 'Confirm Password',
                     border: OutlineInputBorder(),
+                    contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
                   ),
                   validator: (value) { // Validator to ensure passwords match
                     if (value != passwordController.text) {
@@ -121,14 +125,15 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     return null;
                   },
                 ),
-                const SizedBox(height: 40),
+                const SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: (){
                     _trySubmit();
                     Navigator.pushNamed(context, '/Login');
                   }, // Button to trigger form submission
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
+                    backgroundColor: const Color(0xFF41B1F1),
+                    foregroundColor: Colors.white,
                   ),
                   child: const Text('Sign Up'),
                 ),

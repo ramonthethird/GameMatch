@@ -70,18 +70,54 @@ class SideBar extends StatelessWidget {
           .collection('users')
           .doc(user.uid)
           .get();
-      String userName = userDoc['username'] ?? 'Unknown';
+      var userData = userDoc.data() as Map<String, dynamic>?;
+      String userName = userData?['username'] ?? 'Unknown';
 
       DateTime? creationTime = user.metadata.creationTime;
       String memberSince = creationTime != null
           ? DateFormat('MMMM yyyy').format(creationTime)
           : 'Unknown';
 
-      String profileImageUrl = userDoc['profileImageUrl'] ?? '';
-      return {'username': userName, 'memberSince': memberSince, 'profileImageUrl': profileImageUrl};
+      String profileImageUrl = userData?['profileImageUrl'] ?? '';
+      if (profileImageUrl.isEmpty) {
+        profileImageUrl = '';
+      }
+      String subscriptionStatus = userData?['subscription'] ?? 'free';
+      return {
+        'username': userName,
+        'memberSince': memberSince,
+        'profileImageUrl': profileImageUrl,
+        'subscription': subscriptionStatus
+      };
     }
-    return {'username': 'Unknown', 'memberSince': 'Unknown'};
+  return {
+      'username': 'Unknown',
+      'memberSince': 'Unknown',
+      'profileImageUrl': ''
+    };
   }
+
+  Future<void> navigateToSubscription(BuildContext context) async {
+  User? user = FirebaseAuth.instance.currentUser;
+  if (user != null) {
+    DocumentSnapshot userDoc = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(user.uid)
+        .get();
+
+    // Ensure the document data is available and contains 'subscription'
+    String subscriptionStatus = userDoc.data() != null && (userDoc.data() as Map<String, dynamic>).containsKey('subscription')
+        ? userDoc['subscription'] as String
+        : 'free';
+
+    if (subscriptionStatus == 'free') {
+      Navigator.pushNamed(context, '/Subscription'); // Free subscription page
+    } else if (subscriptionStatus == 'paid') {
+      Navigator.pushNamed(context, '/SubscriptionPremium'); // Paid subscription page
+    }
+  }
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -118,7 +154,7 @@ class SideBar extends StatelessWidget {
                     } else {
                       final userInfo = snapshot.data ?? {'profileImageUrl': ''};
                       if (userInfo['profileImageUrl'] == null || userInfo['profileImageUrl']!.isEmpty) {
-                      return const Icon(Icons.person, color: Colors.white, size: 40);
+                      return const Icon(Icons.person, size: 40);
                       } else {
                       return Container(
                         decoration: BoxDecoration(
@@ -164,9 +200,7 @@ class SideBar extends StatelessWidget {
                                     snapshot.data?['username'] ?? 'Unknown',
                                   style: TextStyle(
                                     fontSize: 18,
-                                    color: isDarkMode
-                                        ? Colors.white
-                                        : Colors.black87,
+                                    color: Colors.black87,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
@@ -175,18 +209,17 @@ class SideBar extends StatelessWidget {
                                   "Member Since: ${userInfo['memberSince']}",
                                   style: TextStyle(
                                     fontSize: 12,
-                                    color: isDarkMode
-                                        ? Colors.white70
-                                        : Colors.black54,
+                                    color: Colors.black54,
                                   ),
                                 ),
                                 const SizedBox(height: 4),
                                 Text(
-                                  "Diamond Tier",
+                                  "${snapshot.data?['subscription'] == 'paid' ? 'Premium' : ''}",
                                   style: TextStyle(
                                     fontSize: 14,
-                                    color: isDarkMode
-                                        ? Colors.white70
+                                    color 
+                                    // isDarkMode
+                                    //     ? Colors.white70
                                         : Colors.black54,
                                     fontStyle: FontStyle.italic,
                                   ),
@@ -209,19 +242,19 @@ class SideBar extends StatelessWidget {
                 buildMenuButton(context, Icons.home, "Home", () {
                   Navigator.pushNamed(context, '/Post_home');
                 }),
-                buildMenuButton(context, Icons.room_preferences, "Preferences",
+                buildMenuButton(context, Icons.favorite, "Swipe Games",
                     () {
-                  Navigator.pushNamed(context, '/Preference_&_Interest');
+                  Navigator.pushNamed(context, '/swiping_games');
                 }),
                 buildMenuButton(context, Icons.subscriptions, "Subscription",
                     () {
-                  Navigator.pushNamed(context, '/Subscription');
+                  navigateToSubscription(context); // Check subscription status
                 }),
                 buildMenuButton(context, Icons.interests, "Wishlist", () {
                   Navigator.pushNamed(context, '/Wishlist');
                 }),
                 buildMenuButton(
-                    context, Icons.reviews, "My Reviews", () {
+                    context, Icons.reviews, "My Activity", () {
                   Navigator.pushNamed(context, '/Reviews');
                 }),
                 buildMenuButton(context, Icons.settings, "Settings", () {
@@ -240,29 +273,32 @@ class SideBar extends StatelessWidget {
                               color: isDarkMode ? Colors.white : Colors.black),
                         ),
                         actions: [
-                          TextButton(
+                          Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            TextButton(
                             child: Text(
                               "No",
                               style: TextStyle(
-                                  color:
-                                      isDarkMode ? Colors.white : Colors.black),
+                                color: isDarkMode ? Colors.white : Colors.black),
                             ),
                             onPressed: () {
                               Navigator.of(context).pop();
                             },
-                          ),
-                          TextButton(
+                            ),
+                            TextButton(
                             child: Text(
                               "Yes",
                               style: TextStyle(
-                                  color:
-                                      isDarkMode ? Colors.white : Colors.black),
+                                color: isDarkMode ? Colors.white : Colors.black),
                             ),
                             onPressed: () {
                               FirebaseAuth.instance.signOut();
                               Navigator.pushNamedAndRemoveUntil(
-                                  context, "/Home", (route) => false);
+                                context, "/Home", (route) => false);
                             },
+                            ),
+                          ],
                           ),
                         ],
                       );

@@ -1,343 +1,20 @@
-// import 'package:flutter/material.dart';
-// import 'dart:convert';
-// import 'package:http/http.dart' as http;
-// import 'ApiService.dart';
-//
-//
-// void main() => runApp(const MyApp());
-//
-// class MyApp extends StatelessWidget {
-//   const MyApp({super.key});
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return const MaterialApp(
-//       home: MyHomePage(title: ''),
-//     );
-//   }
-// }
-//
-// class MyHomePage extends StatefulWidget {
-//   const MyHomePage({super.key, required this.title});
-//
-//   final String title;
-//
-//   @override
-//   State<MyHomePage> createState() => _MyHomePageState();
-// }
-//
-// class _MyHomePageState extends State<MyHomePage> {
-//   final ApiService apiService = ApiService();
-//   String apexScreenshotUrl = '';
-//   String cyberpunkScreenshotUrl = '';
-//   String untilDawnScreenshotUrl = '';
-//   String ghostOfTsushimaScreenshotUrl = '';
-//   final String igdbImageBaseUrl = "https://images.igdb.com/igdb/image/upload/";
-//
-//
-//   int _selectedIndex = 0;
-//   static const TextStyle optionStyle =
-//   TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
-//
-//
-//
-//   static const List<Widget> _widgetOptions = <Widget>[
-//     Text(
-//       '',
-//       style: optionStyle,
-//     ),
-//     Text(
-//       '',
-//       style: optionStyle,
-//     ),
-//   ];
-//
-//   @override
-//   void initState() {
-//     super.initState();
-//     loadScreenshots();
-//   }
-//
-//   Future<void> loadScreenshots() async {
-//     List<String> apexScreenshots = await apiService.fetchScreenshots('Apex Legends');
-//     List<String> cyberpunkScreenshots = await apiService.fetchScreenshots('Cyberpunk 2077');
-//     List<String> untilDawnScreenshots = await apiService.fetchScreenshots('Until Dawn');
-//     List<String> ghostOfTsushimaScreenshots = await apiService.fetchScreenshots('Ghost of Tsushima');
-//
-//     setState(() {
-//       apexScreenshotUrl = apexScreenshots.isNotEmpty
-//           ? (apexScreenshots[0].startsWith('http') ? apexScreenshots[0] : igdbImageBaseUrl + apexScreenshots[0])
-//           : '';
-//       cyberpunkScreenshotUrl = cyberpunkScreenshots.isNotEmpty
-//           ? (cyberpunkScreenshots[0].startsWith('http') ? cyberpunkScreenshots[0] : igdbImageBaseUrl + cyberpunkScreenshots[0])
-//           : '';
-//       untilDawnScreenshotUrl = untilDawnScreenshots.isNotEmpty
-//           ? (untilDawnScreenshots[0].startsWith('http') ? untilDawnScreenshots[0] : igdbImageBaseUrl + untilDawnScreenshots[0])
-//           : '';
-//       ghostOfTsushimaScreenshotUrl = ghostOfTsushimaScreenshots.isNotEmpty
-//           ? (ghostOfTsushimaScreenshots[0].startsWith('http') ? ghostOfTsushimaScreenshots[0] : igdbImageBaseUrl + ghostOfTsushimaScreenshots[0])
-//           : '';
-//     });
-//   }
-//
-//   void _onItemTapped(int index) {
-//     setState(() {
-//       _selectedIndex = index;
-//     });
-//   }
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: AppBar(
-//         title: Text(widget.title),
-//         leading: Builder(
-//           builder: (context) {
-//             return IconButton(
-//               icon: const Icon(Icons.menu),
-//               onPressed: () {
-//                 Scaffold.of(context).openDrawer();
-//               },
-//             );
-//           },
-//         ),
-//       ),
-//       body: SingleChildScrollView(
-//         child: Column(
-//           children: [
-//             Padding(
-//               padding: const EdgeInsets.all(10.0),
-//               child: Text('Community',
-//                   style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold)),
-//             ),
-//             Padding(
-//               padding: const EdgeInsets.all(10.0),
-//               child: TextField(
-//                 decoration: InputDecoration(
-//                   labelText: 'Search...',
-//                   border: OutlineInputBorder(),
-//                   prefixIcon: Icon(Icons.search),
-//                 ),
-//                 onSubmitted: (value) {
-//                   print('Searching for: $value');
-//                 },
-//               ),
-//             ),
-//             Padding(
-//               padding: const EdgeInsets.all(10.0),
-//               child: apexScreenshotUrl.isNotEmpty
-//                   ? Image.network(apexScreenshotUrl)
-//                   : CircularProgressIndicator(), // Loading indicator while fetching
-//             ),
-//             Padding(
-//               padding: const EdgeInsets.all(10.0),
-//               child: Text('Trending Games',
-//                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-//             ),
-//             Padding(
-//               padding: const EdgeInsets.all(8.0),
-//               child: SingleChildScrollView(
-//                 scrollDirection: Axis.horizontal,
-//                 child: Row(
-//                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//                   children: [
-//                     Column(
-//                       children: [
-//                         Container(
-//                           width: 383,
-//                           height: 215,
-//                           child: Image.network(
-//                             'https://i.guim.co.uk/img/media/b1cf1d39219150e9cc57ce23eed8a1fdd3855c17/60_0_1800_1080/master/1800.jpg?width=465&dpr=1&s=none&crop=none',
-//                             fit: BoxFit.cover,
-//                           ),
-//                         ),
-//                         SizedBox(height: 5), // Space between the image and the caption
-//                         Text('Cyberpunk 2077'),
-//                       ],
-//                     ),
-//                     SizedBox(width: 15),
-//                     Column(
-//                       children: [
-//                         Container(
-//                           width: 383,
-//                           height: 215,
-//                           child: Image.network(
-//                             'https://image.api.playstation.com/vulcan/ap/rnd/202401/2910/3cb17e8780924be93de73d4b6b81e3309f69d24137c02d54.jpg',
-//                             fit: BoxFit.cover,
-//                           ),
-//                         ),
-//                         SizedBox(height: 5),
-//                         Text('Until Dawn'),
-//                       ],
-//                     ),
-//                     SizedBox(width: 15),
-//                     Column(
-//                       children: [
-//                         Container(
-//                           width: 383,
-//                           height: 215,
-//                           child: Image.network(
-//                             'https://media.licdn.com/dms/image/D5612AQEnhLpRjbjREA/article-cover_image-shrink_720_1280/0/1706043456097?e=2147483647&v=beta&t=W2dbeO1-WRs6g4Ufv8vo5bIy5EryCnw--nUqg5SII60',
-//                             fit: BoxFit.cover,
-//                           ),
-//                         ),
-//                         SizedBox(height: 5),
-//                         Text('Ghost of Tsushima'),
-//                       ],
-//                     ),
-//                   ],
-//
-//                 ),
-//               ),
-//             ),
-//             Padding(
-//               padding: const EdgeInsets.all(10.0),
-//               child: Text('Most Recent Reviews \n (go to reviews page for games)',
-//                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-//             ),
-//
-//             Padding(
-//               padding: const EdgeInsets.all(10.0),
-//               child: Container(
-//                 width: double.infinity, // Make the container take up full width
-//                 padding: EdgeInsets.all(10.0), // Padding inside the container
-//                 decoration: BoxDecoration(
-//                   color: Colors.grey[300], // Background color for the container
-//                   borderRadius: BorderRadius.circular(12), // Rounded corners
-//                   border: Border.all(color: Colors.black), // Optional: add a border
-//                 ),
-//                 child: Text(
-//                   '@username \n game title: mario kart\n rate: 9/10 \n this game is rlly fun \n',
-//                   style: TextStyle(fontSize: 16), // Optional: customize text style
-//                 ),
-//               ),
-//             ),
-//
-//             Padding(
-//               padding: const EdgeInsets.all(10.0),
-//               child: Container(
-//                 width: double.infinity, // Make the container take up full width
-//                 padding: EdgeInsets.all(10.0), // Padding inside the container
-//                 decoration: BoxDecoration(
-//                   color: Colors.grey[300], // Background color for the container
-//                   borderRadius: BorderRadius.circular(12), // Rounded corners
-//                   border: Border.all(color: Colors.black), // Optional: add a border
-//                 ),
-//                 child: Text(
-//                   '@username \n game title: cyberpunk 2077\n rate: 8/10 \n this game is rlly fun \n',
-//                   style: TextStyle(fontSize: 16), // Optional: customize text style
-//                 ),
-//               ),
-//             ),
-//             Padding(
-//               padding: const EdgeInsets.all(10.0),
-//               child: Container(
-//                 width: double.infinity, // Make the container take up full width
-//                 padding: EdgeInsets.all(10.0), // Padding inside the container
-//                 decoration: BoxDecoration(
-//                   color: Colors.grey[300], // Background color for the container
-//                   borderRadius: BorderRadius.circular(12), // Rounded corners
-//                   border: Border.all(color: Colors.black), // Optional: add a border
-//                 ),
-//                 child: Text(
-//                   '@username \n game title: apex\n rate: 8/10 \n fast paced game! rlly fun!\n',
-//                   style: TextStyle(fontSize: 16), // Optional: customize text style
-//                 ),
-//               ),
-//             ),
-//             Padding(
-//               padding: const EdgeInsets.all(10.0),
-//               child: Container(
-//                 width: double.infinity, // Make the container take up full width
-//                 padding: EdgeInsets.all(10.0), // Padding inside the container
-//                 decoration: BoxDecoration(
-//                   color: Colors.grey[300], // Background color for the container
-//                   borderRadius: BorderRadius.circular(12), // Rounded corners
-//                   border: Border.all(color: Colors.black), // Optional: add a border
-//                 ),
-//                 child: Text(
-//                   '@username \n game title: astro bot\n rate: 8/10 \n this game is rlly fun \n',
-//                   style: TextStyle(fontSize: 16), // Optional: customize text style
-//                 ),
-//               ),
-//             ),
-//             Padding(
-//               padding: const EdgeInsets.all(10.0),
-//               child: Container(
-//                 width: double.infinity, // Make the container take up full width
-//                 padding: EdgeInsets.all(10.0), // Padding inside the container
-//                 decoration: BoxDecoration(
-//                   color: Colors.grey[300], // Background color for the container
-//                   borderRadius: BorderRadius.circular(12), // Rounded corners
-//                   border: Border.all(color: Colors.black), // Optional: add a border
-//                 ),
-//                 child: Text(
-//                   '@username \n game title: until dawn\n rate: 7/10 \n this game is ok \n',
-//                   style: TextStyle(fontSize: 16), // Optional: customize text style
-//                 ),
-//               ),
-//             ),
-//
-//             // Content for the selected index
-//             Center(
-//               child: _widgetOptions[_selectedIndex],
-//             ),
-//           ],
-//         ),
-//       ),
-//       drawer: Drawer(
-//         child: ListView(
-//           padding: EdgeInsets.zero,
-//           children: [
-//             const DrawerHeader(
-//               decoration: BoxDecoration(
-//                 color: Colors.blue,
-//               ),
-//               child: Text('Drawer Header'),
-//             ),
-//             ListTile(
-//               title: const Text('Home'),
-//               selected: _selectedIndex == 0,
-//               onTap: () {
-//                 _onItemTapped(0);
-//                 Navigator.pop(context);
-//               },
-//             ),
-//             ListTile(
-//               title: const Text('Business'),
-//               selected: _selectedIndex == 1,
-//               onTap: () {
-//                 _onItemTapped(1);
-//                 Navigator.pop(context);
-//               },
-//             ),
-//             ListTile(
-//               title: const Text('School'),
-//               selected: _selectedIndex == 2,
-//               onTap: () {
-//                 _onItemTapped(2);
-//                 Navigator.pop(context);
-//               },
-//             ),
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-// }
-
 import 'package:flutter/material.dart';
-import 'Api_Service.dart';
-import 'game_model.dart';
-import 'game_description.dart';
-import 'Side_bar.dart';
-// import 'FirestoreService.dart';
+import 'package:cloud_firestore/cloud_firestore.dart'; // Firestore package for database access
+import 'package:game_match/firestore_service.dart'; // Custom Firestore service for database interaction
+import 'game_model.dart'; // Model class for Game objects
+import 'Api_Service.dart'; // Custom API service file to fetch game data
+import 'game_description.dart'; // Page to show detailed game description
+import 'Side_bar.dart'; // Sidebar widget for navigation
+import 'Threads.dart';
+import 'Thread_Comments.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -345,12 +22,14 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: GameListScreen(),
+      home: const GameListScreen(),
     );
   }
 }
 
 class GameListScreen extends StatefulWidget {
+  const GameListScreen({super.key});
+
   @override
   _GameListScreenState createState() => _GameListScreenState();
 }
@@ -358,19 +37,17 @@ class GameListScreen extends StatefulWidget {
 class _GameListScreenState extends State<GameListScreen> {
   final ApiService apiService = ApiService();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  final FirestoreService _firestoreService = FirestoreService();
 
-  // final FirestoreService firestoreService = FirestoreService();
   Map<String, List<Map<String, dynamic>>> gameThreads = {};
   List<Game> games = [];
   bool isLoading = true;
-  Map<String, dynamic>? gameDetails;
 
   @override
   void initState() {
     super.initState();
-    // fetchTopGames();
     fetchTrendingGames();
-    // fetchGameInfo();
+    fetchRecentThreads();
   }
 
   Future<void> fetchTrendingGames() async {
@@ -385,50 +62,53 @@ class _GameListScreenState extends State<GameListScreen> {
     }
   }
 
-  // Future<void> fetchThreeLatestThreads(int gameId) async {
-  //   try {
-  //     List<QueryDocumentSnapshot> threadDocs =
-  //     await firestoreService.getThreeLatestThreads(gameId.toString());
-  //     List<Map<String, dynamic>> threads = threadDocs
-  //         .map((doc) => doc.data() as Map<String, dynamic>)
-  //         .toList();
-  //     setState(() {
-  //       gameThreads[gameId.toString()] = threads; // Store the threads by gameId
-  //     });
-  //   } catch (e) {
-  //     print('Error fetching threads: $e');
-  //   }
-  // }
+  Future<void> fetchRecentThreads() async {
+    try {
+      QuerySnapshot<Map<String, dynamic>> snapshot = await _firestoreService.getRecentThreads(limit: 5);
+      List<Map<String, dynamic>> fetchedThreads = await Future.wait(
+        snapshot.docs.map((doc) async {
+          Map<String, dynamic> thread = doc.data();
+          String threadId = doc.id;
+          String userId = thread['userId'] ?? 'unknownUser';
+          Map<String, dynamic>? userInfo = await _firestoreService.getUserInfo(userId);
+          thread['userName'] = userInfo?['username'] ?? 'Anonymous';
+          thread['avatarUrl'] = userInfo?['profileImageUrl'];
+          thread['id'] = threadId;
+          DateTime threadTimestamp = (thread['timestamp'] as Timestamp).toDate();
+          thread['timestamp'] = threadTimestamp;
+          thread['likes'] = thread['likes'] ?? 0;
+          thread['comments'] = thread['comments'] ?? [];
+          thread['content'] = thread['content'] ?? 'No body content available';
+          return thread;
+        }).toList(),
+      );
+      setState(() {
+        gameThreads['recent'] = fetchedThreads;
+      });
+    } catch (e) {
+      print('Error fetching recent threads: $e');
+    }
+  }
 
-  // Future<void> fetchTopGames() async {
-  //   try {
-  //     final fetchedGames = await apiService.fetchPopularGames();
-  //     setState(() {
-  //       // Filter out games without a cover image
-  //       games = fetchedGames.where((game) => game.coverUrl != null).toList();
-  //       isLoading = false;
-  //     });
-  //   } catch (e) {
-  //     print('Error fetching games: $e');
-  //   }
-  // }
-
-  // Future<void> fetchGameInfo() async {
-  //   final details = await apiService.fetchGameInfo(widget.game.gameId!);
-  //   setState(() {
-  //     gameDetails = details;
-  //     isLoading = false;
-  //   });
-  // }
+  Future<void> _refreshPage() async {
+    setState(() => isLoading = true);
+    await Future.wait([fetchTrendingGames(), fetchRecentThreads()]);
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      key: _scaffoldKey, // Key for the scaffold
+      key: _scaffoldKey,
       appBar: AppBar(
-        title: Text('Community'),
+        title: const Text('Community',
+        style: TextStyle(
+            color: Colors.black,
+            fontSize: 16,
+          ),
+        ),
+        centerTitle: true,
         leading: IconButton(
-          icon: const Icon(Icons.menu, color: Colors.black), // Sidebar Icon
+          icon: const Icon(Icons.menu, color: Colors.black),
           onPressed: () {
             _scaffoldKey.currentState?.openDrawer();
           },
@@ -436,154 +116,384 @@ class _GameListScreenState extends State<GameListScreen> {
       ),
       drawer: Drawer(
         child: SideBar(
-          onThemeChanged: (isDarkMode) {
-            // Handle theme change here
-          },
-          isDarkMode: false, // Replace with actual theme state if implemented
+          onThemeChanged: (isDarkMode) {},
+          isDarkMode: false,
         ),
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Search bar
-            Padding(
-              padding: const EdgeInsets.all(10.0),
-              child: TextField(
-                decoration: InputDecoration(
-                  labelText: 'Search...',
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.search),
-                ),
-                onSubmitted: (value) {
-                  print('Searching for: $value');
-                },
-              ),
-            ),
+      body: RefreshIndicator(
+        onRefresh: _refreshPage,
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: TextField(
+                  decoration: const InputDecoration(
+                    filled: true,
+                    fillColor: Colors.white,
+                    labelText: 'Search for a game...',
+                    border: OutlineInputBorder(),
+                    prefixIcon: Icon(Icons.search),
+                  ),
+                  onSubmitted: (query) async {
+                    try {
+                      final List<Game> searchResults = await apiService.searchGames(query);
+                      final Game? matchingGame = searchResults.isNotEmpty
+                          ? searchResults.firstWhere(
+                              (game) => game.name.toLowerCase() == query.toLowerCase(),
+                          orElse: () => searchResults.first)
+                          : null;
 
-            // Trending games title
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10.0),
-              child: Text(
-                'Trending Games',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
-            ),
-
-            SizedBox(height: 5), // Adjust spacing between Trending Games and rectangles
-
-            // Games horizontal list
-            isLoading
-                ? Center(child: CircularProgressIndicator())
-                : SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: games.map((game) {
-                  return GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => GameDescriptionPage(game: game),
-                        ),
-                      );
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(10.0), // Rounded corners
-                        child: Container(
-                          width: 150,  // Set width for the rounded rectangle
-                          height: 200, // Set height for the rounded rectangle
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10.0), // Rounded corners
-                            color: Colors.grey[300],
+                      if (matchingGame != null) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ThreadsPage(gameId: matchingGame.id),
                           ),
-                          child: Column(
-                            children: [
-                              // Cover Image takes most of the space
-                              Expanded(
-                                flex: 3,
-                                child: game.coverUrl != null
-                                    ? Image.network(
-                                  game.coverUrl!,
-                                  width: 150, // Match the container width
-                                  height: 150, // Fill the top part
-                                  fit: BoxFit.cover, // Make sure the image fits the container
-                                )
-                                    : Container(
-                                  width: 150,
-                                  height: 150,
-                                  color: Colors.grey[400],
-                                  child: Icon(Icons.videogame_asset, size: 50),
+                        );
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Game "$query" not found.')),
+                        );
+                      }
+                    } catch (error) {
+                      print('Error searching for game: $error');
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Error searching for game.')),
+                      );
+                    }
+                  },
+                ),
+              ),
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 10.0),
+                child: Text(
+                  'Trending Games',
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                ),
+              ),
+              const SizedBox(height: 5),
+              isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: games.take(5).map((game) {
+                    return GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ThreadsPage(gameId: game.id.toString()),
+                          ),
+                        );
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(10.0),
+                          child: Container(
+                            width: 150,
+                            height: 280, // 350
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10.0),
+                              color: Colors.white, // Changed background color to white
+                            ),
+                            child: Column(
+                              children: [
+                                // Game cover image
+                                Expanded(
+                                  flex: 3,
+                                  child: game.coverUrl != null
+                                      ? Image.network(
+                                    game.coverUrl!,
+                                    width: 150,
+                                    height: 150,
+                                    fit: BoxFit.cover,
+                                  )
+                                      : Container(
+                                    width: 150,
+                                    height: 150,
+                                    color: Colors.grey[400],
+                                    child: const Icon(Icons.videogame_asset, size: 50),
+                                  ),
                                 ),
-                              ),
-                              // Game Name in the bottom part
-                              Expanded(
-                                flex: 1,
-                                child: Container(
-                                  width: double.infinity,
-                                  color: Colors.black.withOpacity(0.7),
-                                  alignment: Alignment.center,
-                                  child: Text(
-                                    game.name,
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold,
+                                // Game name and genres at the bottom
+                                Expanded(
+                                  flex: 1,
+                                  child: Container(
+                                    width: double.infinity,
+                                    padding: const EdgeInsets.all(8.0),
+                                    color: Colors.white, // Ensure white background
+                                    alignment: Alignment.center,
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Text(
+                                          game.name,
+                                          style: const TextStyle(
+                                            color: Colors.black, // Game name in black
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                        const SizedBox(height: 2),
+                                        Text(
+                                          game.genres.take(1).join(', '), // Display genres
+                                          style: const TextStyle(
+                                            color: Colors.grey, // Genres in gray
+                                            fontSize: 12,
+                                          ),
+                                          textAlign: TextAlign.center,
+                                        ),
+                                      ],
                                     ),
                                   ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         ),
                       ),
-                    ),
+                    );
+                  }).toList(),
+                ),
+              ),
+              const Padding(
+                padding: EdgeInsets.all(10.0),
+                child: Text(
+                  'Recent Threads',
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                ),
+              ),
+              if (gameThreads['recent'] != null)
+                ...gameThreads['recent']!.map((thread) {
+                  return buildThreadContainer(
+                    thread['avatarUrl'] ?? '',
+                    thread['userName'] ?? 'Anonymous',
+                    thread['timestamp'] as DateTime,
+                    thread['content'] ?? 'No body content available',
+                    thread['id'],
+                    thread['gameId'] ?? '',
+                    thread['likes'] ?? 0,
+                    thread['comments'] ?? 0, // Use the comments count directly as an integer
+                    thread['imageUrl'] ?? '',
                   );
-                }).toList(),
-              ),
-            ),
-
-            // Recent Threads Section
-            Padding(
-              padding: const EdgeInsets.all(10.0),
-              child: Text(
-                'Recent Threads',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
-            ),
-
-            // Example thread rectangles
-            buildThreadContainer('Thread #1 \n\n'),
-            buildThreadContainer('Thread #2 \n\n'),
-            buildThreadContainer('Thread #3 \n\n'),
-            buildThreadContainer('Thread #4 \n\n'),
-            buildThreadContainer('Thread #5 \n\n'),
-
-          ],
+                }).toList()
+              else
+                const Center(child: CircularProgressIndicator()),
+            ],
+          ),
         ),
       ),
     );
   }
 
-  Widget buildThreadContainer(String threadName) {
+  String formatTimestamp(DateTime timestamp) {
+    return "${timestamp.day.toString().padLeft(2, '0')}-"
+        "${timestamp.month.toString().padLeft(2, '0')}-"
+        "${timestamp.year} "
+        "${timestamp.hour.toString().padLeft(2, '0')}:"
+        "${timestamp.minute.toString().padLeft(2, '0')}";
+  }
+
+  Widget buildThreadContainer(
+      String avatarUrl,
+      String userName,
+      DateTime timestamp,
+      String content,
+      String threadId,
+      String gameId,
+      int likes,
+      int commentsCount,
+      String? threadImageUrl, // New parameter for thread image
+      ) {
+    final ApiService apiService = ApiService();
+
     return Padding(
       padding: const EdgeInsets.all(10.0),
-      child: Container(
-        width: double.infinity,
-        padding: EdgeInsets.all(10.0),
-        decoration: BoxDecoration(
-          color: Colors.grey[300],
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.black),
-        ),
-        child: Text(
-          threadName,
-          style: TextStyle(fontSize: 16),
-        ),
+      child: FutureBuilder<Map<String, dynamic>?>(
+        future: apiService.fetchGameInfo(int.parse(gameId)), // Use IGDB API to fetch game info
+        builder: (context, snapshot) {
+          String gameName = 'Loading...';
+          if (snapshot.connectionState == ConnectionState.done && snapshot.hasData) {
+            gameName = snapshot.data?['name'] ?? 'Game Not Found';
+          } else if (snapshot.hasError) {
+            gameName = 'Error fetching game';
+          }
+
+          return GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ThreadDetailPage(
+                    threadId: threadId,
+                    threadContent: content,
+                    threadUserName: userName,
+                    threadImageUrl: threadImageUrl,
+                    threadUserAvatarUrl: avatarUrl,
+                    timestamp: Timestamp.fromDate(timestamp),
+                    likes: likes,
+                    comments: commentsCount,
+                    shares: 0,
+                  ),
+                ),
+              );
+            },
+            child: Container(
+              padding: const EdgeInsets.all(15.0),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.white),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(gameName, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                  const SizedBox(height: 5),
+                  Row(
+                    children: [
+                      CircleAvatar(
+                        radius: 20,
+                        backgroundImage: avatarUrl.isNotEmpty ? NetworkImage(avatarUrl) : null,
+                        child: avatarUrl.isEmpty ? const Icon(Icons.person, size: 25) : null,
+                      ),
+                      const SizedBox(width: 10),
+                      Text(userName, style: const TextStyle(fontWeight: FontWeight.bold)),
+                      const Spacer(),
+                      Text(
+                        "${timestamp.day}-${timestamp.month}-${timestamp.year}",
+                        style: const TextStyle(fontSize: 12, color: Colors.grey),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  Text(content),
+                  if (threadImageUrl != null && threadImageUrl.isNotEmpty)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(10),
+                        child: Image.network(
+                          threadImageUrl,
+                          height: 150,
+                          width: double.infinity,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return const SizedBox();
+                          },
+                        ),
+                      ),
+                    ),
+                  const SizedBox(height: 10),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Icon(Icons.favorite, color: Colors.red, size: 18),
+                      const SizedBox(width: 5),
+                      Text('$likes', style: const TextStyle(color: Colors.black)),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
       ),
     );
   }
 
+  
+}
 
+class ThreadDetailScreen extends StatelessWidget {
+  final String threadId;
+  final String content;
+  final String userName;
+  final String avatarUrl;
+  final DateTime timestamp;
+  final int likes;
+  final String gameId;
+
+  const ThreadDetailScreen({
+    Key? key,
+    required this.threadId,
+    required this.content,
+    required this.userName,
+    required this.avatarUrl,
+    required this.timestamp,
+    required this.likes,
+    required this.gameId,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final FirestoreService _firestoreService = FirestoreService();
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Thread Details'),
+      ),
+      body: FutureBuilder<Game?>(
+        future: _firestoreService.getGameById(gameId),
+        builder: (context, snapshot) {
+          String gameName = 'Loading...';
+          if (snapshot.connectionState == ConnectionState.done && snapshot.hasData) {
+            gameName = snapshot.data?.name ?? 'Game Not Found';
+          }
+
+          return Padding(
+            padding: const EdgeInsets.all(10.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ThreadsPage(gameId: gameId),
+                      ),
+                    );
+                  },
+                  child: Text(
+                    gameName,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                      color: Colors.blue,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                Row(
+                  children: [
+                    CircleAvatar(
+                      radius: 20,
+                      backgroundImage: avatarUrl.isNotEmpty ? NetworkImage(avatarUrl) : null,
+                      child: avatarUrl.isEmpty ? const Icon(Icons.person, size: 25) : null,
+                    ),
+                    const SizedBox(width: 10),
+                    Text(userName, style: const TextStyle(fontWeight: FontWeight.bold)),
+                    const Spacer(),
+                    Text(
+                      "${timestamp.day}-${timestamp.month}-${timestamp.year}",
+                      style: const TextStyle(fontSize: 12, color: Colors.grey),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                Text(content, style: const TextStyle(fontSize: 16)),
+                const SizedBox(height: 10),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
 }

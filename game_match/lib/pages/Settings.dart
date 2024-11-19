@@ -14,48 +14,63 @@ class SettingsPage extends StatefulWidget {
 
 class _SettingsPageState extends State<SettingsPage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-  String? fetchedUsername;
-  String? profilePictureUrl; // Store profile picture URL
+  String? _username = 'User';
+  String? _profilePictureUrl; // Profile picture URL
   bool notificationsEnabled = false;
 
   @override
   void initState() {
     super.initState();
-    _fetchUserProfile();
+    _loadUserData();
   }
 
-  Future<void> _fetchUserProfile() async {
-    try {
-      User? user = FirebaseAuth.instance.currentUser;
+  Future<void> _loadUserData() async {
+    String? userId = FirebaseAuth.instance.currentUser?.uid;
+    if (userId != null) {
+      final userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userId)
+          .get();
 
-      if (user != null) {
-        DocumentSnapshot userDoc = await FirebaseFirestore.instance
-            .collection('users')
-            .doc(user.uid)
-            .get();
-
-        if (userDoc.exists) {
-          setState(() {
-            fetchedUsername = userDoc['username'] ?? 'No username found';
-            profilePictureUrl = userDoc['profileImageUrl'] ?? ''; // Fetch profile picture URL
-          });
-        } else {
-          setState(() {
-            fetchedUsername = 'No username found';
-          });
-        }
-      } else {
-        setState(() {
-          fetchedUsername = 'User not logged in';
-        });
-      }
-    } catch (e) {
-      print('Error fetching user profile: $e');
       setState(() {
-        fetchedUsername = 'Error fetching user profile';
+        _username = userDoc['username'] ?? 'User';
+        _profilePictureUrl = userDoc.data()?['profileImageUrl'] ?? ''; // Load profile picture URL
       });
     }
   }
+
+  // Future<void> _fetchUserProfile() async {
+  //   try {
+  //     User? user = FirebaseAuth.instance.currentUser;
+
+  //     if (user != null) {
+  //       DocumentSnapshot userDoc = await FirebaseFirestore.instance
+  //           .collection('users')
+  //           .doc(user.uid)
+  //           .get();
+
+  //       if (userDoc.exists) {
+  //         setState(() {
+  //           fetchedUsername = userDoc['username'] ?? 'No username found';
+  //           profilePictureUrl = userDoc['profileImageUrl'] ?? ''; // Fetch profile picture URL
+  //         });
+  //       } else {
+  //         setState(() {
+  //           fetchedUsername = 'No username found';
+  //         });
+  //       }
+  //     } else {
+  //       setState(() {
+  //         fetchedUsername = 'User not logged in';
+  //       });
+  //     }
+  //   } catch (e) {
+  //     print('Error fetching user profile: $e');
+  //     setState(() {
+  //       fetchedUsername = 'Error fetching user profile';
+  //     });
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -68,7 +83,7 @@ class _SettingsPageState extends State<SettingsPage> {
           'Settings',
           style: TextStyle(
             color: Colors.black,
-            fontSize: 24,
+            fontSize: 16,
           ),
         ),
         centerTitle: true,
@@ -98,14 +113,17 @@ class _SettingsPageState extends State<SettingsPage> {
             children: [
               const SizedBox(height: 20),
               CircleAvatar(
-                radius: 50,
-                backgroundImage: profilePictureUrl != null && profilePictureUrl!.isNotEmpty
-                    ? NetworkImage(profilePictureUrl!) // Use the URL if available
-                    : const AssetImage('assets/images/profile_picture.png') as ImageProvider, // Fallback to placeholder
+                radius: 40,
+                backgroundImage: _profilePictureUrl != null && _profilePictureUrl!.isNotEmpty
+                    ? NetworkImage(_profilePictureUrl!)  // Display profile image if available
+                    : null, // No image if URL is null or empty
+                child: _profilePictureUrl == null || _profilePictureUrl!.isEmpty
+                    ? const Icon(Icons.person, size: 40) // Default icon if no image
+                    : null,
               ),
               const SizedBox(height: 10),
               Text(
-                fetchedUsername ?? 'Loading...',
+                _username ?? 'Loading...',
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
@@ -122,18 +140,18 @@ class _SettingsPageState extends State<SettingsPage> {
                   themeNotifier.toggleTheme(value);
                 },
               ),
-              const SizedBox(height: 20),
-              buildSectionHeader('Notifications'),
-              buildSwitchOption(
-                'Enable Notifications',
-                notificationsEnabled,
-                Icons.notifications_active,
-                (value) {
-                  setState(() {
-                    notificationsEnabled = value;
-                  });
-                },
-              ),
+              // const SizedBox(height: 20),
+              // buildSectionHeader('Notifications'),
+              // buildSwitchOption(
+              //   'Enable Notifications',
+              //   notificationsEnabled,
+              //   Icons.notifications_active,
+              //   (value) {
+              //     setState(() {
+              //       notificationsEnabled = value;
+              //     });
+              //   },
+              // ),
               const SizedBox(height: 20),
               buildSectionHeader('Legal'),
               buildSettingsOption(
@@ -175,12 +193,12 @@ class _SettingsPageState extends State<SettingsPage> {
       child: ListTile(
         leading: Icon(
           icon,
-          color: themeNotifier.isDarkMode ? Colors.white : Colors.black,
+          color: themeNotifier.isDarkMode ? Color(0xFF74ACD5) : Color(0xFF74ACD5),
         ),
         title: Text(
           title,
           style: TextStyle(
-            fontSize: 16.0,
+            fontSize: 14.0,
             color: themeNotifier.isDarkMode ? Colors.white : Colors.black,
           ),
         ),
@@ -207,7 +225,7 @@ class _SettingsPageState extends State<SettingsPage> {
       child: Text(
         title,
         style: TextStyle(
-          fontSize: 18.0,
+          fontSize: 16.0,
           fontWeight: FontWeight.bold,
           color: themeNotifier.isDarkMode ? Colors.white : Colors.black,
         ),
@@ -236,13 +254,13 @@ class _SettingsPageState extends State<SettingsPage> {
           children: [
             Icon(
               icon,
-              color: themeNotifier.isDarkMode ? Colors.white : Colors.black,
+              color: themeNotifier.isDarkMode ? Color(0xFF74ACD5) : Color(0xFF74ACD5),
             ),
             const SizedBox(width: 10),
             Text(
               title,
               style: TextStyle(
-                fontSize: 16.0,
+                fontSize: 14.0,
                 color: themeNotifier.isDarkMode ? Colors.white : Colors.black,
               ),
             ),

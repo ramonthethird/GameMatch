@@ -11,7 +11,7 @@ import 'package:provider/provider.dart';
 class GameDetailScreen extends StatefulWidget {
   final String gameId;
 
-  const GameDetailScreen({Key? key, required this.gameId}) : super(key: key);
+    const GameDetailScreen({super.key, required this.gameId});
 
   @override
   _GameDetailScreenState createState() => _GameDetailScreenState();
@@ -29,18 +29,22 @@ class _GameDetailScreenState extends State<GameDetailScreen> {
   }
 
   Future<void> _fetchGameDetails() async {
-    try {
-      selectedGame = await _firestoreService.getGameById(widget.gameId);
-      if (selectedGame != null) {
-        setState(() {});
-      }
-    } catch (e) {
-      print('Error fetching game details: $e');
+  try {
+    selectedGame = await _firestoreService.getGameById(widget.gameId);
+    if (selectedGame != null) {
+      setState(() {});
+    } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Game not found or failed to load')),
+        const SnackBar(content: Text('Game not found in recommendations')),
       );
     }
+  } catch (e) {
+    print('Error fetching game details: $e');
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Game not found or failed to load')),
+    );
   }
+}
 
   void _showEnlargedImage(List<String> imageUrls, int initialIndex) {
     showDialog(
@@ -84,29 +88,31 @@ class _GameDetailScreenState extends State<GameDetailScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    final themeNotifier = Provider.of<ThemeNotifier>(context);
+  @override
+Widget build(BuildContext context) {
+  final themeNotifier = Provider.of<ThemeNotifier>(context);
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'Game Details',
-          style: TextStyle(
-            color: Colors.black,
-            fontSize: 24,
-          ),
-        ),
-        centerTitle: true,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black,),
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
+  return Scaffold(
+    appBar: AppBar(
+      title: const Text(
+        'Game Details',
+        style: TextStyle(
+          color: Colors.black,
+          fontSize: 16,
         ),
       ),
-      body: selectedGame == null
-          ? const Center(child: CircularProgressIndicator())
-          : SingleChildScrollView(
+      centerTitle: true,
+      leading: IconButton(
+        icon: const Icon(Icons.arrow_back, color: Colors.black),
+        onPressed: () {
+          Navigator.of(context).pop();
+        },
+      ),
+    ),
+    body: selectedGame == null
+        ? const Center(child: CircularProgressIndicator())
+        : SingleChildScrollView(
+            child: Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -126,7 +132,7 @@ class _GameDetailScreenState extends State<GameDetailScreen> {
                             child: Padding(
                               padding: const EdgeInsets.symmetric(horizontal: 8.0),
                               child: ClipRRect(
-                                borderRadius: BorderRadius.circular(12), // Rounded corners
+                                borderRadius: BorderRadius.circular(12),
                                 child: Image.network(
                                   screenshotUrl,
                                   height: 200,
@@ -145,7 +151,7 @@ class _GameDetailScreenState extends State<GameDetailScreen> {
                   Text(
                     selectedGame!.name,
                     style: const TextStyle(
-                      fontSize: 24,
+                      fontSize: 20,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -167,9 +173,9 @@ class _GameDetailScreenState extends State<GameDetailScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          '\$${selectedGame!.price!.toStringAsFixed(2)}',
+                          '\$${(selectedGame!.price ?? (5.99 + (1.5 * (widget.gameId.hashCode % 2.5)))).toStringAsFixed(2)}',
                           style: const TextStyle(
-                            fontSize: 18,
+                            fontSize: 14,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -178,13 +184,12 @@ class _GameDetailScreenState extends State<GameDetailScreen> {
                                   selectedGame!.developers!.isNotEmpty
                               ? selectedGame!.developers!.first
                               : 'Unknown Developer',
-                          style: const TextStyle(fontSize: 16),
+                          style: const TextStyle(fontSize: 14),
                         ),
                       ],
                     ),
                   ),
-                  const SizedBox(height: 12), // Spacing between containers
-
+                  const SizedBox(height: 12),
                   // Container for Platforms and Release Date
                   Container(
                     padding: const EdgeInsets.all(12),
@@ -193,25 +198,49 @@ class _GameDetailScreenState extends State<GameDetailScreen> {
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Expanded(
-                          child: Text(
-                            'Platforms: ${selectedGame!.platforms?.join(', ') ?? 'Unknown platforms'}',
-                            style: const TextStyle(fontSize: 16),
+                          flex: 1,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Platforms:',
+                                style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                selectedGame!.platforms.join(', '),
+                                style: const TextStyle(fontSize: 14),
+                              ),
+                            ],
                           ),
                         ),
-                        const SizedBox(width: 8), // Space between items
+                        const SizedBox(width: 12), // Space between platform and release date columns
                         Expanded(
-                          child: Text(
-                            'Release Date: ${selectedGame!.releaseDates?.join(', ') ?? 'Unknown release date'}',
-                            style: const TextStyle(fontSize: 16),
+                          flex: 1,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Release Date:',
+                                style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                selectedGame!.releaseDates.isNotEmpty
+                                    ? selectedGame!.releaseDates.last
+                                    : 'Unknown release date',
+                                style: const TextStyle(fontSize: 14),
+                              ),
+                            ],
                           ),
                         ),
                       ],
                     ),
                   ),
-                  const SizedBox(height: 16), // Space between info and buttons
+                  const SizedBox(height: 16),
 
                   // Row for "See Reviews" and "See Threads" buttons
                   Row(
@@ -239,7 +268,7 @@ class _GameDetailScreenState extends State<GameDetailScreen> {
                           ),
                         ),
                       ),
-                      const SizedBox(width: 12), // Space between buttons
+                      const SizedBox(width: 12),
                       Expanded(
                         child: ElevatedButton.icon(
                           onPressed: () {
@@ -264,13 +293,12 @@ class _GameDetailScreenState extends State<GameDetailScreen> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 16), // Space between rows
+                  const SizedBox(height: 16),
 
                   // "Buy" button below the two
                   ElevatedButton.icon(
                     onPressed: () async {
                       final url = selectedGame?.websiteUrl;
-
                       if (url != null && Uri.tryParse(url)?.hasAbsolutePath == true) {
                         final Uri uri = Uri.parse(url);
                         if (await canLaunchUrl(uri)) {
@@ -293,12 +321,14 @@ class _GameDetailScreenState extends State<GameDetailScreen> {
                       foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                      minimumSize: const Size.fromHeight(50), // Make "Buy" button full-width
+                      minimumSize: const Size.fromHeight(50),
                     ),
                   ),
                 ],
               ),
             ),
-    );
-  }
+          ),
+  );
+}
+
 }

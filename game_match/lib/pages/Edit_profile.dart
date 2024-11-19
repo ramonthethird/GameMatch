@@ -33,23 +33,26 @@ class _EditProfileState extends State<EditProfile> {
   }
 // Load user data from Firestore
   Future<void> _loadUserData() async {
-    User? user = FirebaseAuth.instance.currentUser;
-    if (user != null) {
-      final userDoc = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(user.uid)
-          .get();
+  User? user = FirebaseAuth.instance.currentUser;
+  if (user != null) {
+    final userDoc = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(user.uid)
+        .get();
 
+    if (userDoc.exists) {
       setState(() {
-        _usernameController.text = userDoc['username'] ?? 'User';
-        _bioController.text = userDoc['bio'] ?? '';
-        _favoriteGame1Controller.text = userDoc['favoriteGames']['game1'] ?? '';
-        _favoriteGame2Controller.text = userDoc['favoriteGames']['game2'] ?? '';
-        _favoriteGame3Controller.text = userDoc['favoriteGames']['game3'] ?? '';
-        _profileImageUrl = userDoc['profileImageUrl'];
+        _usernameController.text = userDoc.data()?['username'] ?? 'User';
+        _bioController.text = userDoc.data()?['bio'] ?? ''; // Check if field exists
+        _favoriteGame1Controller.text = userDoc.data()?['favoriteGames']?['game1'] ?? '';
+        _favoriteGame2Controller.text = userDoc.data()?['favoriteGames']?['game2'] ?? '';
+        _favoriteGame3Controller.text = userDoc.data()?['favoriteGames']?['game3'] ?? '';
+        _profileImageUrl = userDoc.data()?['profileImageUrl'];
       });
     }
   }
+}
+
   // Select an image from the gallery
   Uint8List? _imageData;
   final ImagePicker _imagePicker = ImagePicker(); // Initialize once
@@ -173,13 +176,20 @@ class _EditProfileState extends State<EditProfile> {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-          icon: const Icon(Icons.cancel),
+          icon: const Icon(Icons.cancel, color: Colors.black,),
           onPressed: () {
             Navigator.pop(context);
           },
         ),
-        title: const Text('Edit Profile'),
-        backgroundColor: const Color(0xFF74ACD5),
+        title: Text(
+          'Edit Profile',
+          style: TextStyle(
+            color: Colors.black,
+            fontSize: 16,
+          ),
+        ),
+        centerTitle: true,
+        // backgroundColor: const Color(0xFF74ACD5),
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -191,7 +201,8 @@ class _EditProfileState extends State<EditProfile> {
                   height: 120,
                   decoration: const BoxDecoration(
                     gradient: LinearGradient(
-                      colors: [Color(0xFFF1F3F4), Color(0xFFF1F3F4)],
+                      colors: [//Color(0xFFF1F3F4), Color(0xFFF1F3F4)
+                      ],
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                     ),
@@ -273,16 +284,17 @@ class _EditProfileState extends State<EditProfile> {
                             Navigator.pop(context); // Go back to previous page
                           },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF74ACD5),
+                      backgroundColor: Color(0xFF41B1F1),
+                      foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 80, vertical: 15),
+                          horizontal: 40, vertical: 10),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20),
+                        borderRadius: BorderRadius.circular(10),
                       ),
                     ),
                     child: _isLoading
                         ? const CircularProgressIndicator()
-                        : const Text('Save', style: TextStyle(fontSize: 18)),
+                        : const Text('Save', style: TextStyle(fontSize: 14)),
                   ),
                 ],
               ),
@@ -298,7 +310,7 @@ class _EditProfileState extends State<EditProfile> {
     return Container(
       padding: const EdgeInsets.all(8.0),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(12),
         boxShadow: const [
           BoxShadow(

@@ -25,21 +25,40 @@ class MoreGenresPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('View All Selected Genres')),
+      appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.black,),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+        title: const Text('Selected Genres', style: TextStyle(fontSize: 16, color: Colors.black)),
+        centerTitle: true,
+        backgroundColor: const Color(0xFF41B1F1),
+        elevation: 0,
+      ),
       body: ListView.builder(
         itemCount: selectedGenres.length,
         itemBuilder: (context, index) {
           String genre = selectedGenres[index];
-          return ListTile(
-            title: Text(genre),
-            trailing: IconButton(
-              icon: Icon(Icons.remove_circle),
-              onPressed: () {
-                onGenresUnselected(genre);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Removing Genre')),
-                );
-              },
+          return Card(
+            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+            color: Color(0xFFF1F3F4),
+            child: ListTile(
+              title: Text(
+                genre,
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+              trailing: IconButton(
+                icon: const Icon(Icons.remove_circle, color: Colors.redAccent),
+                onPressed: () {
+                  onGenresUnselected(genre);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Removing Genre')),
+                  );
+                },
+              ),
             ),
           );
         },
@@ -82,23 +101,29 @@ class FirestoreService {
 
 // Main screen for the preference page
 class GenrePreferencePage extends StatefulWidget {
+  const GenrePreferencePage({super.key});
+
   @override
   _GenrePreferencePageState createState() => _GenrePreferencePageState();
 }
 
 class _GenrePreferencePageState extends State<GenrePreferencePage> {
+  List<String> genres_stored = [
+    'Pinball', 'Adventure', 'Indie', 'Arcade', 'Visual Novel', 'Card Game', 'MOBA',
+    'Point-and-click', 'Fighting', 'Shooter', 'Music', 'Platform', 'Puzzle',
+    'Racing', 'RTS', 'RPG', 'Simulator', 'Sport', 'Strategy', 'TBS', 'Tactical',
+    'Hack & slash', 'Quiz/Trivia', 'Board Game', 'Turn-based'
+  ];
   List<String> genres = [
-    'Pinball', 'Adventure', 'Indie', 'Arcade', 'Visual Novel', 'Card Game', 'MOBA', 
-    'Point-and-click', 'Fighting', 'Shooter', 'Music', 'Platform', 'Puzzle', 
-    'Racing', 'RTS', 'RPG', 'Simulator', 'Sport', 'Strategy', 'TBS', 'Tactical', 
-    'Hack & slash', 'Quiz/Trivia'
+    'Adventure', 'Shooter', 'RPG', 'Platform', 'Puzzle', 'Racing', 'Sport', 'Fighting', 'Simulator', 'Music'
   ];
 
   List<String> selectedGenres = [];
   FirestoreService firestoreService = FirestoreService();
   String? userId;
   TextEditingController searchController = TextEditingController();
-  ApiService _apiService = ApiService();
+  List<String> searchResults = []; // List to hold search results
+  final ApiService _apiService = ApiService();
 
   @override
   void initState() {
@@ -135,114 +160,159 @@ class _GenrePreferencePageState extends State<GenrePreferencePage> {
     }
   }
 
+  void searchGenres(String query) {
+    setState(() {
+      searchResults = genres_stored
+          .where((genre) => genre.toLowerCase().contains(query.toLowerCase()))
+          .toList();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Genre Preference Page'),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          icon: const Icon(Icons.arrow_back, color: Colors.black,),
           onPressed: () {
-            Navigator.pushNamed(context, "/Preference_&_Interest");
+            Navigator.pop(context);
           },
         ),
+        title: const Text('Genre Preference',style: TextStyle(fontSize: 16, color: Colors.black)),
+        centerTitle: true,
+        backgroundColor: const Color(0xFF41B1F1),
+        elevation: 0,
       ),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(10.0),
-            child: TextField(
-              controller: searchController,
-              decoration: InputDecoration(
-                labelText: 'Search Video Game Genre',
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.search),
-              ),
-              onSubmitted: (value) {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => SearchGenrePage(
-                      searchQuery: value,
-                      onGenreSelected: updateGenreSelection,
-                    ),
-                  ),
-                );
-              },
-            ),
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              Color(0xFFF1F3F4),
+              Color(0xFFF1F3F4)
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
           ),
-          Padding(
-            padding: const EdgeInsets.all(10.0),
-            child: Text('Scroll to view more genres. \nSearch for genres not displayed on the screen'),
-          ),
-          Expanded(
-            child: GridView.builder(
+        ),
+        child: Column(
+          children: [
+            Padding(
               padding: const EdgeInsets.all(10.0),
-              itemCount: genres.length,
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2, 
-                childAspectRatio: 3, 
-                crossAxisSpacing: 10, 
-                mainAxisSpacing: 10
-              ),
-              itemBuilder: (context, index) {
-                String genre = genres[index];
-                return Padding(
-                  padding: const EdgeInsets.all(10.0),
-                  child: ElevatedButton(
-                    onPressed: () => updateGenreSelection(genre),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: selectedGenres.contains(genre) ? Colors.blue : Colors.white60,
-                      minimumSize: Size(100, 40),
-                    ),
-                    child: Text(genre),
+              child: TextField(
+                controller: searchController,
+                decoration: InputDecoration(
+                  labelText: 'Search Genre',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(25.0),
                   ),
-                );
-              },
+                  prefixIcon: const Icon(Icons.search, color: Colors.black),
+                  fillColor: Colors.white.withOpacity(0.8),
+                  filled: true,
+                ),
+                onChanged: (value) {
+                  searchGenres(value);
+                },
+              ),
             ),
-          ),
-          Divider(
-            thickness: 2,
-            color: Colors.grey,
-          ),
-          Padding(
-            padding: const EdgeInsets.all(10.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => MoreGenresPage(
-                          selectedGenres: selectedGenres,
-                          onGenresUnselected: updateGenreSelection,
-                        ),
-                      ),
+            // Display search results only when searchResults is not empty
+            if (searchController.text.isNotEmpty && searchResults.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: searchResults.length,
+                  itemBuilder: (context, index) {
+                    String genre = searchResults[index];
+                    return ListTile(
+                      title: Text(genre),
+                      onTap: () {
+                        updateGenreSelection(genre);
+                        setState(() {
+                          searchController.clear();
+                          searchResults.clear();
+                        });
+                      },
                     );
                   },
-                  child: Text('View More'),
-                  style: ElevatedButton.styleFrom(
-                    minimumSize: Size(150, 40),
-                  ),
                 ),
-                ElevatedButton(
-                  onPressed: () {
-                    setState(() {
-                      selectedGenres.clear();
-                    });
-                    firestoreService.saveGenresToFirestore(userId!, selectedGenres);
-                  },
-                  child: Text('Reset'),
-                  style: ElevatedButton.styleFrom(
-                    minimumSize: Size(150, 40),
-                  ),
-                ),
-              ],
+              ),
+            const Padding(
+              padding: EdgeInsets.all(10.0),
+              child: Text(
+                'Explore genres or search for more!',
+                style: TextStyle(color: Colors.black, fontSize: 16),
+              ),
             ),
-          ),
-        ],
+            Expanded(
+              child: GridView.builder(
+                padding: const EdgeInsets.all(10.0),
+                itemCount: genres.length,
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2, childAspectRatio: 3, crossAxisSpacing: 10, mainAxisSpacing: 10),
+                itemBuilder: (context, index) {
+                  String genre = genres[index];
+                  return ElevatedButton(
+                    onPressed: () => updateGenreSelection(genre),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: selectedGenres.contains(genre)
+                          ? const Color(0xFF41B1F1)
+                          : Colors.white.withOpacity(0.8),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                    ),
+                    child: Text(
+                      genre,
+                      style: TextStyle(
+                        color: selectedGenres.contains(genre) ? Colors.white : Colors.black,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 20),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => MoreGenresPage(
+                            selectedGenres: selectedGenres,
+                            onGenresUnselected: updateGenreSelection,
+                          ),
+                        ),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF41B1F1),
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                    ),
+                    child: const Text('Selected Genres'),
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      setState(() {
+                        selectedGenres.clear();
+                      });
+                      firestoreService.saveGenresToFirestore(userId!, selectedGenres);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      foregroundColor: const Color(0xFF41B1F1),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                    ),
+                    child: const Text('Reset'),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -253,58 +323,63 @@ class SearchGenrePage extends StatefulWidget {
   final String searchQuery;
   final Function(String) onGenreSelected;
 
-  SearchGenrePage({required this.searchQuery, required this.onGenreSelected});
+  const SearchGenrePage({super.key, required this.searchQuery, required this.onGenreSelected});
 
   @override
   _SearchGenrePageState createState() => _SearchGenrePageState();
 }
 
 class _SearchGenrePageState extends State<SearchGenrePage> {
-  final ApiService _apiService = ApiService();
-  String _errorMsg = '';
-  String _searchResult = '';
+  late List<String> genres_stored;
 
   @override
   void initState() {
     super.initState();
-    _fetchGenres(widget.searchQuery);
+    genres_stored = [
+      'Pinball', 'Adventure', 'Indie', 'Arcade', 'Visual Novel', 'Card Game', 'MOBA',
+      'Point-and-click', 'Fighting', 'Shooter', 'Music', 'Platform', 'Puzzle',
+      'Racing', 'RTS', 'RPG', 'Simulator', 'Sport', 'Strategy', 'TBS', 'Tactical',
+      'Hack & slash', 'Quiz/Trivia', 'Board Game', 'Turn-based'
+    ];
   }
 
-  Future<void> _fetchGenres(String genreName) async {
-    try {
-      bool exists = await _apiService.checkGenreExists(genreName);
-      setState(() {
-        _searchResult = exists ? 'Genre found' : 'Cannot find genre name: "$genreName"';
-      });
-    } catch (e) {
-      setState(() {
-        _errorMsg = 'An error occurred trying to find the genre: $e';
-      });
-    }
-  }
+  // Future<void> _fetchGenres(String genreName) async {
+  //   try {
+  //     bool exists = await _apiService.checkGenreExists(genreName);
+  //     setState(() {
+  //       _searchResult = exists ? 'Genre found' : 'Cannot find genre name: "$genreName"';
+  //     });
+  //   } catch (e) {
+  //     setState(() {
+  //       _errorMsg = 'An error occurred trying to find the genre: $e';
+  //     });
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
+    final filteredGenres = genres_stored.where((genre) {
+      return genre.toLowerCase().contains(widget.searchQuery.toLowerCase());
+    }).toList();
+
     return Scaffold(
-      appBar: AppBar(title: Text('Search Genres')),
-      body: Center(
-        child: Column(
-          children: [
-            if (_errorMsg.isNotEmpty)
-              Text(_errorMsg, style: TextStyle(color: Colors.red))
-            else
-              Text(_searchResult),
-            if (_searchResult.contains('Genre found'))
-              ElevatedButton.icon(
-                onPressed: () {
-                  widget.onGenreSelected(widget.searchQuery);
-                  Navigator.pop(context);
-                },
-                icon: Icon(Icons.add),
-                label: Text(widget.searchQuery),
-              )
-          ],
-        ),
+      appBar: AppBar(
+        title: const Text('Genre Search', style: TextStyle(fontSize: 16, color: Colors.black)),
+        centerTitle: true,
+        backgroundColor: const Color(0xFF41B1F1),
+        elevation: 0,
+      ),
+      body: ListView.builder(
+        itemCount: filteredGenres.length,
+        itemBuilder: (context, index) {
+          return ListTile(
+            title: Text(filteredGenres[index]),
+            onTap: () {
+              widget.onGenreSelected(filteredGenres[index]);
+              Navigator.pop(context);
+            },
+          );
+        },
       ),
     );
   }

@@ -123,18 +123,100 @@ class FirestoreService {
     }
   }
 
-  Future<Game?> getGameById(String gameId) async {
-    try {
-      DocumentSnapshot doc = await _db.collection('games').doc(gameId).get();
-      if (doc.exists) {
-        Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
-        return Game.fromMap(data);
+  // get all the recommended games from the Firestore
+Future<List<Game>> loadRecommendedGames(String userId) async {
+  try {
+    DocumentSnapshot userDoc = await _db.collection('users').doc(userId).get();
+    if (userDoc.exists) {
+      Map<String, dynamic>? userData = userDoc.data() as Map<String, dynamic>?;
+      if (userData != null && userData.containsKey('recommendedGames')) {
+        List<dynamic> recommendedGames = userData['recommendedGames'] as List<dynamic>;
+        return recommendedGames.map((gameData) {
+          if (gameData is Map<String, dynamic>) {
+            // Convert 'id' to a string if necessary
+            if (gameData.containsKey('id') && gameData['id'] is int) {
+              gameData['id'] = gameData['id'].toString();
+            }
+            return Game.fromMap(gameData);
+          }
+          return null;
+        }).whereType<Game>().toList();
       }
-    } catch (e) {
-      print('Error fetching game from Firestore: $e');
     }
+    return [];
+  } catch (e) {
+    print('Error loading recommended games for user $userId: $e');
+    return [];
+  }
+}
+
+// getGameById method to show the game details for a specific gameId
+Future<Game?> getGameById(dynamic gameId) async {
+  try {
+    // Convert input gameId to string for consistent comparison
+    String searchId = gameId.toString();
+    
+    // Retrieve all documents in the 'users' collection
+    QuerySnapshot snapshot = await _db.collection('users').get();
+    
+    // Iterate through each user's data
+    for (var userDoc in snapshot.docs) {
+      Map<String, dynamic>? userData;
+      try {
+        userData = userDoc.data() as Map<String, dynamic>?;
+      } catch (e) {
+        print('Error casting user data: $e');
+        continue;
+      }
+      
+      if (userData != null && userData.containsKey('recommendedGames')) {
+        List<dynamic> recommendedGames;
+        try {
+          recommendedGames = userData['recommendedGames'] as List<dynamic>;
+        } catch (e) {
+          print('Error casting recommendedGames: $e');
+          continue;
+        }
+        
+        // Search for the game with matching gameId
+        for (var gameData in recommendedGames) {
+          try {
+            if (gameData is Map<String, dynamic>) {
+              // Debug log the game data
+              print('Checking game data: $gameData');
+              
+              if (gameData.containsKey('id')) {
+                var storedId = gameData['id'];
+                // Debug log the stored ID and its type
+                print('Found stored ID: $storedId (Type: ${storedId.runtimeType})');
+                
+                // Convert both to strings for comparison
+                String storedIdString = storedId.toString();
+                if (storedIdString == searchId) {
+                  // Convert all numeric IDs in the map to strings
+                  Map<String, dynamic> sanitizedGameData = Map.from(gameData);
+                  sanitizedGameData['id'] = storedIdString;
+                  
+                  print('Match found! Converting to Game object...'); // Debug log
+                  return Game.fromMap(sanitizedGameData);
+                }
+              }
+            }
+          } catch (e) {
+            print('Error processing game data: $e');
+            continue;
+          }
+        }
+      }
+    }
+    
+    print('Game with gameId $searchId not found in recommendedGames.');
+    return null;
+  } catch (e) {
+    print('Error searching for gameId $gameId in recommendedGames: $e');
     return null;
   }
+}
 
   Future<void> saveGameToFirestore(Game game) async {
     try {
@@ -172,6 +254,14 @@ class FirestoreService {
       print('Error fetching threads: $e');
       return [];
     }
+  }
+  
+  Future<QuerySnapshot<Map<String, dynamic>>> getRecentThreads({int limit = 4}) {
+  return _db
+      .collection('threads')
+      .orderBy('timestamp', descending: true)
+      .limit(limit)
+      .get();
   }
 
   Future<void> addThread(String gameId, String content, String userName, {String? imageUrl}) async {
@@ -226,6 +316,25 @@ Future<void> unlikeThread(String threadId, String userId) async {
   }
 }
 
+Future<int> getCommentCountForThread(String threadId) async {
+  QuerySnapshot commentsSnapshot = await _db
+      .collection('threads')
+      .doc(threadId)
+      .collection('comments')
+      .get();
+  return commentsSnapshot.size;
+}
+
+Future<void> updateThreadContent(String threadId, String newContent) async {
+  try {
+    await FirebaseFirestore.instance.collection('threads').doc(threadId).update({
+      'content': newContent,
+    });
+    print('Thread content updated successfully');
+  } catch (e) {
+    print('Error updating thread content: $e');
+  }
+}
 
   Future<void> addComment(String threadId, String commentContent) async {
     User? user = _auth.currentUser;
@@ -283,6 +392,28 @@ Future<void> unlikeThread(String threadId, String userId) async {
       print('Thread deleted: $threadId');
     } catch (e) {
       print('Error deleting thread: $e');
+    }
+  }
+
+  Future<void> deleteComment(String threadId, String commentId) async {
+    try {
+      DocumentReference commentRef = _db
+          .collection('threads')
+          .doc(threadId)
+          .collection('comments')
+          .doc(commentId);
+
+      await commentRef.delete();
+
+      // Decrement comment count on the thread document
+      DocumentReference threadRef = _db.collection('threads').doc(threadId);
+      await threadRef.update({
+        'comments': FieldValue.increment(-1),
+      });
+
+      print('Comment deleted from thread: $threadId');
+    } catch (e) {
+      print('Error deleting comment: $e');
     }
   }
 }

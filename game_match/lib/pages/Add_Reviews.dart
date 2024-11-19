@@ -89,7 +89,7 @@ class _AddReviewsPageState extends State<AddReviewsPage> {
         title: Text('Create New Review',
         style: TextStyle(
               color: Colors.black, 
-              fontSize: 24,
+              fontSize: 16,
             ),),
         centerTitle: true,
         //backgroundColor: Colors.white,
@@ -117,7 +117,7 @@ class _AddReviewsPageState extends State<AddReviewsPage> {
               decoration: InputDecoration(
                 hintText: 'Enter review title...',
                 filled: true,
-                fillColor: Colors.grey[200],
+                fillColor: Theme.of(context).cardColor,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
                   borderSide: BorderSide.none,
@@ -139,7 +139,7 @@ class _AddReviewsPageState extends State<AddReviewsPage> {
               decoration: InputDecoration(
                 hintText: 'Write your review here...',
                 filled: true,
-                fillColor: Colors.grey[200],
+                fillColor: Theme.of(context).cardColor,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
                   borderSide: BorderSide.none,
@@ -192,7 +192,7 @@ class _AddReviewsPageState extends State<AddReviewsPage> {
                 ),
                 child: Text(
                   'Post Review',
-                  style: TextStyle(color: Colors.white, fontSize: 16),
+                  style: TextStyle(color: Colors.white, fontSize: 14),
                 ),
               ),
             ),

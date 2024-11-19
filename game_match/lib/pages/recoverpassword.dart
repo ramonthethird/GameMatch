@@ -40,7 +40,7 @@ class _PasswordRecoveryPageState extends State<PasswordRecoveryPage> {
           'Recover Password',
           style: TextStyle(
             color: Colors.black,
-            fontSize: 24,
+            fontSize: 16,
           ),
         ),
         centerTitle: true,
@@ -59,7 +59,7 @@ class _PasswordRecoveryPageState extends State<PasswordRecoveryPage> {
             mainAxisAlignment: MainAxisAlignment.start,
             children: <Widget>[
               Padding(
-                padding: const EdgeInsets.only(top: 40.0),
+                padding: const EdgeInsets.only(top: 0.0),
                 child: ColorFiltered(
                   colorFilter: Theme.of(context).brightness == Brightness.dark
                       ? const ColorFilter.mode(
@@ -79,7 +79,7 @@ class _PasswordRecoveryPageState extends State<PasswordRecoveryPage> {
               ),  
 
 
-              const SizedBox(height: 16),
+              //const SizedBox(height: 16),
 
 
               Container(
@@ -87,7 +87,7 @@ class _PasswordRecoveryPageState extends State<PasswordRecoveryPage> {
                 child: const Text(
                   'Recover your Password',
                   style: TextStyle(
-                    fontSize: 40,
+                    fontSize: 22,
                     fontWeight: FontWeight.bold,
                   ),
                   textAlign: TextAlign.center,
@@ -95,7 +95,7 @@ class _PasswordRecoveryPageState extends State<PasswordRecoveryPage> {
               ),
 
 
-              const SizedBox(height: 10),
+              const SizedBox(height: 5),
 
 
               const Text(
@@ -109,7 +109,7 @@ class _PasswordRecoveryPageState extends State<PasswordRecoveryPage> {
 
 
 
-              const SizedBox(height: 32),
+              const SizedBox(height: 20),
 
 
               SizedBox(
@@ -128,19 +128,19 @@ class _PasswordRecoveryPageState extends State<PasswordRecoveryPage> {
               ElevatedButton(
                 onPressed: _sendPasswordResetEmail, // Call the method to send email
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.lightBlueAccent,
+                  backgroundColor: const Color(0xFF41B1F1),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(2.5),
+                    borderRadius: BorderRadius.circular(10),
 
                   ),
-                  fixedSize: const Size(140, 30),
+                  fixedSize: const Size(150, 30),
                 ),
 
                 child: const Center(
                   child: Text(
                     'Get Password',
                     style: TextStyle(
-                      color: Colors.black,
+                      color: Colors.white,
                       fontSize: 14,
                       fontWeight: FontWeight.normal,
                     ),

@@ -48,8 +48,21 @@ class _NewReleasesGamesState extends State<NewReleasesGames> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('New Releases'),
-        backgroundColor: const Color(0xFFF1F3F4),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.black,),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+        title: Text(
+          'New Releases',
+          style: TextStyle(
+            color: Colors.black,
+            fontSize: 16,
+          ),
+        ),
+        centerTitle: true,
+        backgroundColor: const Color(0xFF41B1F1),
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())

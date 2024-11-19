@@ -31,7 +31,7 @@ class _BillingInfoPageState extends State<BillingInfoPage> {
           'Billing Info',
           style: TextStyle(
             color: Colors.black,
-            fontSize: 24,
+            fontSize: 16,
           ),
         ),
         centerTitle: true,
@@ -99,7 +99,8 @@ class _BillingInfoPageState extends State<BillingInfoPage> {
                 ElevatedButton(
                   onPressed: _submitBillingInfo,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
+                    backgroundColor: Color(0xFF41B1F1),
+                    foregroundColor: Colors.white,
                   ),
                   child: const Text('Submit'),
                 ),

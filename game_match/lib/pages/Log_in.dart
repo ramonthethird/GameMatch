@@ -55,7 +55,7 @@ class _MyLoginPageState extends State<MyLoginPage> {
           'Login',
           style: TextStyle(
             color: Colors.black,
-            fontSize: 24,
+            fontSize: 16,
           ),
         ),
         centerTitle: true,
@@ -74,7 +74,7 @@ class _MyLoginPageState extends State<MyLoginPage> {
             mainAxisAlignment: MainAxisAlignment.start,
             children: <Widget>[
               Padding(
-                padding: const EdgeInsets.only(top: 40.0),
+                padding: const EdgeInsets.only(top: 0.0),
                 child: ColorFiltered(
                   colorFilter: Theme.of(context).brightness == Brightness.dark
                       ? const ColorFilter.mode(
@@ -95,11 +95,11 @@ class _MyLoginPageState extends State<MyLoginPage> {
               const Text(
                 'Login',
                 style: TextStyle(
-                  fontSize: 30,
+                  fontSize: 22,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              const SizedBox(height: 32),
+              const SizedBox(height: 20),
               SizedBox(
                 height: 40,
                 width: 325,
@@ -122,20 +122,20 @@ class _MyLoginPageState extends State<MyLoginPage> {
                   );
                 },
                 child: const Padding(
-                  padding: EdgeInsets.only(left: 30),
+                  padding: EdgeInsets.only(left: 20),
                   child: Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
                       'Forgot your Username?',
                       style: TextStyle(
-                        fontSize: 17,
+                        fontSize: 14,
                         color: Colors.blue,
                       ),
                     ),
                   ),
                 ),
               ),
-              const SizedBox(height: 32),
+              const SizedBox(height: 20),
               SizedBox(
                 height: 40,
                 width: 325,
@@ -159,26 +159,26 @@ class _MyLoginPageState extends State<MyLoginPage> {
                   );
                 },
                 child: const Padding(
-                  padding: EdgeInsets.only(left: 30),
+                  padding: EdgeInsets.only(left: 20),
                   child: Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
                       'Forgot your Password?',
                       style: TextStyle(
-                        fontSize: 17,
+                        fontSize: 14,
                         color: Colors.blue,
                       ),
                     ),
                   ),
                 ),
               ),
-              const SizedBox(height: 40),
+              const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: _signIn, // Call the sign-in method
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.lightBlueAccent,
+                  backgroundColor: const Color(0xFF41B1F1),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(2.5),
+                    borderRadius: BorderRadius.circular(10),
                   ),
                   fixedSize: const Size(140, 30),
                 ),
@@ -186,7 +186,7 @@ class _MyLoginPageState extends State<MyLoginPage> {
                   child: Text(
                     'Continue',
                     style: TextStyle(
-                      color: Colors.black,
+                      color: Colors.white,
                       fontSize: 14,
                       fontWeight: FontWeight.normal,
                     ),
@@ -200,7 +200,7 @@ class _MyLoginPageState extends State<MyLoginPage> {
                   const Text(
                     "Don't have an account? ",
                     style: TextStyle(
-                      fontSize: 16,
+                      fontSize: 14,
                     ),
                   ),
                   GestureDetector(
@@ -211,7 +211,7 @@ class _MyLoginPageState extends State<MyLoginPage> {
                       'Sign up',
                       style: TextStyle(
                         color: Colors.blue,
-                        fontSize: 16,
+                        fontSize: 14,
                         fontWeight: FontWeight.bold,
                       ),
                     ),

@@ -4,12 +4,15 @@ import 'package:flutter/material.dart';
 import 'package:game_match/pages/Billing_info.dart';
 import 'package:game_match/pages/Community.dart';
 import 'package:game_match/pages/Edit_profile.dart';
+import 'package:game_match/pages/Game_news.dart';
 import 'package:game_match/pages/Home.dart';
 import 'package:game_match/pages/Settings_Privacy.dart';
 import 'package:game_match/pages/Settings_Terms.dart';
 import 'package:game_match/pages/Submitted_Reviews.dart';
+import 'package:game_match/pages/SubscriptionPremium.dart';
 //import 'package:game_match/pages/Add_Threads.dart';
 import 'package:game_match/pages/Swipe.dart';
+import 'package:game_match/pages/View_Profile.dart';
 import 'package:game_match/pages/Wish_list.dart';
 import 'package:game_match/pages/genre_model.dart';
 import 'package:game_match/pages/preference_page.dart';
@@ -18,6 +21,9 @@ import 'firebase_options.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
 import 'theme_notifier.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:overlay_support/overlay_support.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 // Import all your pages
 import 'pages/Preference_Interest.dart';
@@ -36,6 +42,8 @@ import 'pages/Subscription.dart';
 import 'pages/Home.dart';
 import 'pages/Post_home.dart';
 import 'pages/New_Releases.dart';
+import 'pages/notif.dart';
+import 'pages/notiftest.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -47,6 +55,11 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+
+  // Initialize Google Mobile Ads SDK before app starts
+  await MobileAds.instance.initialize();
   
   // Load the theme preference before the app starts
   final prefs = await SharedPreferences.getInstance();
@@ -59,9 +72,15 @@ void main() async {
           create: (_) => ThemeNotifier(isDarkMode),
         ),
       ],
-      child: const GameMatchApp(),
+      child: OverlaySupport.global( // Wrap the app with OverlaySupport for banner notifications
+        child: const GameMatchApp(),
+      ),
     ),
   );
+}
+
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  print('Handling a background message: ${message.messageId}');
 }
 
 class GameMatchApp extends StatelessWidget {
@@ -89,6 +108,7 @@ class GameMatchApp extends StatelessWidget {
             fontFamily: 'SignikaNegative',
             primarySwatch: Colors.blue,
             scaffoldBackgroundColor: Colors.black,
+            cardColor: Colors.grey[850], // Set a consistent dark color for cards
             appBarTheme: const AppBarTheme(
               backgroundColor: Color(0xFF41B1F1),
               foregroundColor: Colors.white,
@@ -129,6 +149,7 @@ class GameMatchApp extends StatelessWidget {
             '/swiping_games': (context) => const SwipePage(),
             '/Reviews': (context) => SubmittedReviewsPage(),
             '/Subscription': (context) => SubscriptionManagementScreen(),
+            '/SubscriptionPremium' : (context) => PremiumSubscriptionPage(),
             '/Billing_info': (context) => BillingInfoPage(),
             '/New_Releases': (context) =>
                 const NewReleasesGames(), // Route to TopRatedGames widget
@@ -138,6 +159,9 @@ class GameMatchApp extends StatelessWidget {
             '/Privacy': (context) => SettingsPrivacyPage(),
             '/Wishlist': (context) => WishlistPage(),
             '/community_trends': (context) => GameListScreen(),
+            '/notif': (context) => NotificationsPage(),
+            '/Game_news': (context) => GamingNewsPage(),
+            '/View_profile': (context) => const ViewProfile(),
           },
         );
       },

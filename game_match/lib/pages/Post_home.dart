@@ -7,6 +7,7 @@ import 'api_service.dart'; // Import the ApiService
 import 'game_model.dart'; // Import the Game model
 import 'package:game_match/theme_notifier.dart';
 import 'package:provider/provider.dart';
+import 'notif.dart';
 
 class WelcomePage extends StatefulWidget {
   final String username;
@@ -94,7 +95,7 @@ class _WelcomePageState extends State<WelcomePage> {
         title: const Text(
           'Welcome to Game Match!',
           style: TextStyle(
-            fontSize: 24,
+            fontSize: 16,
             fontWeight: FontWeight.bold,
             color: Colors.black,
           ),
@@ -109,9 +110,10 @@ class _WelcomePageState extends State<WelcomePage> {
         actions: [
           IconButton(
             alignment: Alignment.topRight,
-            icon: const Icon(Icons.notifications),
+            icon: const Icon(Icons.notifications, color: Colors.black,),
             onPressed: () {
               // Handle notification icon press
+              Navigator.of(context).pushNamed('/notif');
             },
           ),
         ],
@@ -129,7 +131,7 @@ class _WelcomePageState extends State<WelcomePage> {
                   borderSide: BorderSide.none,
                 ),
                 filled: true,
-                fillColor: Colors.white,
+                fillColor: Theme.of(context).cardColor,
               ),
               onChanged: (query) {
                 _searchGames(query); // Trigger search on text change
@@ -155,7 +157,7 @@ class _WelcomePageState extends State<WelcomePage> {
               ? const Center(
                   child: Text(
                     'No games found for your search.',
-                    style: TextStyle(fontSize: 18),
+                    style: TextStyle(fontSize: 16),
                   ),
                 )
               : (_searchResults.isNotEmpty)
@@ -179,7 +181,7 @@ class _WelcomePageState extends State<WelcomePage> {
                 return const Text(
                   'Error fetching username',
                   style: TextStyle(
-                    fontSize: 24,
+                    fontSize: 20,
                     fontWeight: FontWeight.bold,
                     //color: Colors.black87,
                   ),
@@ -189,7 +191,7 @@ class _WelcomePageState extends State<WelcomePage> {
                 return Text(
                   'Welcome, $username!',
                   style: const TextStyle(
-                    fontSize: 24,
+                    fontSize: 18,
                     fontWeight: FontWeight.bold,
                     //color: Colors.black87,
                   ),
@@ -197,16 +199,16 @@ class _WelcomePageState extends State<WelcomePage> {
               }
             },
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 5),
           const Text(
             'Discover new games based on your preferences.',
             style: TextStyle(
-              fontSize: 16,
+              fontSize: 12,
               //color: Colors.black54,
             ),
             textAlign: TextAlign.center,
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 10),
           _buildFeatureCard(
             context,
             title: 'New Releases',
@@ -223,10 +225,17 @@ class _WelcomePageState extends State<WelcomePage> {
           ),
           _buildFeatureCard(
             context,
-            title: 'Swiping games',
-            description: 'Swipe right on games you like.',
-            icon: Icons.favorite,
-            routeName: '/swiping_games',
+            title: 'Preferences',
+            description: 'Update your preferences.',
+            icon: Icons.room_preferences,
+            routeName: '/Preference_&_Interest',
+          ),
+          _buildFeatureCard(
+            context,
+            title: 'Game News',
+            description: 'Stay updated with the latest gaming news.',
+            icon: Icons.article,
+            routeName: '/Game_news',
           ),
         ],
       ),
@@ -290,12 +299,12 @@ class _WelcomePageState extends State<WelcomePage> {
                     Text(
                       title,
                       style: const TextStyle(
-                          fontSize: 18, fontWeight: FontWeight.bold),
+                          fontSize: 16, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 5),
                     Text(
                       description,
-                      //style: const TextStyle(color: Colors.black54),
+                      style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
                     ),
                   ],
                 ),

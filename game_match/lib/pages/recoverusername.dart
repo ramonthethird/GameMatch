@@ -20,7 +20,7 @@ class _UsernameRecoveryPageState extends State<UsernameRecoveryPage> {
           'Recover Username',
           style: TextStyle(
             color: Colors.black,
-            fontSize: 24,
+            fontSize: 16,
           ),
         ),
         centerTitle: true,
@@ -43,7 +43,7 @@ class _UsernameRecoveryPageState extends State<UsernameRecoveryPage> {
               // Same logo as the login page
 
               Padding(
-                padding: const EdgeInsets.only(top: 40.0),
+                padding: const EdgeInsets.only(top: 0.0),
                 child: ColorFiltered(
                   colorFilter: Theme.of(context).brightness == Brightness.dark
                       ? const ColorFilter.mode(
@@ -62,21 +62,21 @@ class _UsernameRecoveryPageState extends State<UsernameRecoveryPage> {
                 ),
               ),  
 
-              const SizedBox(height: 16),
+              //const SizedBox(height: 16),
 
               Container(
                 alignment: Alignment.center, // Center the text within the container
                 child: const Text(
                   'Recover your Username',
                   style: TextStyle(
-                    fontSize: 40, // same font size as the "Login" text
+                    fontSize: 22, // same font size as the "Login" text
                     fontWeight: FontWeight.bold,
                   ),
                   textAlign: TextAlign.center,
                 ),
               ),
 
-              const SizedBox(height: 10),
+              const SizedBox(height: 5),
 
               // Subtitle text
               const Text(
@@ -89,7 +89,7 @@ class _UsernameRecoveryPageState extends State<UsernameRecoveryPage> {
               ),
 
 
-              const SizedBox(height: 32),
+              const SizedBox(height: 20),
 
               // TextField for email input
               SizedBox(
@@ -110,16 +110,17 @@ class _UsernameRecoveryPageState extends State<UsernameRecoveryPage> {
               // "Get Username" button, same style as "Continue" button from main page
               Container(
                 width: 140,
-                height: 30,
+                height: 40,
                 decoration: BoxDecoration(
-                  color: Colors.lightBlueAccent, // same color as "continue" button
-                  borderRadius: BorderRadius.all(Radius.circular(2.5)),
+                  
+                  color: const Color(0xFF41B1F1), // same color as "continue" button
+                  borderRadius: BorderRadius.all(Radius.circular(10)),
                 ),
                 child: const Center(
                   child: Text(
                     'Get Username',
                     style: TextStyle(
-                      color: Colors.black, // same black color for text
+                      color: Colors.white, // same black color for text
                       fontSize: 14,
                       fontWeight: FontWeight.normal,
                     ),

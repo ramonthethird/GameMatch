@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'api_service.dart';
 import 'game_model.dart';
 import 'Add_Reviews.dart';
+import 'package:game_match/firestore_service.dart';
 
 class ViewReviewsPage extends StatefulWidget {
   final String gameId; // Accept the gameId as a parameter
@@ -45,36 +46,32 @@ class _ViewReviewsPageState extends State<ViewReviewsPage> {
     currentUser = auth.currentUser; // Get the current user
   }
 
-  // Function to fetch game details like image and title
+  final FirestoreService _firestoreService = FirestoreService();
+
   Future<void> _fetchGameDetails() async {
-    try {
-      // Fetch the game details from the API service
-      List<Game> fetchedGames = await apiService.fetchGames();
+  try {
+    // Fetch the game details directly by game ID
+    Game? currentGame = await _firestoreService.getGameById(widget.gameId);
 
-      // Find the specific game by ID
-      Game? currentGame = fetchedGames.firstWhere(
-        (game) => game.id == widget.gameId,
-        orElse: () => Game(
-          id: 'default', // Default ID if the game isn't found
-          name: 'Unknown Game', // Placeholder name
-          summary: 'No description available', // Placeholder summary
-          genres: [],
-          coverUrl: null, // No cover image
-          websiteUrl: '',
-          platforms: [],
-          releaseDates: [],
-        ),
-      );
-
-      // Update the state with the fetched game details
+    if (currentGame != null) {
       setState(() {
         gameImageUrl = currentGame.coverUrl; // Set the game image URL
         gameTitle = currentGame.name; // Set the game title
       });
-    } catch (e) {
-      print('Error fetching game details: $e');
+    } else {
+      // Show a message if the game is not found
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Game not found')),
+      );
     }
+  } catch (e) {
+    print('Error fetching game details: $e');
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Failed to load game details')),
+    );
   }
+}
+
 
   Future<void> _fetchReviews() async {
     try {
@@ -166,6 +163,10 @@ class _ViewReviewsPageState extends State<ViewReviewsPage> {
   TextEditingController bodyController = TextEditingController(text: currentReview['body']);
   double currentRating = currentReview['rating']?.toDouble() ?? 0.0;
 
+  bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
+  Color textColor = isDarkMode ? Colors.white : Colors.black;
+
+
   showDialog(
     context: context,
     builder: (context) {
@@ -174,81 +175,83 @@ class _ViewReviewsPageState extends State<ViewReviewsPage> {
         content: Container(
           width: 500,
           height: 450,
-          child: StatefulBuilder(
-            builder: (context, setState) {
-              void updateRating(double localX) {
-                final double starWidth = 32.0;
-                final double totalWidth = starWidth * 5;
-                if (localX < 0) localX = 0;
-                if (localX > totalWidth) localX = totalWidth;
-                double newRating = (localX / starWidth);
-                setState(() {
-                  currentRating = (newRating * 2).round() / 2;
-                });
-              }
+          child: SingleChildScrollView( // Added SingleChildScrollView
+            child: StatefulBuilder(
+              builder: (context, setState) {
+                void updateRating(double localX) {
+                  final double starWidth = 32.0;
+                  final double totalWidth = starWidth * 5;
+                  if (localX < 0) localX = 0;
+                  if (localX > totalWidth) localX = totalWidth;
+                  double newRating = (localX / starWidth);
+                  setState(() {
+                    currentRating = (newRating * 2).round() / 2;
+                  });
+                }
 
-              return Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('Review Title', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                  SizedBox(height: 8),
-                  TextField(
-                    controller: titleController,
-                    decoration: InputDecoration(
-                      hintText: 'Enter review title...',
-                      filled: true,
-                      fillColor: Colors.grey[200],
-                      border: OutlineInputBorder(),
+                return Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Review Title', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                    SizedBox(height: 8),
+                    TextField(
+                      controller: titleController,
+                      decoration: InputDecoration(
+                        hintText: 'Enter review title...',
+                        filled: true,
+                        fillColor: Theme.of(context).cardColor,
+                        border: OutlineInputBorder(),
+                      ),
                     ),
-                  ),
-                  SizedBox(height: 10),
-                  Text('Review Body', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                  SizedBox(height: 8),
-                  TextField(
-                    controller: bodyController,
-                    decoration: InputDecoration(
-                      hintText: 'Write your review here...',
-                      filled: true,
-                      fillColor: Colors.grey[200],
-                      border: OutlineInputBorder(),
+                    SizedBox(height: 10),
+                    Text('Review Body', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                    SizedBox(height: 8),
+                    TextField(
+                      controller: bodyController,
+                      decoration: InputDecoration(
+                        hintText: 'Write your review here...',
+                        filled: true,
+                        fillColor: Theme.of(context).cardColor,
+                        border: OutlineInputBorder(),
+                      ),
+                      maxLines: 6,
+                      maxLength: 300,
                     ),
-                    maxLines: 8,
-                    maxLength: 300,
-                  ),
-                  SizedBox(height: 10),
-                  Text('Rating:', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                  GestureDetector(
-                    onPanUpdate: (details) {
-                      updateRating(details.localPosition.dx);
-                    },
-                    onTapDown: (details) {
-                      updateRating(details.localPosition.dx);
-                    },
-                    child: Row(
-                      children: List.generate(5, (index) {
-                        double starValue = index + 1;
-                        return Icon(
-                          currentRating >= starValue
-                              ? Icons.star
-                              : (currentRating >= starValue - 0.5
-                                  ? Icons.star_half
-                                  : Icons.star_border),
-                          color: Colors.yellow,
-                          size: 32,
-                        );
-                      }),
+                    SizedBox(height: 10),
+                    Text('Rating:', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                    GestureDetector(
+                      onPanUpdate: (details) {
+                        updateRating(details.localPosition.dx);
+                      },
+                      onTapDown: (details) {
+                        updateRating(details.localPosition.dx);
+                      },
+                      child: Row(
+                        children: List.generate(5, (index) {
+                          double starValue = index + 1;
+                          return Icon(
+                            currentRating >= starValue
+                                ? Icons.star
+                                : (currentRating >= starValue - 0.5
+                                    ? Icons.star_half
+                                    : Icons.star_border),
+                            color: Colors.yellow,
+                            size: 32,
+                          );
+                        }),
+                      ),
                     ),
-                  ),
-                ],
-              );
-            },
+                  ],
+                );
+              },
+            ),
           ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: Text('Cancel'),
+            child: Text('Cancel', style: TextStyle(color: textColor)),
           ),
           TextButton(
             onPressed: () async {
@@ -279,7 +282,7 @@ class _ViewReviewsPageState extends State<ViewReviewsPage> {
                 );
               }
             },
-            child: Text('Save'),
+            child: Text('Save', style: TextStyle(color: textColor)),
           ),
         ],
       );
@@ -437,7 +440,7 @@ Future<void> _deleteReview(String reviewId) async {
           children: [
             Text(
               averageRating.toStringAsFixed(1), // Display the average rating
-              style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
             SizedBox(width: 8),
             Row(
@@ -505,6 +508,10 @@ Future<void> _deleteReview(String reviewId) async {
 
     // Widget to build the list of reviews
   Widget _buildReviewList() {
+
+    bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    Color textColor = isDarkMode ? Colors.white : Colors.black;
+
     if (reviews.isEmpty) {
       return Center(
         child: Text('No reviews yet!'), // Show message if no reviews
@@ -527,26 +534,32 @@ Future<void> _deleteReview(String reviewId) async {
           margin: const EdgeInsets.symmetric(vertical: 8.0),
           padding: const EdgeInsets.all(16.0),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: Theme.of(context).cardColor,
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: Colors.grey[300]!),
+            // border: Border.all(color: Colors.grey[300]!),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
                 children: [
-                  CircleAvatar(
-                    backgroundColor: Colors.grey[300],
-                    radius: 20,
-                    backgroundImage: profilePictureUrl != null && profilePictureUrl!.isNotEmpty
-                        ? NetworkImage(profilePictureUrl!)
-                        : null,
-                    child: profilePictureUrl == null || profilePictureUrl!.isEmpty
-                        ? Icon(Icons.person, color: Colors.grey[600])
-                        : null,
-                  ),
-                  SizedBox(width: 8),
+                  GestureDetector(
+                      onTap: () {
+                        // Pass the userId when navigating to the profile page
+                        Navigator.pushNamed(context, '/View_profile', arguments: userId);
+                      },
+                      child: CircleAvatar(
+                        backgroundColor: Colors.grey[300],
+                        radius: 20,
+                        backgroundImage: profilePictureUrl != null && profilePictureUrl!.isNotEmpty
+                          ? NetworkImage(profilePictureUrl!)
+                          : null,
+                        child: profilePictureUrl == null || profilePictureUrl!.isEmpty
+                          ? Icon(Icons.person, color: Colors.grey[600])
+                          : null,
+                      ),
+                    ),
+                  const SizedBox(width: 8),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -609,14 +622,14 @@ Future<void> _deleteReview(String reviewId) async {
                                   onPressed: () {
                                     Navigator.of(context).pop();
                                   },
-                                  child: Text('No'),
+                                  child: Text('No', style: TextStyle(color: textColor)),
                                 ),
                                 TextButton(
                                   onPressed: () {
                                     _deleteReview(docId);
                                     Navigator.of(context).pop();
                                   },
-                                  child: Text('Yes'),
+                                  child: Text('Yes', style: TextStyle(color: textColor)),
                                 ),
                               ],
                             ),
@@ -641,14 +654,14 @@ Future<void> _deleteReview(String reviewId) async {
                 Text(
                   review['title'], // Display review title if available
                   style: TextStyle(
-                    fontSize: 16,
+                    fontSize: 14,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
               SizedBox(height: 4),
               Text(
                 review['body'] ?? '', // Display review body
-                style: TextStyle(fontSize: 14),
+                style: TextStyle(fontSize: 12),
               ),
               SizedBox(height: 8),
               Row(
@@ -692,10 +705,16 @@ Future<void> _deleteReview(String reviewId) async {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.black,),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
         title: Text('View Reviews',
           style: TextStyle(
               color: Colors.black, 
-              fontSize: 24,
+              fontSize: 16,
             ),
           ),
         centerTitle: true,
@@ -743,7 +762,7 @@ Future<void> _deleteReview(String reviewId) async {
                       Text(
                         gameTitle!,
                         style: TextStyle(
-                          fontSize: 24,
+                          fontSize: 20,
                           fontWeight: FontWeight.bold,
                         ),
                         textAlign: TextAlign.center,
@@ -759,7 +778,7 @@ Future<void> _deleteReview(String reviewId) async {
                         Text(
                           'Game Reviews',
                           style: TextStyle(
-                              fontSize: 24, fontWeight: FontWeight.bold),
+                              fontSize: 18, fontWeight: FontWeight.bold),
                         ),
                         _buildSortDropdown(), // Display sorting options
                       ],
@@ -794,7 +813,7 @@ Future<void> _deleteReview(String reviewId) async {
             ),
             child: Text(
               'Add Review',
-              style: TextStyle(color: Colors.white, fontSize: 16),
+              style: TextStyle(color: Colors.white, fontSize: 14),
             ),
           ),
         ),
