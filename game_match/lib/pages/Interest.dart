@@ -19,6 +19,7 @@ class _InterestsPageState extends State<InterestsPage> {
   bool _isLoading = false;
 
   final List<String> gameModes = [
+    'Select',
     'Single Player',
     'Multiplayer',
     'Co-operative',
@@ -26,6 +27,7 @@ class _InterestsPageState extends State<InterestsPage> {
   ];
 
   final List<String> playerPerspective = [
+    'Select',
     'First Person',
     'Third Person',
     'Top-Down',
@@ -33,18 +35,22 @@ class _InterestsPageState extends State<InterestsPage> {
   ];
 
   final List<String> platforms = [
+    'Select',
     'PC',
     'PlayStation',
     'Xbox',
     'Nintendo Switch'
   ];
 
-  final List<String> price = [
-    'Free',
-    '\$0 - \$20',
-    '\$20 - \$50',
-    '\$50 - \$80'
+  final List<String> ratings = [
+    'Select',
+    '0 - 20',
+    '21 - 40',
+    '41 - 60',
+    '61 - 80',
+    '81 - 100',
   ];
+
 
   final firestore = FirebaseFirestore.instance;
 
@@ -61,11 +67,20 @@ class _InterestsPageState extends State<InterestsPage> {
   void _getCurrentUserId() {
     User? currentUser = FirebaseAuth.instance.currentUser;
     if (currentUser != null) {
-      userId = currentUser.uid;
+      setState(() {
+        userId = currentUser.uid;
+      });
     } else {
       print('User not authenticated.');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('User not authenticated. Please log in again.'),
+          backgroundColor: Colors.red,
+        ),
+      );
     }
   }
+
 
   void _saveInterests() async {
     setState(() {
@@ -75,10 +90,10 @@ class _InterestsPageState extends State<InterestsPage> {
     try {
       await firestore.collection('users').doc(userId).set({
         'interests': {
-          'gameMode': dropdownValue1 ?? '',
-          'playerPerspective': dropdownValue2 ?? '',
-          'platform': dropdownValue3 ?? '',
-          'price': dropdownValue4 ?? '',
+        'gameMode': dropdownValue1 == 'None' ? '' : dropdownValue1 ?? '',
+        'playerPerspective': dropdownValue2 == 'None' ? '' : dropdownValue2 ?? '',
+        'platform': dropdownValue3 == 'None' ? '' : dropdownValue3 ?? '',
+        'rating': dropdownValue4 == 'None' ? '' : dropdownValue4 ?? '',
         }
       }, SetOptions(merge: true));
 
@@ -113,13 +128,12 @@ class _InterestsPageState extends State<InterestsPage> {
 
       if (doc.exists && doc['interests'] != null) {
         Map<String, dynamic> interests = doc['interests'];
-        setState(() {
-          dropdownValue1 = interests['gameMode'];
-          dropdownValue2 = interests['playerPerspective'];
-          dropdownValue3 = interests['platform'];
-          dropdownValue4 = interests['price'];
-        });
-
+      setState(() {
+        dropdownValue1 = gameModes.contains(interests['gameMode']) ? interests['gameMode'] : null;
+        dropdownValue2 = playerPerspective.contains(interests['playerPerspective']) ? interests['playerPerspective'] : null;
+        dropdownValue3 = platforms.contains(interests['platform']) ? interests['platform'] : null;
+        dropdownValue4 = ratings.contains(interests['rating']) ? interests['rating'] : null;
+      });
       } else {
         print('No interests found for the user.');
       }
@@ -141,7 +155,7 @@ class _InterestsPageState extends State<InterestsPage> {
           style: TextStyle(color: Colors.black, fontSize: 16),
         ),
         centerTitle: true,
-        backgroundColor: Color(0xFF41B1F1),
+        backgroundColor: const Color(0xFF41B1F1),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () {
@@ -202,10 +216,10 @@ class _InterestsPageState extends State<InterestsPage> {
                   ),
                   const SizedBox(height: 10),
                   _buildDropdownCard(
-                    icon: Icons.attach_money,
-                    label: 'Price',
+                    icon: Icons.star,
+                    label: 'Rating',
                     value: dropdownValue4,
-                    items: price,
+                    items: ratings,
                     onChanged: (String? newValue) {
                       setState(() {
                         dropdownValue4 = newValue;
@@ -249,10 +263,10 @@ class _InterestsPageState extends State<InterestsPage> {
               ],
             ),
             DropdownButton<String>(
-              value: value,
-              hint: Text('Select $label'),
-              isExpanded: true,
-              onChanged: onChanged,
+            value: value == null || value == '' ? 'Select' : value, // Handle unselected state
+            hint: Text('Select $label'),
+            isExpanded: true,
+            onChanged: onChanged,
               items: items.map<DropdownMenuItem<String>>((String item) {
                 return DropdownMenuItem<String>(
                   value: item,

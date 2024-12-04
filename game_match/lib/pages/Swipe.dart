@@ -15,6 +15,7 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
 import 'Subscription.dart';
+import 'Preference_Interest.dart';
 
 class SwipePage extends StatefulWidget {
   const SwipePage({super.key});
@@ -64,7 +65,7 @@ class _SwipePageState extends State<SwipePage> with TickerProviderStateMixin {
     if (user != null) {
       _fetchGames(user.uid);
     }
-    _fetchSubscriptionStatus();
+    _fetchSubscriptionStatus(); 
     _loadInterstitialAd();
 
     _heartAnimationController = AnimationController(
@@ -729,7 +730,7 @@ void _onGameSwiped(int index) async {
                                             ],
                                           ),
                                         );
-                                      }).toList(),
+                                      }),
                                   ],
                                 ),
                               ],
@@ -839,28 +840,61 @@ void _onGameSwiped(int index) async {
               top: MediaQuery.of(context).size.height * 0.2,
               child: SlideTransition(
                 position: _instructionWagAnimation!,
-                child: const Column(
+                child: Column(
                   children: [
-                    Icon(
-                      Icons.swipe,
-                      size: 100,
-                      color: Colors.white,
-                    ),
-                    SizedBox(height: 8),
-                    Text(
-                      'Swipe to interact',
-                      style: TextStyle(
+                      const Icon(
+                        Icons.swipe,
+                        size: 100,
                         color: Colors.white,
-                        fontSize: 16,
-                        shadows: [
-                          Shadow(
-                            offset: Offset(1.0, 1.0),
-                            blurRadius: 3.0,
-                            color: Colors.black,
-                          ),
-                        ],
                       ),
-                    ),
+                      const SizedBox(height: 8),
+                    if (games.isEmpty)...[
+                      const Text(
+                      'Set your preferences', // Display message if no games are found
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 20,
+                      ),
+                      ),
+                      const Text(
+                      'No games found',
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 12,
+                      ),
+                      ),
+                    ],
+                      const SizedBox(height: 8),
+                      if (games.isEmpty)
+                      ElevatedButton(
+                          onPressed: () {
+                            Navigator.pushNamed(context, '/Preferences_Interest'); // Corrected route name
+                          },
+                        style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blue,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        ),
+                        child: const Text('Set Preferences'),
+                      ),
+                    if (games.isNotEmpty)
+                      const Text(
+                        'Swipe to interact',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          shadows: [
+                            Shadow(
+                              offset: Offset(1.0, 1.0),
+                              blurRadius: 3.0,
+                              color: Colors.black,
+                            ),
+                          ],
+                        ),
+                      ),
                   ],
                 ),
               ),
@@ -1008,6 +1042,8 @@ class CustomAdPage extends StatelessWidget {
 }
 // custom dialog with countdown timer for swipe limit reset
 class SwipeLimitDialog extends StatefulWidget {
+  const SwipeLimitDialog({super.key});
+
   @override
   _SwipeLimitDialogState createState() => _SwipeLimitDialogState();
 }
@@ -1030,10 +1066,10 @@ class _SwipeLimitDialogState extends State<SwipeLimitDialog> {
   }
 
   void _startTimer() {
-    _timer = Timer.periodic(Duration(seconds: 1), (timer) {
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       setState(() {
         if (_timeRemaining.inSeconds > 0) {
-          _timeRemaining -= Duration(seconds: 1);
+          _timeRemaining -= const Duration(seconds: 1);
         } else {
           _timer.cancel();
         }
@@ -1052,26 +1088,26 @@ class _SwipeLimitDialogState extends State<SwipeLimitDialog> {
     String formattedTime = _formatDuration(_timeRemaining);
 
     return AlertDialog(
-      title: Text('Daily Swipe Limit Reached'),
+      title: const Text('Daily Swipe Limit Reached'),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(
+          const Text(
               'You have reached your daily swipe limit. Upgrade to Premium for unlimited swipes and an ad-free experience!'),
-          SizedBox(height: 16),
+          const SizedBox(height: 16),
           Text(
             'Time until swipes reset: $formattedTime',
-            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.red),
+            style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.red),
           ),
         ],
       ),
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: Text('Cancel'),
           style: TextButton.styleFrom(
             foregroundColor: Colors.black,
           ),
+          child: Text('Cancel'),
         ),
         ElevatedButton(
           onPressed: () {
@@ -1083,11 +1119,11 @@ class _SwipeLimitDialogState extends State<SwipeLimitDialog> {
               ),
             );
           },
-          child: Text('Upgrade'),
           style: ElevatedButton.styleFrom(
-            backgroundColor: Color(0xFF41B1F1),
+            backgroundColor: const Color(0xFF41B1F1),
             foregroundColor: Colors.white,
           ),
+          child: Text('Upgrade'),
         ),
       ],
     );

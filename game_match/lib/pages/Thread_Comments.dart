@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:game_match/firestore_service.dart';
 import 'package:intl/intl.dart';
 
 class ThreadDetailPage extends StatefulWidget {
@@ -15,7 +16,7 @@ class ThreadDetailPage extends StatefulWidget {
   final int shares;
 
   const ThreadDetailPage({
-    Key? key,
+    super.key,
     required this.threadId,
     required this.threadContent,
     required this.threadUserName,
@@ -25,23 +26,26 @@ class ThreadDetailPage extends StatefulWidget {
     required this.likes,
     required this.comments,
     required this.shares,
-  }) : super(key: key);
+  });
 
   @override
   _ThreadDetailPageState createState() => _ThreadDetailPageState();
 }
 
 class _ThreadDetailPageState extends State<ThreadDetailPage> {
+  String? threadUserId;
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final TextEditingController _commentController = TextEditingController();
   List<Map<String, dynamic>> comments = [];
+  final _firestoreService = FirestoreService(); // Add this line to define _firestoreService
   User? currentUser;
   bool isLoading = true;
   bool isThreadLiked = false;
+  int threadLikes = 0;
   bool _isPaidUser = false;
   bool isSubscriptionLoading = true; // Track loading state of subscription check
-  int threadLikes = 0;
   int commentCount = 0;
+  List<Map<String, dynamic>> threads = []; // Change threads to a list
 
   @override
   void initState() {
@@ -52,7 +56,9 @@ class _ThreadDetailPageState extends State<ThreadDetailPage> {
     _fetchComments();
     _listenToCommentCount(); // Add listener for comments count
     _fetchSubscriptionStatus(); // Fetch subscription status for current user
+    _fetchThreadUserId(); // Fetch the user ID of the thread creator
   }
+
 
   Future<void> _fetchSubscriptionStatus() async {
     if (currentUser != null) {
@@ -134,8 +140,8 @@ class _ThreadDetailPageState extends State<ThreadDetailPage> {
           .get();
 
       final fetchedComments = await Future.wait(querySnapshot.docs.map((doc) async {
-        Map<String, dynamic> commentData = doc.data() as Map<String, dynamic>;
-
+        Map<String, dynamic> commentData = doc.data();
+        commentData['userId']= doc.data()['userId'];
         if (commentData['userId'] != null) {
           final userSnapshot = await FirebaseFirestore.instance
               .collection('users')
@@ -144,7 +150,8 @@ class _ThreadDetailPageState extends State<ThreadDetailPage> {
           if (userSnapshot.exists) {
             final userData = userSnapshot.data() as Map<String, dynamic>;
             commentData['userName'] = userData['username'] ?? 'Anonymous';
-            commentData['userAvatarUrl'] = userData['profileImageUrl'] ?? null;
+            commentData['userAvatarUrl'] = userData['profileImageUrl'];
+
           } else {
             commentData['userName'] = 'Anonymous';
           }
@@ -173,14 +180,14 @@ class _ThreadDetailPageState extends State<ThreadDetailPage> {
     final user = _auth.currentUser;
     if (user == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('You need to be logged in to comment.')),
+        const SnackBar(content: Text('You need to be logged in to comment.')),
       );
       return;
     }
 
     try {
       final userSnapshot = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
-      final userData = userSnapshot.data() as Map<String, dynamic>?;
+      final userData = userSnapshot.data();
 
       final userName = userData?['username'] ?? 'Anonymous';
       final userAvatarUrl = userData?['profileImageUrl'];
@@ -204,10 +211,28 @@ class _ThreadDetailPageState extends State<ThreadDetailPage> {
     } catch (e) {
       print('Error adding comment: $e');
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to add comment. Please try again.')),
+        const SnackBar(content: Text('Failed to add comment. Please try again.')),
       );
     }
   }
+    Future<void> _fetchThreadUserId() async {
+      try {
+        DocumentSnapshot threadSnapshot = await FirebaseFirestore.instance
+            .collection('threads')
+            .doc(widget.threadId)
+            .get();
+
+        if (threadSnapshot.exists) {
+          setState(() {
+            threadUserId = threadSnapshot['userId'];
+          });
+        } else {
+          print('Thread does not exist');
+        }
+      } catch (e) {
+        print('Error fetching thread user ID: $e');
+      }
+    }
 
   Future<void> _deleteComment(String commentId) async {
 
@@ -218,8 +243,8 @@ class _ThreadDetailPageState extends State<ThreadDetailPage> {
     context: context,
     builder: (BuildContext context) {
       return AlertDialog(
-        title: Text('Delete Comment'),
-        content: Text('Are you sure you want to delete this comment?'),
+        title: const Text('Delete Comment'),
+        content: const Text('Are you sure you want to delete this comment?'),
         actions: [
           TextButton(
             child: Text('No', style: TextStyle(color: textColor)),
@@ -264,19 +289,19 @@ class _ThreadDetailPageState extends State<ThreadDetailPage> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text('Edit Comment'),
-          content: Container(
+          title: const Text('Edit Comment'),
+          content: SizedBox(
           width: 500,
           height: 250,
           child: SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
+                const Text(
                   'Comment',
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
-                SizedBox(height: 8),
+                const SizedBox(height: 8),
                 TextField(
                   controller: editController,
                   maxLines: 5,
@@ -366,7 +391,7 @@ class _ThreadDetailPageState extends State<ThreadDetailPage> {
             Navigator.pop(context);
           },
         ),
-        title: Text(
+        title: const Text(
           'Comments',
           style: TextStyle(
             color: Colors.black,
@@ -392,30 +417,36 @@ class _ThreadDetailPageState extends State<ThreadDetailPage> {
                   children: [
                     Row(
                       children: [
-                        CircleAvatar(
+                        GestureDetector(
+                            onTap: () {
+                              // Pass the userId when navigating to the profile page
+                              Navigator.pushNamed(context, '/View_profile', arguments: threadUserId);
+                            },
+                          child: CircleAvatar(
                           backgroundColor: Colors.grey[300],
                           backgroundImage: widget.threadUserAvatarUrl != null && widget.threadUserAvatarUrl!.isNotEmpty
                             ? NetworkImage(widget.threadUserAvatarUrl!)
                             : null,
                           radius: 20,
                           child: widget.threadUserAvatarUrl == null || widget.threadUserAvatarUrl!.isEmpty
-                            ? Icon(Icons.person, color: Colors.grey)
+                            ? const Icon(Icons.person, color: Colors.grey)
                             : null,
+                          )
                         ),
-                        SizedBox(width: 8),
+                        const SizedBox(width: 8),
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
                               widget.threadUserName,
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 16,
                               ),
                             ),
                             Text(
                               _formatTimestamp(widget.timestamp),
-                              style: TextStyle(
+                              style: const TextStyle(
                                 color: Colors.grey,
                                 fontSize: 12,
                               ),
@@ -427,7 +458,7 @@ class _ThreadDetailPageState extends State<ThreadDetailPage> {
                     const SizedBox(height: 12),
                     Text(
                       widget.threadContent,
-                      style: TextStyle(fontSize: 16),
+                      style: const TextStyle(fontSize: 16),
                     ),
                     const SizedBox(height: 12),
                     if (widget.threadImageUrl != null)
@@ -478,10 +509,10 @@ class _ThreadDetailPageState extends State<ThreadDetailPage> {
               ),
             ),
           ),
-          Divider(),
+          const Divider(),
           Expanded(
             child: isLoading
-                ? Center(child: CircularProgressIndicator())
+                ? const Center(child: CircularProgressIndicator())
                 : ListView.builder(
   itemCount: comments.length,
   itemBuilder: (context, index) {
@@ -505,7 +536,7 @@ class _ThreadDetailPageState extends State<ThreadDetailPage> {
                 children: [
                   Row(
                     children: [
-                      // Profile picture
+                      // comment user profile picture
                       GestureDetector(
                         onTap: () {
                           // Pass the userId when navigating to the profile page
@@ -514,9 +545,12 @@ class _ThreadDetailPageState extends State<ThreadDetailPage> {
                         child: CircleAvatar(
                           backgroundColor: Colors.grey[300],
                           backgroundImage: comment['userAvatarUrl'] != null && comment['userAvatarUrl']!.isNotEmpty
-                            ? NetworkImage(comment['userAvatarUrl'])
-                            : AssetImage('assets/default_avatar.png') as ImageProvider,
+                            ? NetworkImage(comment['userAvatarUrl']) as ImageProvider<Object>?
+                            : null,
                           radius: 20,
+                          child: comment['userAvatarUrl'] == null || comment['userAvatarUrl']!.isEmpty
+                            ? const Icon(Icons.person, color: Colors.grey)
+                            : null,
                         ),
                       ),
                       const SizedBox(width: 8),
@@ -526,7 +560,7 @@ class _ThreadDetailPageState extends State<ThreadDetailPage> {
                         children: [
                           Text(
                             comment['userName'] ?? 'Anonymous',
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 16,
                             ),
@@ -535,7 +569,7 @@ class _ThreadDetailPageState extends State<ThreadDetailPage> {
                             comment['timestamp'] != null
                                 ? _formatTimestamp(comment['timestamp'])
                                 : 'No timestamp available',
-                            style: TextStyle(fontSize: 12, color: Colors.grey),
+                            style: const TextStyle(fontSize: 12, color: Colors.grey),
                           ),
                         ],
                       ),
@@ -547,7 +581,7 @@ class _ThreadDetailPageState extends State<ThreadDetailPage> {
                     padding: const EdgeInsets.only(left: 0.0), // Align content under profile picture
                     child: Text(
                       comment['content'] ?? '',
-                      style: TextStyle(fontSize: 14),
+                      style: const TextStyle(fontSize: 14),
                     ),
                   ),
                   const SizedBox(height: 8),
@@ -585,17 +619,17 @@ class _ThreadDetailPageState extends State<ThreadDetailPage> {
                       }
                     },
                     itemBuilder: (BuildContext context) => [
-                      PopupMenuItem<String>(
+                      const PopupMenuItem<String>(
                         value: 'Edit',
                         child: Text('Edit'),
                       ),
-                      PopupMenuItem<String>(
+                      const PopupMenuItem<String>(
                         value: 'Delete',
                         child: Text('Delete'),
                       ),
                     ],
                   )
-                : SizedBox.shrink(),
+                : const SizedBox.shrink(),
           ),
         ],
       ),
@@ -603,7 +637,7 @@ class _ThreadDetailPageState extends State<ThreadDetailPage> {
   },
 ),
           ),
-          Divider(),
+          const Divider(),
           if (!isSubscriptionLoading) // Ensure subscription check is complete
             Padding(
               padding: const EdgeInsets.all(8.0),
@@ -615,13 +649,13 @@ class _ThreadDetailPageState extends State<ThreadDetailPage> {
                       enabled: _isPaidUser,
                       decoration: InputDecoration(
                         hintText: _isPaidUser ? 'Add a comment...' : 'Upgrade to comment...',
-                        border: OutlineInputBorder(),
+                        border: const OutlineInputBorder(),
                       ),
                     ),
                   ),
                   IconButton(
-                    icon: Icon(Icons.send),
-                    color: Color(0xFF41B1F1),
+                    icon: const Icon(Icons.send),
+                    color: const Color(0xFF41B1F1),
                     onPressed: _isPaidUser
                         ? () => _addComment(_commentController.text.trim())
                         : null,
@@ -641,7 +675,7 @@ class _ThreadDetailPageState extends State<ThreadDetailPage> {
       icon: Row(
         children: [
           Icon(icon, color: color, size: 20),
-          SizedBox(width: 4),
+          const SizedBox(width: 4),
           Text(
             count.toString(),
             style: TextStyle(fontSize: 14, 

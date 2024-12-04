@@ -18,6 +18,8 @@ void main() async {
 
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -31,6 +33,8 @@ class MyApp extends StatelessWidget {
 }
 
 class WishlistPage extends StatefulWidget {
+  const WishlistPage({super.key});
+
   @override
   _WishlistPageState createState() => _WishlistPageState();
 }
@@ -91,7 +95,7 @@ class _WishlistPageState extends State<WishlistPage> {
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
-        title: Text(
+        title: const Text(
           'Wishlist',
           style: TextStyle(
             color: Colors.black,
@@ -125,7 +129,7 @@ class _WishlistPageState extends State<WishlistPage> {
                 filled: true,
                 fillColor: Theme.of(context).cardColor, // Match the color from com 901.txt
                 hintText: 'Search...',
-                prefixIcon: Icon(Icons.search),
+                prefixIcon: const Icon(Icons.search),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),
@@ -143,18 +147,18 @@ class _WishlistPageState extends State<WishlistPage> {
               onChanged: (value) {
                 _sortGames(value!);
               },
-              items: [
+              items: const [
                 DropdownMenuItem(
-                  child: Text('Sort by Custom'),
                   value: 'Sort by Custom',
+                  child: Text('Sort by Custom'),
                 ),
                 DropdownMenuItem(
-                  child: Text('Name: A - Z'),
                   value: 'Name: A - Z',
+                  child: Text('Name: A - Z'),
                 ),
                 DropdownMenuItem(
-                  child: Text('Name: Z - A'),
                   value: 'Name: Z - A',
+                  child: Text('Name: Z - A'),
                 ),
               ],
             ),
@@ -193,13 +197,13 @@ class _WishlistPageState extends State<WishlistPage> {
                             width: 100,
                             height: 150,
                             color: Colors.grey,
-                            child: Icon(
+                            child: const Icon(
                               Icons.image_not_supported,
                               size: 50,
                               color: Colors.white,
                             ),
                           ),
-                          SizedBox(width: 16), // Spacing between image and text
+                          const SizedBox(width: 16), // Spacing between image and text
 
                           // Display game details in a column
                           Expanded(
@@ -209,14 +213,14 @@ class _WishlistPageState extends State<WishlistPage> {
                                 // Align game name with the top of the cover image
                                 Text(
                                   game.name,
-                                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                                  style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                                 ),
-                                SizedBox(height: 8), // Space between name and platforms
+                                const SizedBox(height: 8), // Space between name and platforms
                                 Text(
                                   'Platforms: ${game.platforms.join(', ')}',
                                   style: TextStyle(color: Colors.grey[700]),
                                 ),
-                                SizedBox(height: 20), // Space before buttons
+                                const SizedBox(height: 20), // Space before buttons
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
@@ -226,10 +230,10 @@ class _WishlistPageState extends State<WishlistPage> {
                                         backgroundColor: Colors.blue,
                                         foregroundColor: Colors.white,
                                       ),
-                                      child: Text('Buy Now'),
+                                      child: const Text('Buy Now'),
                                     ),
                                     IconButton(
-                                      icon: Icon(Icons.more_horiz),
+                                      icon: const Icon(Icons.more_horiz),
                                       onPressed: () => _showRemoveDialog(context, game),
                                     ),
                                   ],
@@ -270,7 +274,7 @@ class _WishlistPageState extends State<WishlistPage> {
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: Text('Close', style: TextStyle(color: Colors.blue),),
+              child: const Text('Close', style: TextStyle(color: Colors.blue),),
             ),
           ],
         );
@@ -285,12 +289,12 @@ class _WishlistPageState extends State<WishlistPage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Remove Game'),
+          title: const Text('Remove Game'),
           content: Text('Would you like to remove ${game.name} from the wishlist?'),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: Text('Cancel', style: TextStyle(color: Colors.blue),),
+              child: const Text('Cancel', style: TextStyle(color: Colors.blue),),
             ),
             TextButton(
               onPressed: () {
@@ -299,7 +303,7 @@ class _WishlistPageState extends State<WishlistPage> {
                 });
                 Navigator.of(context).pop();
               },
-              child: Text('Remove', style: TextStyle(color: Colors.blue),),
+              child: const Text('Remove', style: TextStyle(color: Colors.blue),),
             ),
           ],
         );
@@ -320,7 +324,7 @@ Widget _buildLinkText(String label, String url, BuildContext context) {
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Text(
         label,
-        style: TextStyle(
+        style: const TextStyle(
           fontSize: 18,
           color: Colors.blue,
           decoration: TextDecoration.underline,

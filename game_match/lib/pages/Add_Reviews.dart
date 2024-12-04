@@ -6,7 +6,7 @@ import 'Submitted_Reviews.dart'; // Import the Submitted Reviews page
 class AddReviewsPage extends StatefulWidget {
   final String gameId;
 
-  AddReviewsPage({required this.gameId});
+  const AddReviewsPage({super.key, required this.gameId});
 
   @override
   _AddReviewsPageState createState() => _AddReviewsPageState();
@@ -45,7 +45,7 @@ class _AddReviewsPageState extends State<AddReviewsPage> {
 
         // Show a success message
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
+          const SnackBar(
             content: Text('Review submitted successfully!'),
             backgroundColor: Colors.green,
             duration: Duration(seconds: 3),
@@ -54,7 +54,7 @@ class _AddReviewsPageState extends State<AddReviewsPage> {
       } catch (e) {
         // Show an error message if the review submission fails
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
+          const SnackBar(
             content: Text('Failed to submit review. Please try again.'),
             backgroundColor: Colors.red,
             duration: Duration(seconds: 3),
@@ -68,7 +68,7 @@ class _AddReviewsPageState extends State<AddReviewsPage> {
 
   // Function to update the rating based on user's interaction with the stars
   void _updateRating(double localX) {
-    final double starWidth = 32.0; // Each star's width
+    const double starWidth = 32.0; // Each star's width
     final double totalWidth = starWidth * 5; // Total width for all stars
 
     // Ensure the x position is within valid bounds
@@ -86,7 +86,7 @@ class _AddReviewsPageState extends State<AddReviewsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Create New Review',
+        title: const Text('Create New Review',
         style: TextStyle(
               color: Colors.black, 
               fontSize: 16,
@@ -95,7 +95,7 @@ class _AddReviewsPageState extends State<AddReviewsPage> {
         //backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.black),
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () {
             Navigator.pop(context); // Navigate back to the previous screen
           },
@@ -107,11 +107,11 @@ class _AddReviewsPageState extends State<AddReviewsPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Review Title Input
-            Text(
+            const Text(
               'Review Title',
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
             TextField(
               controller: titleController,
               decoration: InputDecoration(
@@ -124,14 +124,14 @@ class _AddReviewsPageState extends State<AddReviewsPage> {
                 ),
               ),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
 
             // Review Body Input
-            Text(
+            const Text(
               'Review Body',
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
             TextField(
               controller: bodyController,
               maxLines: 8,
@@ -146,14 +146,14 @@ class _AddReviewsPageState extends State<AddReviewsPage> {
                 ),
               ),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
 
             // Star Rating Row
-            Text(
+            const Text(
               'Rating:',
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
             GestureDetector(
               onPanUpdate: (details) {
                 _updateRating(details.localPosition.dx); // Update rating based on drag
@@ -174,7 +174,7 @@ class _AddReviewsPageState extends State<AddReviewsPage> {
                 }),
               ),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
 
             // Post Review Button
             SizedBox(
@@ -184,19 +184,19 @@ class _AddReviewsPageState extends State<AddReviewsPage> {
                   _addReview(titleController.text, bodyController.text, rating); // Call the function to submit the review
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Color(0xFF41B1F1),
-                  padding: EdgeInsets.symmetric(vertical: 16),
+                  backgroundColor: const Color(0xFF41B1F1),
+                  padding: const EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),
                 ),
-                child: Text(
+                child: const Text(
                   'Post Review',
                   style: TextStyle(color: Colors.white, fontSize: 14),
                 ),
               ),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
 
             // Navigate to Submitted Reviews Button
             // SizedBox(
@@ -224,7 +224,7 @@ class _AddReviewsPageState extends State<AddReviewsPage> {
 
             // Guidelines Text
             //SizedBox(height: 20),
-            Text(
+            const Text(
               'Please ensure your review follows our community guidelines.',
               style: TextStyle(color: Colors.grey, fontSize: 14),
               textAlign: TextAlign.center,

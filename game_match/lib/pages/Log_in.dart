@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:game_match/pages/Side_bar.dart';
 import 'package:game_match/pages/recoverusername.dart';
 import 'package:game_match/pages/recoverpassword.dart';
 
@@ -60,7 +59,7 @@ class _MyLoginPageState extends State<MyLoginPage> {
         ),
         centerTitle: true,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.black),
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () {
             Navigator.pop(context); // Navigate back to the previous screen
           },
@@ -122,7 +121,7 @@ class _MyLoginPageState extends State<MyLoginPage> {
                   );
                 },
                 child: const Padding(
-                  padding: EdgeInsets.only(left: 20),
+                  padding: EdgeInsets.only(left: 30),
                   child: Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
@@ -159,7 +158,7 @@ class _MyLoginPageState extends State<MyLoginPage> {
                   );
                 },
                 child: const Padding(
-                  padding: EdgeInsets.only(left: 20),
+                  padding: EdgeInsets.only(left: 30),
                   child: Align(
                     alignment: Alignment.centerLeft,
                     child: Text(

@@ -10,7 +10,7 @@ import 'package:share_plus/share_plus.dart';
 
 class ThreadsPage extends StatefulWidget {
   final String gameId;
-  const ThreadsPage({Key? key, required this.gameId}) : super(key: key);
+  const ThreadsPage({super.key, required this.gameId});
 
   @override
   _ThreadsPageState createState() => _ThreadsPageState();
@@ -44,19 +44,19 @@ class _ThreadsPageState extends State<ThreadsPage> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text('Edit Thread'),
-          content: Container(
+          title: const Text('Edit Thread'),
+          content: SizedBox(
             width: 500,
             height: 300,
             child: SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
+                const Text(
                   'Thread Description',
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
-                SizedBox(height: 8),
+                const SizedBox(height: 8),
                 TextField(
                   controller: editController,
                   maxLines: 6,
@@ -120,7 +120,7 @@ class _ThreadsPageState extends State<ThreadsPage> {
       isLoading = false;
     });
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('You need to be logged in to view threads.')),
+      const SnackBar(content: Text('You need to be logged in to view threads.')),
     );
   }
 }
@@ -154,8 +154,9 @@ class _ThreadsPageState extends State<ThreadsPage> {
           Map<String, dynamic>? userInfo = await _firestoreService.getUserInfo(userId);
 
           thread['userName'] = userInfo?['username'] ?? 'Anonymous';
-          thread['avatarUrl'] = userInfo?['profileImageUrl'] ?? null;
+          thread['avatarUrl'] = userInfo?['profileImageUrl'];
           thread['id'] = threadId;
+          thread['userId'] = userId;
 
           // Fetch the count of comments in the comments sub-collection
           int commentCount = await _firestoreService.getCommentCountForThread(threadId);
@@ -193,7 +194,7 @@ void _copyLinkToClipboard(String threadId) {
   FlutterClipboard.copy(link).then((_) {
     // Show a confirmation message
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Link copied to clipboard!')),
+      const SnackBar(content: Text('Link copied to clipboard!')),
     );
   });
 }
@@ -212,7 +213,7 @@ void _copyLinkToClipboard(String threadId) {
         ),
         title: Text(
           '${gameTitle ?? 'Threads'} Threads',
-          style: TextStyle(
+          style: const TextStyle(
             color: Colors.black,
             fontSize: 16,
           ),
@@ -224,9 +225,9 @@ void _copyLinkToClipboard(String threadId) {
           _buildFilterTabs(),
           Expanded(
             child: isLoading
-                ? Center(child: CircularProgressIndicator())
+                ? const Center(child: CircularProgressIndicator())
                 : threads.isEmpty
-                    ? Center(
+                    ? const Center(
                         child: Text(
                           'No Threads',
                           style: TextStyle(fontSize: 18, color: Colors.grey),
@@ -235,7 +236,7 @@ void _copyLinkToClipboard(String threadId) {
                     : RefreshIndicator(
                         onRefresh: _fetchThreads,
                         child: ListView.builder(
-                          padding: EdgeInsets.all(16.0),
+                          padding: const EdgeInsets.all(16.0),
                           itemCount: threads.length,
                           itemBuilder: (context, index) {
                             final thread = threads[index];
@@ -251,15 +252,15 @@ void _copyLinkToClipboard(String threadId) {
           onPressed: () {
           if (subscriptionStatus == "free") {
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Please upgrade to Premium to post your own threads.')),
+              const SnackBar(content: Text('Please upgrade to Premium to post your own threads.')),
             );
           } else {
             _navigateToAddThreadPage(); // Only "paid" users can add threads
           }
         },
-          backgroundColor: Color(0xFF41B1F1), // Blue background color
+          backgroundColor: const Color(0xFF41B1F1), // Blue background color
           foregroundColor: Colors.white, // White icon color
-          child: Icon(Icons.add), // "Plus" icon
+          child: const Icon(Icons.add), // "Plus" icon
         )
       : null,
     );
@@ -304,7 +305,7 @@ void _copyLinkToClipboard(String threadId) {
           ),
           if (filter == label)
             Container(
-              margin: EdgeInsets.only(top: 4),
+              margin: const EdgeInsets.only(top: 4),
               height: 2,
               width: 40,
               color: Colors.blue,
@@ -320,10 +321,10 @@ void _copyLinkToClipboard(String threadId) {
   return Card(
     color: Theme.of(context).cardColor,
     elevation: 2,
-    margin: EdgeInsets.symmetric(vertical: 8.0),
+    margin: const EdgeInsets.symmetric(vertical: 8.0),
     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
     child: Padding(
-      padding: EdgeInsets.all(12.0),
+      padding: const EdgeInsets.all(12.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -341,32 +342,32 @@ void _copyLinkToClipboard(String threadId) {
                   : null,
                   radius: 20,
                   child: thread['avatarUrl'] == null || thread['avatarUrl']!.isEmpty
-                  ? Icon(Icons.person, color: Colors.grey)
+                  ? const Icon(Icons.person, color: Colors.grey)
                   : null,
                 ),
               ),
-              SizedBox(width: 8),
+              const SizedBox(width: 8),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     thread['userName'] ?? 'Anonymous',
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 16,
                     ),
                   ),
-                  SizedBox(height: 4),
+                  const SizedBox(height: 4),
                   Text(
                     _formatTimestamp(thread['timestamp']),
-                    style: TextStyle(
+                    style: const TextStyle(
                       color: Colors.grey,
                       fontSize: 12,
                     ),
                   ),
                 ],
               ),
-              Spacer(),
+              const Spacer(),
               if (thread['userId'] == _currentUser?.uid)
                 PopupMenuButton<String>(
                   onSelected: (value) {
@@ -377,11 +378,11 @@ void _copyLinkToClipboard(String threadId) {
                     }
                   },
                   itemBuilder: (BuildContext context) => [
-                    PopupMenuItem(
+                    const PopupMenuItem(
                       value: 'edit',
                       child: Text('Edit'),
                     ),
-                    PopupMenuItem(
+                    const PopupMenuItem(
                       value: 'delete',
                       child: Text('Delete'),
                     ),
@@ -389,12 +390,12 @@ void _copyLinkToClipboard(String threadId) {
                 ),
             ],
           ),
-          SizedBox(height: 16),
+          const SizedBox(height: 16),
             Text(
               thread['content'] ?? '',
-              style: TextStyle(fontSize: 14),
+              style: const TextStyle(fontSize: 14),
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             if (thread['imageUrl'] != null)
               GestureDetector(
                 onTap: () => _showImageDialog(thread['imageUrl']),
@@ -409,13 +410,13 @@ void _copyLinkToClipboard(String threadId) {
                       return Container(
                         height: 200,
                         color: Colors.grey[300],
-                        child: Center(child: Icon(Icons.image_not_supported)),
+                        child: const Center(child: Icon(Icons.image_not_supported)),
                       );
                     },
                   ),
                 ),
               ),
-          SizedBox(height: 16),
+          const SizedBox(height: 16),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -451,6 +452,7 @@ void _copyLinkToClipboard(String threadId) {
                         likes: thread['likes'] ?? 0,
                         comments: thread['comments'] ?? 0,
                         shares: thread['shares'] ?? 0,
+
                       ),
                     ),
                   );
@@ -463,7 +465,7 @@ void _copyLinkToClipboard(String threadId) {
                 () {
                   if (subscriptionStatus == "free") {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Please upgrade to Premium to share threads.')),
+                      const SnackBar(content: Text('Please upgrade to Premium to share threads.')),
                     );
                     return;
                   }
@@ -485,8 +487,8 @@ void _copyLinkToClipboard(String threadId) {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Delete Thread'),
-          content: Text('Are you sure you want to delete this thread?'),
+          title: const Text('Delete Thread'),
+          content: const Text('Are you sure you want to delete this thread?'),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
@@ -510,12 +512,12 @@ void _copyLinkToClipboard(String threadId) {
       await _firestoreService.deleteThread(threadId);
       _fetchThreads();
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Thread deleted successfully.')),
+        const SnackBar(content: Text('Thread deleted successfully.')),
       );
     } catch (e) {
       print('Error deleting thread: $e');
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error deleting thread.')),
+        const SnackBar(content: Text('Error deleting thread.')),
       );
     }
   }
@@ -558,7 +560,7 @@ void _copyLinkToClipboard(String threadId) {
       child: Row(
         children: [
           Icon(icon, color: color, size: 20),
-          SizedBox(width: 4),
+          const SizedBox(width: 4),
           Text(
             count.toString(),
             style: TextStyle(fontSize: 14,

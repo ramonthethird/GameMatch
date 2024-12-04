@@ -9,6 +9,8 @@ import 'package:game_match/theme_notifier.dart';
 import 'package:provider/provider.dart';
 
 class SubmittedReviewsPage extends StatefulWidget {
+  const SubmittedReviewsPage({super.key});
+
   @override
   _SubmittedReviewsPageState createState() => _SubmittedReviewsPageState();
 }
@@ -143,8 +145,8 @@ Future<void> _confirmDelete(String threadId) async {
   showDialog(
     context: context,
     builder: (context) => AlertDialog(
-      title: Text('Delete Thread'),
-      content: Text('Are you sure you want to delete this thread?'),
+      title: const Text('Delete Thread'),
+      content: const Text('Are you sure you want to delete this thread?'),
       actions: [
         TextButton(
           onPressed: () {
@@ -158,12 +160,12 @@ Future<void> _confirmDelete(String threadId) async {
             try {
               await _deleteThread(threadId); // Call delete method with await
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Thread deleted successfully.')),
+                const SnackBar(content: Text('Thread deleted successfully.')),
               );
             } catch (e) {
               print('Error deleting thread: $e');
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Error deleting thread.')),
+                const SnackBar(content: Text('Error deleting thread.')),
               );
             }
           },
@@ -182,12 +184,12 @@ Future<void> _deleteThread(String threadId) async {
       userReviews.removeWhere((review) => review['id'] == threadId); // Assuming userReviews contains thread data
     });
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Thread deleted successfully.')),
+      const SnackBar(content: Text('Thread deleted successfully.')),
     );
   } catch (e) {
     print('Error deleting thread: $e');
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Error deleting thread.')),
+      const SnackBar(content: Text('Error deleting thread.')),
     );
   }
 }
@@ -205,19 +207,19 @@ Future<void> _editThreadContent(String threadId, String currentContent) async {
     context: context,
     builder: (context) {
       return AlertDialog(
-        title: Text('Edit Thread'),
-        content: Container(
+        title: const Text('Edit Thread'),
+        content: SizedBox(
           width: 500,
           height: 300,
           child: SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
+                const Text(
                   'Thread Description',
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
-                SizedBox(height: 8),
+                const SizedBox(height: 8),
                 TextField(
                   controller: editController,
                   maxLines: 6,
@@ -257,12 +259,12 @@ Future<void> _editThreadContent(String threadId, String currentContent) async {
                     'content': newContent,
                   });
                   ScaffoldMessenger.of(mainContext).showSnackBar( // Use main context here
-                    SnackBar(content: Text('Thread updated successfully!')),
+                    const SnackBar(content: Text('Thread updated successfully!')),
                   );
                 } catch (e) {
                   print('Error updating thread: $e');
                   ScaffoldMessenger.of(mainContext).showSnackBar( // Use main context here
-                    SnackBar(content: Text('Error updating thread.')),
+                    const SnackBar(content: Text('Error updating thread.')),
                   );
                 }
               }
@@ -299,15 +301,15 @@ Future<void> _editThreadContent(String threadId, String currentContent) async {
     context: context,
     builder: (context) {
       return AlertDialog(
-        title: Text('Edit Review'),
-        content: Container(
+        title: const Text('Edit Review'),
+        content: SizedBox(
           width: 500,
           height: 450,
           child: SingleChildScrollView(
             child: StatefulBuilder(
               builder: (context, setState) {
                 void updateRating(double localX) {
-                  final double starWidth = 32.0;
+                  const double starWidth = 32.0;
 
                   if (localX < 0) localX = 0;
                   if (localX > starWidth * 5) localX = starWidth * 5;
@@ -323,39 +325,39 @@ Future<void> _editThreadContent(String threadId, String currentContent) async {
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
+                    const Text(
                       'Review Title',
                       style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                     ),
-                    SizedBox(height: 8),
+                    const SizedBox(height: 8),
                     TextField(
                       controller: titleController,
                       decoration: InputDecoration(
                         hintText: 'Enter review title...',
                         filled: true,
                         fillColor: Theme.of(context).cardColor,
-                        border: OutlineInputBorder(),
+                        border: const OutlineInputBorder(),
                       ),
                     ),
-                    SizedBox(height: 10),
-                    Text(
+                    const SizedBox(height: 10),
+                    const Text(
                       'Review Body',
                       style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                     ),
-                    SizedBox(height: 8),
+                    const SizedBox(height: 8),
                     TextField(
                       controller: bodyController,
                       decoration: InputDecoration(
                         hintText: 'Write your review here...',
                         filled: true,
                         fillColor: Theme.of(context).cardColor,
-                        border: OutlineInputBorder(),
+                        border: const OutlineInputBorder(),
                       ),
                       maxLines: 6,
                       maxLength: 300,
                     ),
-                    SizedBox(height: 10),
-                    Text(
+                    const SizedBox(height: 10),
+                    const Text(
                       'Rating:',
                       style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                     ),
@@ -406,7 +408,7 @@ Future<void> _editThreadContent(String threadId, String currentContent) async {
                 _fetchUserReviews();
 
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
+                  const SnackBar(
                     content: Text('Review updated successfully!'),
                     backgroundColor: Colors.green,
                     duration: Duration(seconds: 2),
@@ -417,7 +419,7 @@ Future<void> _editThreadContent(String threadId, String currentContent) async {
                   SnackBar(
                     content: Text('Failed to update review: $e'),
                     backgroundColor: Colors.red,
-                    duration: Duration(seconds: 2),
+                    duration: const Duration(seconds: 2),
                   ),
                 );
               }
@@ -437,7 +439,7 @@ Future<void> _editThreadContent(String threadId, String currentContent) async {
   Color textColor = isDarkMode ? Colors.white : Colors.black;
 
   if (userReviews.isEmpty) {
-    return Center(
+    return const Center(
       child: Text('You have not submitted any reviews yet!'),
     );
   }
@@ -460,7 +462,7 @@ Future<void> _editThreadContent(String threadId, String currentContent) async {
           borderRadius: BorderRadius.circular(10),
           // border: Border.all(color: Colors.grey.shade300, width: 1),
         ),
-        margin: EdgeInsets.symmetric(vertical: 8),
+        margin: const EdgeInsets.symmetric(vertical: 8),
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Row(
@@ -479,7 +481,7 @@ Future<void> _editThreadContent(String threadId, String currentContent) async {
                       width: 48,
                       height: 48,
                       color: Colors.grey,
-                      child: Icon(
+                      child: const Icon(
                         Icons.image_not_supported,
                         color: Colors.white,
                       ),
@@ -487,7 +489,7 @@ Future<void> _editThreadContent(String threadId, String currentContent) async {
                   },
                 ),
               ),
-              SizedBox(width: 16),
+              const SizedBox(width: 16),
               
               // Game details in a column to align title, stars, and date horizontally
               Expanded(
@@ -499,7 +501,7 @@ Future<void> _editThreadContent(String threadId, String currentContent) async {
                         Expanded(
                           child: Text(
                             gameTitle,
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 18,
                             ),
@@ -513,8 +515,8 @@ Future<void> _editThreadContent(String threadId, String currentContent) async {
                               showDialog(
                                 context: context,
                                 builder: (context) => AlertDialog(
-                                  title: Text('Delete Review'),
-                                  content: Text(
+                                  title: const Text('Delete Review'),
+                                  content: const Text(
                                       'Are you sure you want to delete this review?'),
                                   actions: [
                                     TextButton(
@@ -536,11 +538,11 @@ Future<void> _editThreadContent(String threadId, String currentContent) async {
                             }
                           },
                           itemBuilder: (BuildContext context) => [
-                            PopupMenuItem<String>(
+                            const PopupMenuItem<String>(
                               value: 'Edit',
                               child: Text('Edit'),
                             ),
-                            PopupMenuItem<String>(
+                            const PopupMenuItem<String>(
                               value: 'Delete',
                               child: Text('Delete'),
                             ),
@@ -558,41 +560,41 @@ Future<void> _editThreadContent(String threadId, String currentContent) async {
                             (starIndex) {
                               double starValue = starIndex + 1;
                               if (rating >= starValue) {
-                                return Icon(Icons.star,
+                                return const Icon(Icons.star,
                                     color: Colors.yellow, size: 16);
                               } else if (rating >= starValue - 0.5) {
-                                return Icon(Icons.star_half,
+                                return const Icon(Icons.star_half,
                                     color: Colors.yellow, size: 16);
                               } else {
-                                return Icon(Icons.star_border,
+                                return const Icon(Icons.star_border,
                                     color: Colors.yellow, size: 16);
                               }
                             },
                           ),
                         ),
-                        SizedBox(width: 8),
+                        const SizedBox(width: 8),
                         Text(
                           formattedDate,
-                          style: TextStyle(color: Colors.grey, fontSize: 12),
+                          style: const TextStyle(color: Colors.grey, fontSize: 12),
                         ),
                       ],
                     ),
-                    SizedBox(height: 8),
+                    const SizedBox(height: 8),
 
                     // Review Title and Body
                     Text(
                       review['title'] ?? '',
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    SizedBox(height: 4),
+                    const SizedBox(height: 4),
                     Text(
                       review['body'] ?? '',
-                      style: TextStyle(fontSize: 12),
+                      style: const TextStyle(fontSize: 12),
                     ),
-                    SizedBox(height: 8),
+                    const SizedBox(height: 8),
 
                     // Like and Dislike Icons
                     Row(
@@ -600,16 +602,16 @@ Future<void> _editThreadContent(String threadId, String currentContent) async {
                       children: [
                         Row(
                           children: [
-                            Icon(Icons.favorite, color: Colors.red, size: 24),
-                            SizedBox(width: 4),
+                            const Icon(Icons.favorite, color: Colors.red, size: 24),
+                            const SizedBox(width: 4),
                             Text('${review['likes'] ?? 0}',
-                                style: TextStyle(fontSize: 12)),
-                            SizedBox(width: 16),
-                            Icon(Icons.heart_broken,
+                                style: const TextStyle(fontSize: 12)),
+                            const SizedBox(width: 16),
+                            const Icon(Icons.heart_broken,
                                 color: Colors.blue, size: 24),
-                            SizedBox(width: 4),
+                            const SizedBox(width: 4),
                             Text('${review['dislikes'] ?? 0}',
-                                style: TextStyle(fontSize: 12)),
+                                style: const TextStyle(fontSize: 12)),
                           ],
                         ),
                       ],
@@ -627,7 +629,7 @@ Future<void> _editThreadContent(String threadId, String currentContent) async {
 
   Widget _buildThreadList(List<Map<String, dynamic>> threads) {
   if (threads.isEmpty) {
-    return Center(
+    return const Center(
       child: Text('You have not submitted any threads yet!'),
     );
   }
@@ -645,10 +647,10 @@ Future<void> _editThreadContent(String threadId, String currentContent) async {
       return Card(
         color: Theme.of(context).cardColor,
         elevation: 2,
-        margin: EdgeInsets.symmetric(vertical: 8.0),
+        margin: const EdgeInsets.symmetric(vertical: 8.0),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         child: Padding(
-          padding: EdgeInsets.all(12.0),
+          padding: const EdgeInsets.all(12.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -666,7 +668,7 @@ Future<void> _editThreadContent(String threadId, String currentContent) async {
                           width: 48,
                           height: 48,
                           color: Colors.grey,
-                          child: Icon(
+                          child: const Icon(
                             Icons.image_not_supported,
                             color: Colors.white,
                           ),
@@ -674,21 +676,21 @@ Future<void> _editThreadContent(String threadId, String currentContent) async {
                       },
                     ),
                   ),
-                  SizedBox(width: 16),
+                  const SizedBox(width: 16),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
                           gameTitle,
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 16,
                           ),
                         ),
                         Text(
                           formattedDate,
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 12,
                             color: Colors.grey,
                           ),
@@ -705,25 +707,25 @@ Future<void> _editThreadContent(String threadId, String currentContent) async {
                       }
                     },
                     itemBuilder: (BuildContext context) => [
-                      PopupMenuItem(
+                      const PopupMenuItem(
                         value: 'edit',
                         child: Text('Edit'),
                       ),
-                      PopupMenuItem(
+                      const PopupMenuItem(
                         value: 'delete',
                         child: Text('Delete'),
                       ),
                     ],
-                    icon: Icon(Icons.more_vert),
+                    icon: const Icon(Icons.more_vert),
                   ),
                 ],
               ),
-              SizedBox(height: 12),
+              const SizedBox(height: 12),
               Text(
                 thread['content'] ?? '',
-                style: TextStyle(fontSize: 14),
+                style: const TextStyle(fontSize: 14),
               ),
-              SizedBox(height: 8),
+              const SizedBox(height: 8),
               if (thread['imageUrl'] != null)
                 ClipRRect(
                   borderRadius: BorderRadius.circular(10),
@@ -736,20 +738,20 @@ Future<void> _editThreadContent(String threadId, String currentContent) async {
                       return Container(
                         height: 200,
                         color: Colors.grey[300],
-                        child: Center(child: Icon(Icons.image_not_supported)),
+                        child: const Center(child: Icon(Icons.image_not_supported)),
                       );
                     },
                   ),
                 ),
-              SizedBox(height: 12),
+              const SizedBox(height: 12),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   // Like icon and count
                   Row(
                     children: [
-                      Icon(Icons.favorite, color: Colors.red, size: 20),
-                      SizedBox(width: 4),
+                      const Icon(Icons.favorite, color: Colors.red, size: 20),
+                      const SizedBox(width: 4),
                       Text(
                         '${thread['likes'] ?? 0}',
                         style: TextStyle(fontSize: 12, color: Theme.of(context).textTheme.bodyLarge?.color),
@@ -759,8 +761,8 @@ Future<void> _editThreadContent(String threadId, String currentContent) async {
                   // Comment icon and count
                   Row(
                     children: [
-                      Icon(Icons.comment, color: Colors.blue, size: 20),
-                      SizedBox(width: 4),
+                      const Icon(Icons.comment, color: Colors.blue, size: 20),
+                      const SizedBox(width: 4),
                       Text(
                         '${threads[index]['comments'] ?? 0}',
                         style: TextStyle(fontSize: 12, color: Theme.of(context).textTheme.bodyLarge?.color),
@@ -770,8 +772,8 @@ Future<void> _editThreadContent(String threadId, String currentContent) async {
                   // Share icon and count
                   Row(
                     children: [
-                      Icon(Icons.share, color: Colors.green, size: 20),
-                      SizedBox(width: 4),
+                      const Icon(Icons.share, color: Colors.green, size: 20),
+                      const SizedBox(width: 4),
                       Text(
                         '${thread['shares'] ?? 0}',
                         style: TextStyle(fontSize: 12, color: Theme.of(context).textTheme.bodyLarge?.color),
@@ -797,7 +799,7 @@ Future<void> _editThreadContent(String threadId, String currentContent) async {
       child: Scaffold(
         key: _scaffoldKey,
         appBar: AppBar(
-  title: Text(
+  title: const Text(
     'My Activity',
     style: TextStyle(
       color: Colors.black,
@@ -812,7 +814,7 @@ Future<void> _editThreadContent(String threadId, String currentContent) async {
       _scaffoldKey.currentState?.openDrawer();
     },
   ),
-  bottom: TabBar(
+  bottom: const TabBar(
     labelColor: Colors.black, // Set active tab text color to black
     unselectedLabelColor: Colors.black54, // Set inactive tab text color (optional)
     indicatorColor: Colors.white,
