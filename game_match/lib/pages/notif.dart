@@ -151,9 +151,9 @@ class _NotificationsPageState extends State<NotificationsPage> {
       loadedNotifications.add(subscriptionNotification);
     }
 
-    // Fetch wishlist and sale notifications
+    // Fetch games from wishlist and the sale notifs
     await fetchWishlist();
-
+    // check only if wishlist is populated then iterate through the wishlist and do fetch game info function
     if (wishlist.isNotEmpty) {
       // Sale notifications for wishlist games
       for (String game in wishlist) {
@@ -189,7 +189,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
       notifications = loadedNotifications;
     });
 
-    // Start random notifications
+    // trigger function for random notifs here
     _startRandomNotifications(loadedNotifications);
   }
   
