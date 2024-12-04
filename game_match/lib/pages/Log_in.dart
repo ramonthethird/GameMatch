@@ -122,11 +122,11 @@ class _MyLoginPageState extends State<MyLoginPage> {
                   );
                 },
                 child: const Padding(
-                  padding: EdgeInsets.only(left: 20),
+                  padding: EdgeInsets.only(left: 30),
                   child: Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
-                      'Forgot your Username?',
+                      'Want to change your Email?',
                       style: TextStyle(
                         fontSize: 14,
                         color: Colors.blue,
@@ -159,7 +159,7 @@ class _MyLoginPageState extends State<MyLoginPage> {
                   );
                 },
                 child: const Padding(
-                  padding: EdgeInsets.only(left: 20),
+                  padding: EdgeInsets.only(left: 30),
                   child: Align(
                     alignment: Alignment.centerLeft,
                     child: Text(

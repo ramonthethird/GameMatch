@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart'; // Firestore package for database access
 import 'package:game_match/firestore_service.dart'; // Custom Firestore service for database interaction
 import 'game_model.dart'; // Model class for Game objects
-import 'Api_Service.dart'; // Custom API service file to fetch game data
+import 'api_Service.dart'; // Custom API service file to fetch game data
 import 'game_description.dart'; // Page to show detailed game description
 import 'Side_bar.dart'; // Sidebar widget for navigation
 import 'Threads.dart';
 import 'Thread_Comments.dart';
+import 'package:game_match/theme_notifier.dart';
+import 'package:provider/provider.dart';
 
 void main() {
   runApp(const MyApp());
@@ -42,19 +44,22 @@ class _GameListScreenState extends State<GameListScreen> {
   Map<String, List<Map<String, dynamic>>> gameThreads = {};
   List<Game> games = [];
   bool isLoading = true;
+  String? mostLikedReviewTitle;
+  String? mostLikedReviewScreenshot;
 
   @override
   void initState() {
     super.initState();
     fetchTrendingGames();
     fetchRecentThreads();
+    fetchMostLikedReview();
   }
 
   Future<void> fetchTrendingGames() async {
     try {
-      final fetchedGames = await apiService.fetchPopularGames();
+      final fetchedGames = await apiService.fetchTopVisitedGames(); // fetchPopularGames(); no args
       setState(() {
-        games = fetchedGames;
+        games = fetchedGames ?? [];
         isLoading = false;
       });
     } catch (e) {
@@ -79,6 +84,7 @@ class _GameListScreenState extends State<GameListScreen> {
           thread['likes'] = thread['likes'] ?? 0;
           thread['comments'] = thread['comments'] ?? [];
           thread['content'] = thread['content'] ?? 'No body content available';
+          thread["userId"] = userId;
           return thread;
         }).toList(),
       );
@@ -89,6 +95,50 @@ class _GameListScreenState extends State<GameListScreen> {
       print('Error fetching recent threads: $e');
     }
   }
+  
+    Future<void> fetchMostLikedReview() async {
+    try {
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('reviews')
+           // Primary sort by likes
+          .orderBy('timestamp', descending: true) // Secondary sort by timestamp
+          .limit(1)
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        // Extract the title of the most liked review
+        Map<String, dynamic> reviewData =
+        querySnapshot.docs.first.data() as Map<String, dynamic>;
+        String title = reviewData['title'] ?? 'No Title';
+        String gameId = reviewData['gameId'] ?? '';
+
+        final Map<String, dynamic>? gameInfo = await apiService.fetchGameInfo(int.parse(gameId));
+        final List<dynamic>? screenshots = gameInfo?['screenshots'];
+
+        String? screenshotUrl;
+        if (screenshots != null && screenshots.isNotEmpty) {
+          screenshotUrl =
+          'https://images.igdb.com/igdb/image/upload/t_720p/${screenshots.first['image_id']}.jpg';
+        }
+
+        setState(() {
+          mostLikedReviewTitle = title;
+          mostLikedReviewScreenshot = screenshotUrl;
+        });
+      } else {
+        setState(() {
+          mostLikedReviewTitle = 'No reviews found';
+          mostLikedReviewScreenshot = null;
+        });
+      }
+    } catch (e) {
+      print('Error fetching most liked review: $e');
+      setState(() {
+        mostLikedReviewTitle = 'Error fetching review';
+        mostLikedReviewScreenshot = null;
+      });
+    }
+  }
 
   Future<void> _refreshPage() async {
     setState(() => isLoading = true);
@@ -97,6 +147,8 @@ class _GameListScreenState extends State<GameListScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final themeNotifier = Provider.of<ThemeNotifier>(context);
+    final isDarkMode = themeNotifier.isDarkMode;
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
@@ -116,8 +168,11 @@ class _GameListScreenState extends State<GameListScreen> {
       ),
       drawer: Drawer(
         child: SideBar(
-          onThemeChanged: (isDarkMode) {},
-          isDarkMode: false,
+          onThemeChanged: (isDarkMode) {
+            // Handle theme change here
+            themeNotifier.toggleTheme(isDarkMode);
+          },
+          isDarkMode: themeNotifier.isDarkMode,
         ),
       ),
       body: RefreshIndicator(
@@ -129,9 +184,9 @@ class _GameListScreenState extends State<GameListScreen> {
               Padding(
                 padding: const EdgeInsets.all(10.0),
                 child: TextField(
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     filled: true,
-                    fillColor: Colors.white,
+                    fillColor: Theme.of(context).cardColor,
                     labelText: 'Search for a game...',
                     border: OutlineInputBorder(),
                     prefixIcon: Icon(Icons.search),
@@ -160,7 +215,7 @@ class _GameListScreenState extends State<GameListScreen> {
                     } catch (error) {
                       print('Error searching for game: $error');
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Error searching for game.')),
+                        const SnackBar(content: Text('Error searching for game.')),
                       );
                     }
                   },
@@ -179,7 +234,7 @@ class _GameListScreenState extends State<GameListScreen> {
                   : SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 child: Row(
-                  children: games.take(5).map((game) {
+                  children: games.take(10).map((game) {
                     return GestureDetector(
                       onTap: () {
                         Navigator.push(
@@ -195,7 +250,7 @@ class _GameListScreenState extends State<GameListScreen> {
                           borderRadius: BorderRadius.circular(10.0),
                           child: Container(
                             width: 150,
-                            height: 280, // 350
+                            height: 220, // 350
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(10.0),
                               color: Colors.white, // Changed background color to white
@@ -225,15 +280,15 @@ class _GameListScreenState extends State<GameListScreen> {
                                   child: Container(
                                     width: double.infinity,
                                     padding: const EdgeInsets.all(8.0),
-                                    color: Colors.white, // Ensure white background
+                                    color: Theme.of(context).cardColor, // Ensure white background
                                     alignment: Alignment.center,
                                     child: Column(
                                       mainAxisAlignment: MainAxisAlignment.center,
                                       children: [
                                         Text(
                                           game.name,
-                                          style: const TextStyle(
-                                            color: Colors.black, // Game name in black
+                                          style: TextStyle(
+                                            color: isDarkMode ? Colors.white : Colors.black, // Game name in black
                                             fontWeight: FontWeight.bold,
                                           ),
                                           maxLines: 1,
@@ -280,6 +335,7 @@ class _GameListScreenState extends State<GameListScreen> {
                     thread['likes'] ?? 0,
                     thread['comments'] ?? 0, // Use the comments count directly as an integer
                     thread['imageUrl'] ?? '',
+                    thread['userId'] ?? 'unknownUser', // Pass userId to buildThreadContainer
                   );
                 }).toList()
               else
@@ -298,7 +354,6 @@ class _GameListScreenState extends State<GameListScreen> {
         "${timestamp.hour.toString().padLeft(2, '0')}:"
         "${timestamp.minute.toString().padLeft(2, '0')}";
   }
-
   Widget buildThreadContainer(
       String avatarUrl,
       String userName,
@@ -309,8 +364,12 @@ class _GameListScreenState extends State<GameListScreen> {
       int likes,
       int commentsCount,
       String? threadImageUrl, // New parameter for thread image
+      String userId, // Add userId parameter
       ) {
+      
     final ApiService apiService = ApiService();
+    final themeNotifier = Provider.of<ThemeNotifier>(context);
+    final isDarkMode = themeNotifier.isDarkMode;
 
     return Padding(
       padding: const EdgeInsets.all(10.0),
@@ -346,9 +405,9 @@ class _GameListScreenState extends State<GameListScreen> {
             child: Container(
               padding: const EdgeInsets.all(15.0),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: Theme.of(context).cardColor,
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.white),
+                // border: Border.all(color: Colors.white),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -357,16 +416,22 @@ class _GameListScreenState extends State<GameListScreen> {
                   const SizedBox(height: 5),
                   Row(
                     children: [
-                      CircleAvatar(
+                      GestureDetector(
+                          onTap: () {
+                            // Pass the userId when navigating to the profile page
+                            Navigator.pushNamed(context, '/View_profile', arguments: userId);
+                          },
+                      child: CircleAvatar(
                         radius: 20,
                         backgroundImage: avatarUrl.isNotEmpty ? NetworkImage(avatarUrl) : null,
                         child: avatarUrl.isEmpty ? const Icon(Icons.person, size: 25) : null,
+                      )
                       ),
                       const SizedBox(width: 10),
                       Text(userName, style: const TextStyle(fontWeight: FontWeight.bold)),
                       const Spacer(),
                       Text(
-                        "${timestamp.day}-${timestamp.month}-${timestamp.year}",
+                        "${timestamp.year}-${timestamp.month}-${timestamp.day}",
                         style: const TextStyle(fontSize: 12, color: Colors.grey),
                       ),
                     ],
@@ -393,9 +458,9 @@ class _GameListScreenState extends State<GameListScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
-                      Icon(Icons.favorite, color: Colors.red, size: 18),
+                      const Icon(Icons.favorite, color: Colors.red, size: 18),
                       const SizedBox(width: 5),
-                      Text('$likes', style: const TextStyle(color: Colors.black)),
+                      Text('$likes', style: TextStyle(color: isDarkMode ? Colors.white : Colors.black)),
                     ],
                   ),
                 ],
@@ -420,7 +485,7 @@ class ThreadDetailScreen extends StatelessWidget {
   final String gameId;
 
   const ThreadDetailScreen({
-    Key? key,
+    super.key,
     required this.threadId,
     required this.content,
     required this.userName,
@@ -428,18 +493,18 @@ class ThreadDetailScreen extends StatelessWidget {
     required this.timestamp,
     required this.likes,
     required this.gameId,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
-    final FirestoreService _firestoreService = FirestoreService();
+    final FirestoreService firestoreService = FirestoreService();
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Thread Details'),
       ),
       body: FutureBuilder<Game?>(
-        future: _firestoreService.getGameById(gameId),
+        future: firestoreService.getGameById(gameId),
         builder: (context, snapshot) {
           String gameName = 'Loading...';
           if (snapshot.connectionState == ConnectionState.done && snapshot.hasData) {
@@ -472,10 +537,16 @@ class ThreadDetailScreen extends StatelessWidget {
                 const SizedBox(height: 10),
                 Row(
                   children: [
-                    CircleAvatar(
+                    GestureDetector(
+                          onTap: () {
+                            // Pass the userId when navigating to the profile page
+                           Navigator.pushNamed(context, '/View_profile', arguments: threadId);
+                          },
+                    child: CircleAvatar(
                       radius: 20,
                       backgroundImage: avatarUrl.isNotEmpty ? NetworkImage(avatarUrl) : null,
                       child: avatarUrl.isEmpty ? const Icon(Icons.person, size: 25) : null,
+                    ),
                     ),
                     const SizedBox(width: 10),
                     Text(userName, style: const TextStyle(fontWeight: FontWeight.bold)),

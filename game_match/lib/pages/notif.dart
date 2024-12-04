@@ -1,3 +1,5 @@
+import 'dart:async';
+import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -14,20 +16,10 @@ class NotificationsPage extends StatefulWidget {
 }
 
 class _NotificationsPageState extends State<NotificationsPage> {
-  final List<String> wishlist = [
-    "Injustice 2",
-    "Neon Arena",
-    "Call of Duty: Black Ops 6",
-    "Elden Ring Shadow of the Erdtree",
-    "Universe Sandbox",
-    "F.E.A.R. 2",
-    "Figment",
-    "Metro 2033 Redux",
-    "BioShock Infinite"
-  ];
-
+  List<String> wishlist = [];
   List<Widget> notifications = [];
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+  Timer? _randomNotificationTimer;
 
   @override
   void initState() {
@@ -54,12 +46,12 @@ class _NotificationsPageState extends State<NotificationsPage> {
     );
 
     const NotificationDetails platformChannelSpecifics = NotificationDetails(android: androidPlatformChannelSpecifics);
-    // await flutterLocalNotificationsPlugin.show(
-    //   0,
-    //   title,
-    //   body,
-    //   platformChannelSpecifics,
-    // );
+    await flutterLocalNotificationsPlugin.show(
+      Random().nextInt(100000), // Unique ID for each notification
+      title,
+      body,
+      platformChannelSpecifics,
+    );
   }
 
   @override
@@ -75,6 +67,12 @@ class _NotificationsPageState extends State<NotificationsPage> {
           ),
         ),
         centerTitle: true,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () {
+            Navigator.pop(context); // Navigate back to the previous screen
+          },
+        ),
       ),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.start,
@@ -92,8 +90,11 @@ class _NotificationsPageState extends State<NotificationsPage> {
           Expanded(
             child: notifications.isEmpty
                 ? const Center(child: Text('No notifications available.'))
-                : ListView(
-              children: notifications,
+                : ListView.builder(
+              itemCount: notifications.length,
+              itemBuilder: (context, index) {
+                return notifications[index];
+              },
             ),
           ),
           Padding(
@@ -144,53 +145,82 @@ class _NotificationsPageState extends State<NotificationsPage> {
   Future<void> fetchNotifications() async {
     List<Widget> loadedNotifications = [];
 
-    // Subscription expiration fetcher
+    // Subscription expiration fetcher should be the first notification
     final subscriptionNotification = await fetchSubscriptionExpirationDate();
     if (subscriptionNotification != null) {
       loadedNotifications.add(subscriptionNotification);
     }
 
-    // Sale notifications for wishlist games
-    for (String game in wishlist) {
-      final gameInfo = await fetchGameInfo(game);
+    // Fetch wishlist and sale notifications
+    await fetchWishlist();
 
-      if (gameInfo['salePrice'] != null && gameInfo['normalPrice'] != null) {
-        double salePrice = double.parse(gameInfo['salePrice']);
-        double normalPrice = double.parse(gameInfo['normalPrice']);
-        double discount = ((normalPrice - salePrice) / normalPrice) * 100;
+    if (wishlist.isNotEmpty) {
+      // Sale notifications for wishlist games
+      for (String game in wishlist) {
+        final gameInfo = await fetchGameInfo(game);
 
-        if (discount > 0) {
-          String discountStr = discount.toStringAsFixed(0);
+        if (gameInfo['salePrice'] != null && gameInfo['normalPrice'] != null) {
+          double salePrice = double.parse(gameInfo['salePrice']);
+          double normalPrice = double.parse(gameInfo['normalPrice']);
+          double discount = ((normalPrice - salePrice) / normalPrice) * 100;
 
-          loadedNotifications.add(NotificationCard(
-            gameTitle: gameInfo['title'],
-            discount: discountStr,
-            thumbnailUrl: gameInfo['thumb'],
-            dealUrl: "https://www.cheapshark.com/redirect?dealID=${gameInfo['dealID']}",
-          ));
+          if (discount > 0) {
+            String discountStr = discount.toStringAsFixed(0);
 
-          _showNotification(gameInfo['title'], '$discountStr% off on your wishlist item!');
+            loadedNotifications.add(NotificationCard(
+              gameTitle: gameInfo['title'],
+              discount: discountStr,
+              thumbnailUrl: gameInfo['thumb'],
+              dealUrl: "https://www.cheapshark.com/redirect?dealID=${gameInfo['dealID']}",
+            ));
+          }
         }
       }
+    } else {
+      loadedNotifications.add(const Center(
+        child: Text(
+          'Your wishlist is empty.',
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+        ),
+      ));
     }
 
     setState(() {
       notifications = loadedNotifications;
     });
-  }
 
+    // Start random notifications
+    _startRandomNotifications(loadedNotifications);
+  }
+  
+  Future<void> fetchWishlist() async {
+    final user = FirebaseAuth.instance.currentUser;
+
+    if (user != null) {
+      final wishlistSnapshot =
+      await FirebaseFirestore.instance.collection('users').doc(user.uid).collection('wishlist').get();
+
+      setState(() {
+        wishlist = wishlistSnapshot.docs.map((doc) => doc['name'] as String).toList();
+      });
+    }
+  }
+  
   Future<Widget?> fetchSubscriptionExpirationDate() async {
     final user = FirebaseAuth.instance.currentUser;
     if (user != null) {
       final userDoc = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
 
       if (userDoc.exists) {
-        final subscriptionExpirationDate = userDoc.get('subscriptionExpirationDate') as String?;
+        final subscriptionStatus = userDoc.data()?['subscription'] as String?; // Check subscription status
+        final subscriptionExpirationDate = userDoc.data()?['subscriptionExpirationDate'] as String?;
 
-        if (subscriptionExpirationDate != null) {
-          return WarningNotificationCard(
-            message: "Warning: Your subscription expires on $subscriptionExpirationDate",
-          );
+        if (
+          subscriptionStatus == 'paid' &&
+          subscriptionExpirationDate != null) {
+        return WarningNotificationCard(
+          message: "Warning: Your subscription expires on $subscriptionExpirationDate",
+        );
         }
       }
     }
@@ -213,6 +243,36 @@ class _NotificationsPageState extends State<NotificationsPage> {
       throw Exception("Failed to fetch deals for $gameTitle: ${response.statusCode}");
     }
   }
+  // Random Notification Logic
+  void _startRandomNotifications(List<Widget> notifications) {
+    // Cancel any existing timer before starting a new one
+    _randomNotificationTimer?.cancel();
+
+    _randomNotificationTimer = Timer.periodic(const Duration(minutes: 5), (timer) {
+      if (notifications.isNotEmpty) {
+        // Pick a random notification
+        final randomIndex = Random().nextInt(notifications.length);
+        final selectedNotification = notifications[randomIndex];
+
+        // If it's a sale notification, trigger a push notification
+        if (selectedNotification is NotificationCard) {
+          _showNotification(
+            selectedNotification.gameTitle,
+            '${selectedNotification.discount}% off on your wishlist item!',
+          );
+        }
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    // Make sure to cancel the random notification timer when disposing
+    _randomNotificationTimer?.cancel();
+    super.dispose();
+  }
+
+
 }
 
 class NotificationCard extends StatelessWidget {

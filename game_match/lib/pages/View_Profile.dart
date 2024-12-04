@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:game_match/theme_notifier.dart';
+import 'package:provider/provider.dart';
 
 class ViewProfile extends StatefulWidget {
   const ViewProfile({super.key});
@@ -88,7 +90,7 @@ class _ProfileState extends State<ViewProfile> {
                         height: 140,
                         decoration: const BoxDecoration(
                           gradient: LinearGradient(
-                            colors: [Color(0xFFF1F3F4), Color(0xFFF1F3F4)],
+                            colors: [],
                             begin: Alignment.topLeft,
                             end: Alignment.bottomRight,
                           ),
@@ -152,11 +154,11 @@ class _ProfileState extends State<ViewProfile> {
     return Container(
       padding: const EdgeInsets.all(8.0),
       decoration: BoxDecoration(
-        color:  Colors.white,
+        color:  Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(12),
       ),
       child: TextField(
-        style: const TextStyle(color: Colors.black),
+        //style: const TextStyle(color: Colors.black),
         controller: TextEditingController(text: value),
         maxLines: maxLines,
         enabled: enabled,

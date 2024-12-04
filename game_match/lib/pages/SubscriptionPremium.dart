@@ -124,7 +124,7 @@ class _PremiumSubscriptionPageState extends State<PremiumSubscriptionPage> {
             ),
             const SizedBox(height: 10),
             ListTile(
-              leading: const Icon(Icons.swap_horiz),
+              leading: const Icon(Icons.swap_horiz, color: Color(0xFF41B1F1)),
               title: const Text('Update billing information'),
               trailing: ElevatedButton(
                 onPressed: () {
@@ -154,7 +154,7 @@ class _PremiumSubscriptionPageState extends State<PremiumSubscriptionPage> {
               ),
             ),
             ListTile(
-              leading: const Icon(Icons.cancel),
+              leading: const Icon(Icons.cancel, color: Color(0xFF41B1F1)),
               title: const Text('Cancel Subscription'),
               trailing: ElevatedButton(
                 onPressed: () {
@@ -194,13 +194,13 @@ class _PremiumSubscriptionPageState extends State<PremiumSubscriptionPage> {
               onPressed: () {
                 Navigator.pushNamed(context, "/Terms");
               },
-              child: const Text('Terms and Conditions'),
+              child: const Text('Terms and Conditions',style: TextStyle(color: Color(0xFF41B1F1)),),
             ),
             TextButton(
               onPressed: () {
                 Navigator.pushNamed(context, "/Privacy");
               },
-              child: const Text('Privacy Policy'),
+              child: const Text('Privacy Policy',style: TextStyle(color: Color(0xFF41B1F1)),),
             ),
           ],
         ),
@@ -210,42 +210,44 @@ class _PremiumSubscriptionPageState extends State<PremiumSubscriptionPage> {
 
   // Method to show a confirmation dialog for cancelling subscription
   void _showCancelConfirmationDialog() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Cancel Subscription'),
-          content: Text(
-            'Are you sure you want to cancel your subscription?\n\n$remainingDays',
+  bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: const Text('Cancel Subscription'),
+        content: Text(
+          'Are you sure you want to cancel your subscription?\n\n$remainingDays',
+        ),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop(); // Close the dialog
+            },
+            child: Text(
+              'No',
+              style: TextStyle(color: isDarkMode ? Colors.white : Colors.black),
+            ),
           ),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(); // Close the dialog
-              },
-              child: const Text(
-                'No',
-                style: TextStyle(color: Colors.black), // Set "No" text color to black
-              ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop(); // Close the dialog
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Subscription cancelled successfully.'),
+                  backgroundColor: Color(0xFF41B1F1), // Set snackbar color to match app color
+                ),
+              );
+            },
+            child: Text(
+              'Yes',
+              style: TextStyle(color: isDarkMode ? Colors.white : Colors.black),
             ),
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(); // Close the dialog
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Subscription cancelled successfully.'),
-                    backgroundColor: Color(0xFF41B1F1), // Set snackbar color to match app color
-                  ),
-                );
-              },
-              child: const Text(
-                'Yes',
-                style: TextStyle(color: Colors.black), // Set "Yes" text color to black
-              ),
-            ),
-          ],
-        );
-      },
-    );
-  }
+          ),
+        ],
+      );
+    },
+  );
+}
 }

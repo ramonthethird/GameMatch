@@ -63,7 +63,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
                 Padding(
-                padding: const EdgeInsets.only(top: 0.0),
+                padding: const EdgeInsets.only(top: 40.0),
                 child: ColorFiltered(
                   colorFilter: Theme.of(context).brightness == Brightness.dark
                       ? const ColorFilter.mode(
@@ -132,7 +132,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     Navigator.pushNamed(context, '/Login');
                   }, // Button to trigger form submission
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF41B1F1),
+                    backgroundColor: Color(0xFF41B1F1),
                     foregroundColor: Colors.white,
                   ),
                   child: const Text('Sign Up'),
@@ -145,51 +145,72 @@ class _SignUpScreenState extends State<SignUpScreen> {
     );
   }
 
-  // Function to handle form submission
-  Future<void> _trySubmit() async {
-    if (_formKey.currentState!.validate()) { // Check if the form is valid
-      _formKey.currentState!.save(); // Save the form
-      try {
-        // Attempt to create a user with Firebase Auth
-        UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
-          email: emailController.text,
-          password: passwordController.text,
-        );
+ Future<void> _trySubmit() async {
+  if (_formKey.currentState!.validate()) { // Check if the form is valid
+    _formKey.currentState!.save(); // Save the form
+    try {
+      // Check if the username is unique
+      QuerySnapshot usernameQuery = await FirebaseFirestore.instance
+          .collection('users')
+          .where('username', isEqualTo: usernameController.text)
+          .get();
 
-        // Store additional user data in Firestore
-        await FirebaseFirestore.instance.collection('users').doc(userCredential.user!.uid).set({
-          'username': usernameController.text,
-          'email': emailController.text,
-          'creationDate': FieldValue.serverTimestamp(), // Store the timestamp of account creation
-        });
-
-        // Show a success message
+      if (usernameQuery.docs.isNotEmpty) {
+        // Show an error if the username already exists
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Successfully signed up! Welcome, ${usernameController.text}!'),
-            backgroundColor: Colors.green,
-          ),
-        );
-
-      } on FirebaseAuthException catch (e) {
-        // Handle errors from Firebase
-        var errorMessage = 'An error occurred, please check your credentials!';
-        if (e.code == 'weak-password') {
-          errorMessage = 'The password provided is too weak. Must have at least 8 characters';
-        } else if (e.code == 'email-already-in-use') {
-          errorMessage = 'The account already exists for that email.';
-        }
-
-        // Show an error message
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(errorMessage),
+          const SnackBar(
+            content: Text('The username is already in use. Please choose another one.'),
             backgroundColor: Colors.red,
           ),
         );
+        return; // Stop further execution
       }
+
+      // Attempt to create a user with Firebase Auth
+      UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        email: emailController.text,
+        password: passwordController.text,
+      );
+
+      // Store additional user data in Firestore
+      await FirebaseFirestore.instance.collection('users').doc(userCredential.user!.uid).set({
+        'username': usernameController.text,
+        'email': emailController.text,
+        'creationDate': FieldValue.serverTimestamp(), // Store the timestamp of account creation
+        'subscription': 'free', // Set default subscription status to "free"
+      });
+
+      // Show a success message
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Successfully signed up! Welcome, ${usernameController.text}!'),
+          backgroundColor: Colors.green,
+        ),
+      );
+
+      // Navigate to the login screen or another page
+      Navigator.pushNamed(context, '/Login');
+
+    } on FirebaseAuthException catch (e) {
+      // Handle errors from Firebase
+      var errorMessage = 'An error occurred, please check your credentials!';
+      if (e.code == 'weak-password') {
+        errorMessage = 'The password provided is too weak. Must have at least 8 characters.';
+      } else if (e.code == 'email-already-in-use') {
+        errorMessage = 'The account already exists for that email.';
+      }
+
+      // Show an error message
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(errorMessage),
+          backgroundColor: Colors.red,
+        ),
+      );
     }
   }
+}
+
 
   @override
   void dispose() {

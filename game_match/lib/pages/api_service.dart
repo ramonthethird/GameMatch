@@ -558,6 +558,61 @@ class ApiService {
     }
   }
 
+  Future<Map<String, dynamic>?> fetchGameDetailsThree(String gameId) async {
+  final String? accessToken = await retrieveAccessToken();
+
+  if (accessToken == null) {
+    print('Access token is null. Authenticating...');
+    await authenticate();
+    return null;
+  }
+
+  final Uri url = Uri.parse('$baseUrl/games');
+  final String query = '''
+  fields name, cover.url; 
+  where id = $gameId;
+  limit 1;
+  ''';
+
+  try {
+    final response = await http.post(
+      url,
+      headers: {
+        'Client-ID': clientId,
+        'Authorization': 'Bearer $accessToken',
+        'Content-Type': 'application/json',
+      },
+      body: query,
+    );
+
+    if (response.statusCode == 200) {
+      final List<dynamic> gameDataJson = json.decode(response.body);
+      if (gameDataJson.isNotEmpty) {
+        final gameData = gameDataJson[0];
+        return {
+          'name': gameData['name'] ?? 'Unknown Game',
+          'coverUrl': gameData['cover'] != null
+              ? 'https:${gameData['cover']['url']}'
+              : null,
+        };
+      } else {
+        print('Game not found: $gameId');
+        return {
+          'name': 'Unknown Game',
+          'coverUrl': null,
+        };
+      }
+    } else {
+      print('Failed to fetch game details: ${response.statusCode}');
+      return null;
+    }
+  } catch (e) {
+    print('Error fetching game details: $e');
+    return null;
+  }
+}
+
+
   Future<int?> fetchThemeId(String themeName) async {
     final String? accessToken = await retrieveAccessToken();
     if (accessToken == null) return null;
@@ -611,6 +666,92 @@ class ApiService {
     }
   }
 
+  Future<List<Game>?> fetchTopVisitedGames() async {
+    final String? accessToken = await retrieveAccessToken();
+
+    if (accessToken == null) {
+      print('Access token is null. Authenticating...');
+      await authenticate();
+      return [];
+    }
+    final Uri url = Uri.parse('$baseUrl/popularity_primitives');
+
+    const String body = '''
+    fields game_id, value, popularity_type;
+    where popularity_type = 1;
+    sort value desc;
+    limit 10;
+  ''';
+
+    try {
+      final response = await http.post(
+        url,
+        headers: {
+          'Client-ID': clientId,
+          'Authorization': 'Bearer $accessToken',
+          'Content-Type': 'application/json',
+        },
+        body: body,
+      );
+
+      if (response.statusCode == 200) {
+        final List<dynamic> popularityData = json.decode(response.body);
+
+        // Extract game IDs
+        final List<int> gameIds = popularityData
+            .map((entry) => entry['game_id'] as int)
+            .toList();
+
+        // Fetch game details
+        return await fetchGameShortDetails(gameIds);
+      } else if (response.statusCode == 401) {
+        await authenticate();
+        return fetchTopVisitedGames();
+      } else {
+        print('Failed to fetch popularity data: ${response.statusCode}');
+        return [];
+      }
+    } catch (error) {
+      print('Error fetching top visited games: $error');
+      return [];
+    }
+  }
+
+  Future<List<Game>> fetchGameShortDetails(List<int> gameIds) async {
+    final String accessToken = await getAccessToken();
+    final Uri url = Uri.parse('$baseUrl/games');
+
+    final String body = '''
+    fields id, name, summary, genres.name, cover.url, platforms.name, release_dates.human, websites.url, screenshots.image_id, involved_companies.company.name;
+    where id = (${gameIds.join(",")});
+  ''';
+
+    try {
+      final response = await http.post(
+        url,
+        headers: {
+          'Client-ID': clientId,
+          'Authorization': 'Bearer $accessToken',
+          'Content-Type': 'application/json',
+        },
+        body: body,
+      );
+
+      if (response.statusCode == 200) {
+        final List<dynamic> gameData = json.decode(response.body);
+        return gameData
+            .map((json) => Game.fromJson(json as Map<String, dynamic>))
+            .toList();
+      } else {
+        print('Failed to fetch game details: ${response.statusCode}');
+        return [];
+      }
+    } catch (error) {
+      print('Error fetching game details: $error');
+      return [];
+    }
+  }
+
   Future<Map<String, dynamic>?> fetchGameInfo(int gameId) async {
     final String? accessToken = await retrieveAccessToken();
     if (accessToken == null) {
@@ -646,6 +787,168 @@ class ApiService {
       }
     } catch (error) {
       print('Error fetching game details: $error');
+    }
+    return null;
+  }
+  Future<String?> fetchSteamWebsite() async {
+    final String accessToken = await getAccessToken();
+    final Uri url = Uri.parse('$baseUrl/platform_websites');
+
+    final String body = '''
+  fields platform.name, url;
+  where platform.name = "Steam";
+  limit 1;
+  ''';
+
+    try {
+      final response = await http.post(
+        url,
+        headers: {
+          'Client-ID': clientId,
+          'Authorization': 'Bearer $accessToken',
+          'Content-Type': 'application/json',
+        },
+        body: body,
+      );
+
+      if (response.statusCode == 200) {
+        final List<dynamic> platformData = json.decode(response.body);
+        if (platformData.isNotEmpty) {
+          return platformData.first['url'] as String?;
+        } else {
+          print('No Steam platform website found.');
+          return null;
+        }
+      } else {
+        print('Failed to fetch Steam website: ${response.statusCode}');
+        return null;
+      }
+    } catch (error) {
+      print('Error fetching Steam website: $error');
+      return null;
+    }
+  }
+
+  Future<String?> fetchSteamPlatformWebsite() async {
+    final String accessToken = await getAccessToken();
+    final Uri url = Uri.parse('$baseUrl/platform_websites');
+
+    final String body = '''
+    fields platform.name, category, url;
+    where platform.name = "steam" & category = 13;
+    limit 1;
+  ''';
+
+    try {
+      final response = await http.post(
+        url,
+        headers: {
+          'Client-ID': clientId,
+          'Authorization': 'Bearer $accessToken',
+          'Content-Type': 'application/json',
+        },
+        body: body,
+      );
+
+      if (response.statusCode == 200) {
+        final List<dynamic> websiteData = json.decode(response.body);
+        if (websiteData.isNotEmpty) {
+          return websiteData.first['url'] as String?;
+        } else {
+          print('No Steam platform website found for category 13.');
+          return null;
+        }
+      } else {
+        print('Failed to fetch platform website: ${response.statusCode}');
+        return null;
+      }
+    } catch (error) {
+      print('Error fetching platform website: $error');
+      return null;
+    }
+  }
+
+
+  Future<String?> fetchSteamWebsiteDetails() async {
+    final String accessToken = await getAccessToken();
+    final Uri url = Uri.parse('$baseUrl/websites');
+
+    final String body = '''
+    fields url, category;
+    where category = 13;
+    limit 1;
+  ''';
+
+    try {
+      final response = await http.post(
+        url,
+        headers: {
+          'Client-ID': clientId,
+          'Authorization': 'Bearer $accessToken',
+          'Content-Type': 'application/json',
+        },
+        body: body,
+      );
+
+      if (response.statusCode == 200) {
+        final List<dynamic> websiteData = json.decode(response.body);
+        if (websiteData.isNotEmpty) {
+          final String? steamWebsiteUrl = websiteData.first['url'] as String?;
+          print('Steam Website URL: $steamWebsiteUrl');
+          return steamWebsiteUrl;
+        } else {
+          print('No Steam website found for category 13.');
+          return null;
+        }
+      } else {
+        print('Failed to fetch website details: ${response.statusCode}');
+        return null;
+      }
+    } catch (error) {
+      print('Error fetching website details: $error');
+      return null;
+    }
+  }
+
+  Future<String?> fetchGameWebsite(String gameName) async {
+    final String accessToken = await getAccessToken();
+    final Uri url = Uri.parse('$baseUrl/games');
+
+    final String body = '''
+  search "$gameName";
+  fields id, websites.url, websites.category;
+  where websites.category = 13;
+  limit 1;
+  ''';
+
+    try {
+      final response = await http.post(
+        url,
+        headers: {
+          'Client-ID': clientId,
+          'Authorization': 'Bearer $accessToken',
+          'Content-Type': 'application/json',
+        },
+        body: body,
+      );
+
+      if (response.statusCode == 200) {
+        final List<dynamic> gameData = json.decode(response.body);
+        if (gameData.isNotEmpty) {
+          final websites = gameData.first['websites'] as List<dynamic>?;
+          if (websites != null && websites.isNotEmpty) {
+            final steamWebsite = websites.firstWhere(
+                  (website) => website['category'] == 13,
+              orElse: () => null,
+            );
+            return steamWebsite?['url'] as String?;
+          }
+        }
+      } else {
+        print('Failed to fetch game website: ${response.statusCode}');
+      }
+    } catch (error) {
+      print('Error fetching game website: $error');
     }
     return null;
   }

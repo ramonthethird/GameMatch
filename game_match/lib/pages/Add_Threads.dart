@@ -20,6 +20,7 @@ class _AddThreadsPageState extends State<AddThreadsPage> {
   final TextEditingController _descriptionController = TextEditingController();
   final ImagePicker _picker = ImagePicker();
   File? _selectedPhoto;
+  bool _isPosting = false;
 
   @override
   Widget build(BuildContext context) {
@@ -186,72 +187,98 @@ class _AddThreadsPageState extends State<AddThreadsPage> {
   return SizedBox(
     width: double.infinity,
     child: ElevatedButton(
-      onPressed: _postThread,
+      onPressed: _isPosting ? null : _postThread, // Disable button if posting
       style: ElevatedButton.styleFrom(
-        backgroundColor: const Color(0xFF41B1F1), // Match color
-        padding: const EdgeInsets.symmetric(vertical: 16), // Same padding
+        backgroundColor: _isPosting
+            ? Colors.grey // Disabled button color
+            : const Color(0xFF41B1F1), // Enabled button color
+        padding: const EdgeInsets.symmetric(vertical: 16),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10), // Rounded corners
+          borderRadius: BorderRadius.circular(10),
         ),
       ),
-      child: const Text(
-        'Post Thread',
-        style: TextStyle(
-          color: Colors.white,
-          fontSize: 16,
-        ),
-      ),
+      child: _isPosting
+          ? const CircularProgressIndicator(
+              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+            )
+          : const Text(
+              'Post Thread',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 16,
+              ),
+            ),
     ),
   );
 }
 
 
+
   Future<void> _postThread() async {
-    if (_descriptionController.text.isEmpty) {
+  if (_isPosting) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Please wait before posting again.')),
+    );
+    return;
+  }
+
+  if (_descriptionController.text.isEmpty) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Please fill out the description.')),
+    );
+    return;
+  }
+
+  setState(() {
+    _isPosting = true;
+  });
+
+  try {
+    final User? user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Please fill out the description.')),
+        SnackBar(content: Text('You need to be logged in to post a thread.')),
       );
+      setState(() {
+        _isPosting = false;
+      });
       return;
     }
 
-    try {
-      final User? user = FirebaseAuth.instance.currentUser;
-      if (user == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('You need to be logged in to post a thread.')),
-        );
-        return;
-      }
-
-      String? imageUrl;
-      if (_selectedPhoto != null) {
-        imageUrl = await _uploadImage();
-      }
-
-      await FirebaseFirestore.instance.collection('threads').add({
-        'gameId': widget.gameId,
-        'userId': user.uid,
-        'userName': user.displayName ?? 'Anonymous',
-        'content': _descriptionController.text,
-        'imageUrl': imageUrl,
-        'timestamp': FieldValue.serverTimestamp(),
-        'likes': 0,
-        'likedBy': [],
-        'comments': 0,
-        'shares': 0,
-      });
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Thread posted successfully.')),
-      );
-      Navigator.of(context).pop();
-    } catch (e) {
-      print('Error posting thread: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error posting thread: $e')),
-      );
+    String? imageUrl;
+    if (_selectedPhoto != null) {
+      imageUrl = await _uploadImage();
     }
+
+    await FirebaseFirestore.instance.collection('threads').add({
+      'gameId': widget.gameId,
+      'userId': user.uid,
+      'userName': user.displayName ?? 'Anonymous',
+      'content': _descriptionController.text,
+      'imageUrl': imageUrl,
+      'timestamp': FieldValue.serverTimestamp(),
+      'likes': 0,
+      'likedBy': [],
+      'comments': 0,
+      'shares': 0,
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Thread posted successfully.')),
+    );
+    Navigator.of(context).pop();
+  } catch (e) {
+    print('Error posting thread: $e');
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Error posting thread: $e')),
+    );
+  } finally {
+    setState(() {
+      _isPosting = false;
+    });
   }
+}
+
 
   Future<String> _uploadImage() async {
     final storageRef = FirebaseStorage.instance

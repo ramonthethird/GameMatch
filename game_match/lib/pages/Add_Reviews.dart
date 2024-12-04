@@ -21,6 +21,8 @@ class _AddReviewsPageState extends State<AddReviewsPage> {
   final TextEditingController bodyController = TextEditingController();
   double rating = 0.0; // Variable to store the rating value
 
+  bool isCooldown = false; // Track cooldown state
+
   // Function to add a new review to Firestore
   Future<void> _addReview(String title, String body, double rating) async {
     User? user = auth.currentUser; // Get the current authenticated user
@@ -65,6 +67,16 @@ class _AddReviewsPageState extends State<AddReviewsPage> {
       print('User not authenticated');
     }
   }
+
+  Future<void> _startCooldown() async {
+  setState(() {
+    isCooldown = true; // Enable cooldown
+  });
+  await Future.delayed(Duration(seconds: 2)); // Set cooldown duration
+  setState(() {
+    isCooldown = false; // Disable cooldown
+  });
+}
 
   // Function to update the rating based on user's interaction with the stars
   void _updateRating(double localX) {
@@ -178,24 +190,44 @@ class _AddReviewsPageState extends State<AddReviewsPage> {
 
             // Post Review Button
             SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () {
-                  _addReview(titleController.text, bodyController.text, rating); // Call the function to submit the review
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Color(0xFF41B1F1),
-                  padding: EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-                child: Text(
-                  'Post Review',
-                  style: TextStyle(color: Colors.white, fontSize: 14),
-                ),
-              ),
+  width: double.infinity,
+  child: ElevatedButton(
+    onPressed: isCooldown
+        ? null // Disable button during cooldown
+        : () async {
+            setState(() {
+              isCooldown = true; // Enable cooldown
+            });
+            await _addReview(titleController.text, bodyController.text, rating);
+            setState(() {
+              isCooldown = false; // Disable cooldown
+            });
+            Navigator.pop(context); // Redirect back to the View Reviews page
+          },
+    style: ElevatedButton.styleFrom(
+      backgroundColor: isCooldown
+          ? Colors.grey // Change button color during cooldown
+          : Color(0xFF41B1F1),
+      padding: EdgeInsets.symmetric(vertical: 16),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10),
+      ),
+    ),
+    child: isCooldown
+        ? SizedBox(
+            height: 24,
+            width: 24,
+            child: CircularProgressIndicator(
+              color: Colors.white,
+              strokeWidth: 2.0,
             ),
+          )
+        : Text(
+            'Post Review',
+            style: TextStyle(color: Colors.white, fontSize: 14),
+          ),
+  ),
+),
             SizedBox(height: 20),
 
             // Navigate to Submitted Reviews Button

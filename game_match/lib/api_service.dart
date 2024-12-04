@@ -36,6 +36,22 @@ class ApiService {
     }
   }
 
+  Future<void> updatePreferences(String userId) async {
+  try {
+    final response = await http.get(
+      Uri.parse('http://127.0.0.1:5000/recommend/$userId'), // Corrected URL
+    );
+
+    if (response.statusCode == 200) {
+      print("Recommendations updated successfully!");
+    } else {
+      print("Failed to update recommendations: ${response.body}");
+    }
+  } catch (e) {
+    print("Error while updating recommendations: $e");
+  }
+}
+
   Future<List<Game>> fetchGames() async {
     final String? accessToken = await retrieveAccessToken();
 

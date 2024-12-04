@@ -11,6 +11,8 @@ class Game {
   bool isFree = false;
   List<String>? screenshotUrls;
   List<String>? developers;
+  final String? steamWebsite;
+
 
   Game({
     required this.id,
@@ -24,6 +26,9 @@ class Game {
     this.price,
     this.screenshotUrls,
     this.developers,
+    //this.value,
+    //this.popularityType,
+    this.steamWebsite,
   });
 
   // Factory method to create Game instance from JSON (e.g., from API)
@@ -103,6 +108,7 @@ class Game {
       price: null,
       screenshotUrls: screenshotUrls,
       developers: developers,
+
     );
   }
 
@@ -121,6 +127,8 @@ class Game {
       'isFree': isFree,
       'screenshotUrls': screenshotUrls,
       'developers': developers,
+     // 'value': value,
+      //'popularityType': popularityType,
     };
   }
 
@@ -148,4 +156,19 @@ class Game {
       isFree = true;
     }
   }
+
+  Game copyWith({String? steamWebsite}) {
+    return Game(
+      id: id,
+      name: name,
+      platforms: platforms,
+      genres: genres,
+      summary: summary,
+      websiteUrl: websiteUrl,
+      releaseDates: releaseDates,
+      steamWebsite: steamWebsite ?? this.steamWebsite,
+    );
+  }
+
+
 }

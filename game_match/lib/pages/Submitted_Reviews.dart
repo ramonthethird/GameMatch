@@ -75,6 +75,12 @@ class _SubmittedReviewsPageState extends State<SubmittedReviewsPage> {
       querySnapshot.docs.map((doc) async {
         final threadData = doc.data() as Map<String, dynamic>;
         final threadId = doc.id;
+        final gameId = threadData['gameId'];
+
+        // Fetch game details if not already fetched
+        if (gameId != null && !gameTitles.containsKey(gameId)) {
+          await _fetchGameDetails(gameId);
+        }
 
         // Fetch the comment count from the comments sub-collection
         QuerySnapshot commentSnapshot = await firestore
@@ -86,7 +92,7 @@ class _SubmittedReviewsPageState extends State<SubmittedReviewsPage> {
         return {
           'thread': threadData,
           'id': threadId,
-          'gameId': threadData['gameId'],
+          'gameId': gameId,
           'comments': commentSnapshot.size, // Store the comment count here
         };
       }).toList(),
@@ -98,35 +104,32 @@ class _SubmittedReviewsPageState extends State<SubmittedReviewsPage> {
   }
 }
 
-
-
-
   Future<void> _fetchGameDetails(String gameId) async {
-    try {
-      List<Game> fetchedGames = await apiService.fetchGames();
-      final matchedGame = fetchedGames.firstWhere(
-        (game) => game.id == gameId,
-        orElse: () => Game(
-          id: gameId,
-          name: 'Unknown Game',
-          summary: 'No description available',
-          genres: [],
-          coverUrl: null,
-          platforms: [],
-          releaseDates: [],
-          websiteUrl: '',
-          price: null,
-        ),
-      );
+  try {
+    // Fetch game details using the provided API call
+    Map<String, dynamic>? gameData = await apiService.fetchGameDetailsThree(gameId);
 
+    if (gameData != null) {
       setState(() {
-        gameImages[gameId] = matchedGame.coverUrl ?? '';
-        gameTitles[gameId] = matchedGame.name;
+        gameImages[gameId] = gameData['coverUrl'] ?? 'assets/default_cover.png'; // Fallback for missing cover
+        gameTitles[gameId] = gameData['name'] ?? 'Unknown Game'; // Fallback for missing name
       });
-    } catch (e) {
-      print('Error fetching game details: $e');
+    } else {
+      print('Game not found: $gameId');
+      setState(() {
+        gameImages[gameId] = 'assets/default_cover.png'; // Fallback image
+        gameTitles[gameId] = 'Unknown Game'; // Fallback title
+      });
     }
+  } catch (e) {
+    print('Error fetching game details for $gameId: $e');
+    setState(() {
+      gameImages[gameId] = 'assets/default_cover.png'; // Fallback image
+      gameTitles[gameId] = 'Unknown Game'; // Fallback title
+    });
   }
+}
+
 
   String _formatTimestamp(Timestamp timestamp) {
   DateTime dateTime = timestamp.toDate();
@@ -137,34 +140,35 @@ class _SubmittedReviewsPageState extends State<SubmittedReviewsPage> {
   // Inside _SubmittedReviewsPageState class
 
 Future<void> _confirmDelete(String threadId) async {
-  bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
+  final BuildContext dialogContext = context; // Capture context safely
+  bool isDarkMode = Theme.of(dialogContext).brightness == Brightness.dark;
   Color textColor = isDarkMode ? Colors.white : Colors.black;
 
   showDialog(
-    context: context,
-    builder: (context) => AlertDialog(
+    context: dialogContext,
+    builder: (dialogContext) => AlertDialog(
       title: Text('Delete Thread'),
       content: Text('Are you sure you want to delete this thread?'),
       actions: [
         TextButton(
           onPressed: () {
-            Navigator.of(context).pop(); // Close dialog
+            Navigator.of(dialogContext).pop(); // Close the dialog
           },
           child: Text('No', style: TextStyle(color: textColor)),
         ),
         TextButton(
           onPressed: () async {
-            Navigator.of(context).pop(); // Close dialog first
+            Navigator.of(dialogContext).pop(); // Close the dialog first
             try {
               await _deleteThread(threadId); // Call delete method with await
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Thread deleted successfully.')),
-              );
+              if (mounted) {
+                _showSnackbar('Thread deleted successfully.');
+              }
             } catch (e) {
               print('Error deleting thread: $e');
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Error deleting thread.')),
-              );
+              if (mounted) {
+                _showSnackbar('Error deleting thread.');
+              }
             }
           },
           child: Text('Yes', style: TextStyle(color: textColor)),
@@ -174,23 +178,35 @@ Future<void> _confirmDelete(String threadId) async {
   );
 }
 
+
 // Method to delete a thread from Firestore
 Future<void> _deleteThread(String threadId) async {
   try {
     await firestore.collection('threads').doc(threadId).delete();
-    setState(() {
-      userReviews.removeWhere((review) => review['id'] == threadId); // Assuming userReviews contains thread data
-    });
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Thread deleted successfully.')),
-    );
+
+    if (mounted) {
+      // Update UI if the widget is still active
+      setState(() {
+        userThreads.removeWhere((thread) => thread['id'] == threadId);
+      });
+      _showSnackbar('Thread deleted successfully.');
+    }
   } catch (e) {
-    print('Error deleting thread: $e');
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Error deleting thread.')),
+    if (mounted) {
+      _showSnackbar('Error deleting thread: $e');
+    }
+  }
+}
+
+
+void _showSnackbar(String message) {
+  if (_scaffoldKey.currentState != null) {
+    ScaffoldMessenger.of(_scaffoldKey.currentContext!).showSnackBar(
+      SnackBar(content: Text(message)),
     );
   }
 }
+
 
 Future<void> _editThreadContent(String threadId, String currentContent) async {
   TextEditingController editController = TextEditingController(text: currentContent);

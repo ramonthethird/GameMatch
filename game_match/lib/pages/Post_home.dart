@@ -127,8 +127,8 @@ class _WelcomePageState extends State<WelcomePage> {
                 hintText: 'Search games...',
                 prefixIcon: const Icon(Icons.search),
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8.0),
-                  borderSide: BorderSide.none,
+                  borderRadius: BorderRadius.circular(10),
+                  //borderSide: BorderSide.none,
                 ),
                 filled: true,
                 fillColor: Theme.of(context).cardColor,

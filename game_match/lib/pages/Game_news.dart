@@ -97,6 +97,12 @@ class _GamingNewsPageState extends State<GamingNewsPage> {
       appBar: AppBar(
         title: Text('Gaming News', style: TextStyle(fontSize: 16, color: Colors.black),),
         centerTitle: true,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () {
+            Navigator.pop(context); // Navigate back to the previous screen
+          },
+        ),
       ),
       body: articles.isEmpty
           ? Center(child: CircularProgressIndicator())

@@ -35,7 +35,6 @@ class _BillingInfoPageState extends State<BillingInfoPage> {
           ),
         ),
         centerTitle: true,
-        //backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
@@ -53,9 +52,20 @@ class _BillingInfoPageState extends State<BillingInfoPage> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
                 const SizedBox(height: 10),
-                Image.asset(
-                  'assets/images/gamematchlogoresize.png', // Replace with your logo path
-                  height: 100,
+                ColorFiltered(
+                  colorFilter: Theme.of(context).brightness == Brightness.dark
+                      ? const ColorFilter.mode(
+                          Colors.white, // Makes the logo white in dark mode
+                          BlendMode.srcATop,
+                        )
+                      : const ColorFilter.mode(
+                          Colors.transparent, // No change in light mode
+                          BlendMode.srcOver,
+                        ),
+                  child: Image.asset(
+                    'assets/images/gamematchlogoresize.png', // Replace with your logo path
+                    height: 100,
+                  ),
                 ),
                 const SizedBox(height: 20),
                 const Text(
@@ -99,7 +109,7 @@ class _BillingInfoPageState extends State<BillingInfoPage> {
                 ElevatedButton(
                   onPressed: _submitBillingInfo,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xFF41B1F1),
+                    backgroundColor: const Color(0xFF41B1F1),
                     foregroundColor: Colors.white,
                   ),
                   child: const Text('Submit'),

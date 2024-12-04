@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:game_match/firestore_service.dart';
 import 'package:intl/intl.dart';
 
 class ThreadDetailPage extends StatefulWidget {
@@ -32,9 +33,11 @@ class ThreadDetailPage extends StatefulWidget {
 }
 
 class _ThreadDetailPageState extends State<ThreadDetailPage> {
+  String? threadUserId;
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final TextEditingController _commentController = TextEditingController();
   List<Map<String, dynamic>> comments = [];
+  final _firestoreService = FirestoreService(); // Add this line to define _firestoreService
   User? currentUser;
   bool isLoading = true;
   bool isThreadLiked = false;
@@ -42,6 +45,8 @@ class _ThreadDetailPageState extends State<ThreadDetailPage> {
   bool isSubscriptionLoading = true; // Track loading state of subscription check
   int threadLikes = 0;
   int commentCount = 0;
+  bool isCommenting = false; // Track whether a comment is being added
+
 
   @override
   void initState() {
@@ -52,6 +57,7 @@ class _ThreadDetailPageState extends State<ThreadDetailPage> {
     _fetchComments();
     _listenToCommentCount(); // Add listener for comments count
     _fetchSubscriptionStatus(); // Fetch subscription status for current user
+    _fetchThreadUserId(); // Fetch the user ID of the thread creator
   }
 
   Future<void> _fetchSubscriptionStatus() async {
@@ -168,46 +174,75 @@ class _ThreadDetailPageState extends State<ThreadDetailPage> {
   }
 
   Future<void> _addComment(String content) async {
-    if (content.isEmpty || !_isPaidUser) return; // Prevent empty or unauthorized comments
+  if (content.isEmpty || !_isPaidUser || isCommenting) return; // Prevent empty, unauthorized, or multiple comments
 
-    final user = _auth.currentUser;
-    if (user == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('You need to be logged in to comment.')),
-      );
-      return;
-    }
+  setState(() {
+    isCommenting = true; // Set commenting state to true
+  });
 
-    try {
-      final userSnapshot = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
-      final userData = userSnapshot.data() as Map<String, dynamic>?;
-
-      final userName = userData?['username'] ?? 'Anonymous';
-      final userAvatarUrl = userData?['profileImageUrl'];
-
-      await FirebaseFirestore.instance
-          .collection('threads')
-          .doc(widget.threadId)
-          .collection('comments')
-          .add({
-        'userId': user.uid,
-        'userName': userName,
-        'userAvatarUrl': userAvatarUrl,
-        'content': content,
-        'timestamp': FieldValue.serverTimestamp(),
-        'likedBy': [],
-        'likes': 0,
-      });
-
-      _commentController.clear();
-      _fetchComments();
-    } catch (e) {
-      print('Error adding comment: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to add comment. Please try again.')),
-      );
-    }
+  final user = _auth.currentUser;
+  if (user == null) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('You need to be logged in to comment.')),
+    );
+    setState(() {
+      isCommenting = false; // Reset commenting state
+    });
+    return;
   }
+
+  try {
+    final userSnapshot = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
+    final userData = userSnapshot.data() as Map<String, dynamic>?;
+
+    final userName = userData?['username'] ?? 'Anonymous';
+    final userAvatarUrl = userData?['profileImageUrl'];
+
+    await FirebaseFirestore.instance
+        .collection('threads')
+        .doc(widget.threadId)
+        .collection('comments')
+        .add({
+      'userId': user.uid,
+      'userName': userName,
+      'userAvatarUrl': userAvatarUrl,
+      'content': content,
+      'timestamp': FieldValue.serverTimestamp(),
+      'likedBy': [],
+      'likes': 0,
+    });
+
+    _commentController.clear();
+    _fetchComments();
+  } catch (e) {
+    print('Error adding comment: $e');
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Failed to add comment. Please try again.')),
+    );
+  } finally {
+    setState(() {
+      isCommenting = false; // Reset commenting state after submission
+    });
+  }
+}
+Future<void> _fetchThreadUserId() async {
+      try {
+        DocumentSnapshot threadSnapshot = await FirebaseFirestore.instance
+            .collection('threads')
+            .doc(widget.threadId)
+            .get();
+
+if (threadSnapshot.exists) {
+          setState(() {
+            threadUserId = threadSnapshot['userId'];
+          });
+        } else {
+          print('Thread does not exist');
+        }
+      } catch (e) {
+        print('Error fetching thread user ID: $e');
+      }
+    }
 
   Future<void> _deleteComment(String commentId) async {
 
@@ -392,7 +427,12 @@ class _ThreadDetailPageState extends State<ThreadDetailPage> {
                   children: [
                     Row(
                       children: [
-                        CircleAvatar(
+                        GestureDetector(
+                            onTap: () {
+                              // Pass the userId when navigating to the profile page
+                              Navigator.pushNamed(context, '/View_profile', arguments: threadUserId);
+                            },
+                          child: CircleAvatar(
                           backgroundColor: Colors.grey[300],
                           backgroundImage: widget.threadUserAvatarUrl != null && widget.threadUserAvatarUrl!.isNotEmpty
                             ? NetworkImage(widget.threadUserAvatarUrl!)
@@ -401,6 +441,7 @@ class _ThreadDetailPageState extends State<ThreadDetailPage> {
                           child: widget.threadUserAvatarUrl == null || widget.threadUserAvatarUrl!.isEmpty
                             ? Icon(Icons.person, color: Colors.grey)
                             : null,
+                          )
                         ),
                         SizedBox(width: 8),
                         Column(
@@ -620,12 +661,21 @@ class _ThreadDetailPageState extends State<ThreadDetailPage> {
                     ),
                   ),
                   IconButton(
-                    icon: Icon(Icons.send),
-                    color: Color(0xFF41B1F1),
-                    onPressed: _isPaidUser
-                        ? () => _addComment(_commentController.text.trim())
-                        : null,
-                  ),
+  icon: isCommenting
+      ? SizedBox(
+          height: 24,
+          width: 24,
+          child: CircularProgressIndicator(
+            color: Color(0xFF41B1F1),
+            strokeWidth: 2.0,
+          ),
+        )
+      : Icon(Icons.send),
+  color: Color(0xFF41B1F1),
+  onPressed: _isPaidUser && !isCommenting
+      ? () => _addComment(_commentController.text.trim())
+      : null,
+),
                 ],
               ),
             ),
