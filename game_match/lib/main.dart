@@ -162,7 +162,7 @@ class GameMatchApp extends StatelessWidget {
             '/swiping_games': (context) => const SwipePage(),
             '/Reviews': (context) => SubmittedReviewsPage(),
             '/Subscription': (context) => SubscriptionManagementScreen(),
-            '/SubscriptionPremium' : (context) => const PremiumSubscriptionPage(),
+            '/SubscriptionPremium': (context) => const premium.PremiumSubscriptionPage(), 
             '/Billing_info': (context) => const BillingInfoPage(),
             '/New_Releases': (context) =>
                 const NewReleasesGames(), // Route to TopRatedGames widget
