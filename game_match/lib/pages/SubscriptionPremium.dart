@@ -25,16 +25,17 @@ class _PremiumSubscriptionPageState extends State<PremiumSubscriptionPage> {
   // Fetch the subscription expiration date from Firestore and calculate remaining days
   Future<void> _fetchRemainingDays() async {
     User? currentUser = FirebaseAuth.instance.currentUser;
+
     if (currentUser != null) {
-      DocumentSnapshot userDoc = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(currentUser.uid)
-          .get();
+      try {
+        DocumentSnapshot userDoc = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(currentUser.uid)
+            .get();
 
-      if (userDoc.exists) {
-        var expirationData = userDoc['subscriptionExpirationDate'];
+        if (userDoc.exists) {
+          var expirationData = userDoc['subscriptionExpirationDate'];
 
-        try {
           DateTime expirationDate;
           if (expirationData is Timestamp) {
             expirationDate = expirationData.toDate();
@@ -53,13 +54,17 @@ class _PremiumSubscriptionPageState extends State<PremiumSubscriptionPage> {
           setState(() {
             remainingDays = daysLeft > 0
                 ? "$daysLeft days left until renewal"
-                : "Your subscription has expired";
+                : "Your subscription has expired.";
           });
-        } catch (e) {
+        } else {
           setState(() {
-            remainingDays = "Error parsing expiration date.";
+            remainingDays = "No subscription information available.";
           });
         }
+      } catch (e) {
+        setState(() {
+          remainingDays = "Error fetching subscription details: $e";
+        });
       }
     }
   }
@@ -67,6 +72,7 @@ class _PremiumSubscriptionPageState extends State<PremiumSubscriptionPage> {
   @override
   Widget build(BuildContext context) {
     final themeNotifier = Provider.of<ThemeNotifier>(context);
+
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
@@ -80,7 +86,7 @@ class _PremiumSubscriptionPageState extends State<PremiumSubscriptionPage> {
           'Manage Subscription',
           style: TextStyle(
             color: Colors.black,
-            fontSize: 16,
+            fontSize: 24,
           ),
         ),
         centerTitle: true,
@@ -100,18 +106,35 @@ class _PremiumSubscriptionPageState extends State<PremiumSubscriptionPage> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Image.asset(
-              'assets/images/premium-sub.png', // Update the path with your image
+              'assets/images/premium-sub.png', // Ensure this path is correct
               height: 200,
+              errorBuilder: (context, error, stackTrace) {
+                return const Placeholder(
+                  fallbackHeight: 200,
+                  fallbackWidth: double.infinity,
+                );
+              },
             ),
             const SizedBox(height: 20),
-            // Removed the "Subscription Status" text here
-            // Square, non-clickable "Manage Subscription" button with black text and light gray background
+            const Text(
+              'Subscription Status',
+              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 20),
+            Text(
+              remainingDays,
+              style: const TextStyle(fontSize: 16, color: Colors.black),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 20),
+            // Non-clickable "Manage Subscription" button
             Container(
               padding: const EdgeInsets.symmetric(vertical: 16.0),
               alignment: Alignment.center,
               decoration: BoxDecoration(
                 color: const Color(0xFFE0E0E0), // Light gray background color
-                borderRadius: BorderRadius.circular(8.0), // Square with rounded corners
+                borderRadius: BorderRadius.circular(8.0),
               ),
               child: const Text(
                 'Manage Subscription',
@@ -124,24 +147,11 @@ class _PremiumSubscriptionPageState extends State<PremiumSubscriptionPage> {
             ),
             const SizedBox(height: 10),
             ListTile(
-              leading: const Icon(Icons.swap_horiz, color: Color(0xFF41B1F1)),
+              leading: const Icon(Icons.swap_horiz),
               title: const Text('Update billing information'),
               trailing: ElevatedButton(
                 onPressed: () {
-                  Navigator.pushNamed(
-                    context,
-                    '/Billing_info',
-                    arguments: {
-                      'creditCard': '1234 5678 9012 3456',
-                      'expDate': '12/24',
-                      'securityCode': '123',
-                      'streetAddress': '123 Main St',
-                      'city': 'Anytown',
-                      'state': 'CA',
-                      'zipCode': '12345',
-                      'country': 'USA'
-                    },
-                  );
+                  Navigator.pushNamed(context, '/Billing_info');
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF41B1F1),
@@ -154,12 +164,10 @@ class _PremiumSubscriptionPageState extends State<PremiumSubscriptionPage> {
               ),
             ),
             ListTile(
-              leading: const Icon(Icons.cancel, color: Color(0xFF41B1F1)),
+              leading: const Icon(Icons.cancel),
               title: const Text('Cancel Subscription'),
               trailing: ElevatedButton(
-                onPressed: () {
-                  _showCancelConfirmationDialog();
-                },
+                onPressed: _showCancelConfirmationDialog,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF41B1F1),
                   foregroundColor: Colors.white,
@@ -194,13 +202,13 @@ class _PremiumSubscriptionPageState extends State<PremiumSubscriptionPage> {
               onPressed: () {
                 Navigator.pushNamed(context, "/Terms");
               },
-              child: const Text('Terms and Conditions',style: TextStyle(color: Color(0xFF41B1F1)),),
+              child: const Text('Terms and Conditions'),
             ),
             TextButton(
               onPressed: () {
                 Navigator.pushNamed(context, "/Privacy");
               },
-              child: const Text('Privacy Policy',style: TextStyle(color: Color(0xFF41B1F1)),),
+              child: const Text('Privacy Policy'),
             ),
           ],
         ),
@@ -210,44 +218,36 @@ class _PremiumSubscriptionPageState extends State<PremiumSubscriptionPage> {
 
   // Method to show a confirmation dialog for cancelling subscription
   void _showCancelConfirmationDialog() {
-  bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
-
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        title: const Text('Cancel Subscription'),
-        content: Text(
-          'Are you sure you want to cancel your subscription?\n\n$remainingDays',
-        ),
-        actions: <Widget>[
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop(); // Close the dialog
-            },
-            child: Text(
-              'No',
-              style: TextStyle(color: isDarkMode ? Colors.white : Colors.black),
-            ),
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Cancel Subscription'),
+          content: Text(
+            'Are you sure you want to cancel your subscription?\n\n$remainingDays',
           ),
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop(); // Close the dialog
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Subscription cancelled successfully.'),
-                  backgroundColor: Color(0xFF41B1F1), // Set snackbar color to match app color
-                ),
-              );
-            },
-            child: Text(
-              'Yes',
-              style: TextStyle(color: isDarkMode ? Colors.white : Colors.black),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+              child: const Text('No', style: TextStyle(color: Colors.black)),
             ),
-          ),
-        ],
-      );
-    },
-  );
-}
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Subscription cancelled successfully.'),
+                    backgroundColor: Color(0xFF41B1F1),
+                  ),
+                );
+              },
+              child: const Text('Yes', style: TextStyle(color: Colors.black)),
+            ),
+          ],
+        );
+      },
+    );
+  }
 }
